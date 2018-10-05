@@ -42,7 +42,8 @@ export default class Game extends Component {
       commands: [],
       subscribe: false,
       subscribed: false,
-      context: null
+      context: null,
+      activeView: null
     }
   }
 
@@ -290,7 +291,9 @@ export default class Game extends Component {
 
   render () {
     return (
-      <canvas width='300' height='600' ref={this.canvasRef} style={{outline: '2px solid black', margin:'24px auto', display: 'block'}} />
+      <main>
+        <canvas width='300' height='600' ref={this.canvasRef} style={{outline: '2px solid black', margin:'24px auto', display: 'block'}} />
+      </main>
     )
   }
 }
