@@ -9,6 +9,7 @@ import Waiting from '../views/display/waiting'
 import WaitingToStart from '../views/display/waitingToStart'
 import Game from '../views/display/game'
 import GameOver from '../views/display/gameOver'
+import { PETER_RIVER } from '../lib/styles/colors'
 
 export default class Display extends Component {
   state = {
@@ -16,7 +17,7 @@ export default class Display extends Component {
     subscribe: false,
     subscribed: false,
     context: null,
-    activeView: DISPALY_GAME_OVER,
+    activeView: DISPLAY_GAME,
     score: 0
   }
 
@@ -69,6 +70,15 @@ export default class Display extends Component {
               return <GameOver score={score} />
           }
         })()}
+        <style jsx>{`
+          main {
+            background-color: ${PETER_RIVER};
+            background-image: url('/static/r-symbol.png');
+            background-size: 50px;
+            background-repeat: no-repeat;
+            background-position: 1vw 1vw;
+          }
+        `}</style>
       </main>
     )
   }

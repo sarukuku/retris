@@ -29,7 +29,7 @@ const shapes = [
       1, 1, 1 ]
 ];
 const colors = [
-  'cyan', 'orange', 'blue', 'yellow', 'red', 'green', 'purple'
+  '#2ecc71', '#34495e', '#9b59b6', '#f1c40f', '#e74c3c', '#e67e22', '#1abc9c'
 ]
 const W = 300
 const H = 600
@@ -287,27 +287,33 @@ export default class DisplayGame extends Component {
     `
 
     return (
-      <React.Fragment>
+      <div className='wrap'>
         <canvas width='300' height='600' ref={this.canvasRef} />
         <h1>Score: {score}</h1>
         <JoinHelpBar className={className} />
         {styles}
         <style jsx>{`
+          .wrap {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            text-align: center;
+            justify-content: center;
+            align-items: center;
+          }
+
           canvas {
-            width: 300;
-            height: 600;
             outline: 2px solid black;
-            margin: 24px auto;
             display: block;
           }
 
           h1 {
             position: absolute;
-            top: 2vh;
-            left: 2vw;
+            top: 1vw;
+            right: 1vw;
           }
         `}</style>
-      </React.Fragment>
+      </div>
     )
   }
 }

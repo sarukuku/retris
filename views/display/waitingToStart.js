@@ -20,7 +20,6 @@ export default class DisplayWaitingToStart extends Component {
           .wrap {
             width: 100%;
             height: 100vh;
-            background: gray;
             display: flex;
             text-align: center;
             justify-content: center;
