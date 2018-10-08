@@ -158,6 +158,7 @@ export default class DisplayGame extends Component {
       }
     }
     freezed = true;
+    this.props.addToScore(10)
   }
 
   // returns rotates the rotated shape 'current' perpendicularly anticlockwise
@@ -225,6 +226,7 @@ export default class DisplayGame extends Component {
   }
 
   newGame = () => {
+    this.props.resetScore()
     this.clearAllIntervals();
     intervalRender = setInterval( this.renderTetris, 30 );
     this.init();
@@ -273,11 +275,12 @@ export default class DisplayGame extends Component {
   // END TETRIS FUNCTIONS
 
   render () {
-    let { activeView } = this.state
+    let { score } = this.props
 
     return (
       <React.Fragment>
         <canvas width='300' height='600' ref={this.canvasRef} />
+        <h1>Score: {score}</h1>
         <style jsx>{`
           canvas {
             width: 300;
@@ -285,6 +288,12 @@ export default class DisplayGame extends Component {
             outline: 2px solid black;
             margin: 24px auto;
             display: block;
+          }
+
+          h1 {
+            position: absolute;
+            top: 2vh;
+            left: 2vw;
           }
         `}</style>
       </React.Fragment>

@@ -5,7 +5,7 @@ export default class DisplayWaiting extends Component {
   render () {
     return (
       <div className='wrap'>
-        <h1>{`Go to ${ (isBrowser()) ? window.location.origin : '...'} to start playing!`}</h1>
+        <h1>{`Go to ${ (isBrowser()) ? window.location.origin : '...'} to start playing! 🎮`}</h1>
         <style jsx>{`
           .wrap {
             width: 100%;

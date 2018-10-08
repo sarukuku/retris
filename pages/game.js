@@ -1,8 +1,8 @@
 import { Component } from 'react'
 import {
   DISPLAY_WAITING,
-  DISPLAY_GAME,
   DISPLAY_WAITING_TO_START,
+  DISPLAY_GAME,
   DISPALY_GAME_OVER
 } from '../lib/views'
 import Waiting from '../views/display/waiting'
@@ -16,7 +16,8 @@ export default class Display extends Component {
     subscribe: false,
     subscribed: false,
     context: null,
-    activeView: DISPLAY_WAITING
+    activeView: DISPALY_GAME_OVER,
+    score: 0
   }
 
   static getDerivedStateFromProps (props, state) {
@@ -35,8 +36,18 @@ export default class Display extends Component {
     this.props.socket.off('commands', callbackFunc)
   }
 
+  addToScore = integer => {
+    this.setState(prevState => {
+      return { score: prevState.score + integer }
+    })
+  }
+
+  resetScore = () => {
+    this.setState({ score: 0 })
+  }
+
   render () {
-    let { activeView } = this.state
+    let { activeView, score } = this.state
 
     return (
       <main>
@@ -50,9 +61,12 @@ export default class Display extends Component {
               return <Game
                        subscribeToCommands={this.subscribeToCommands}
                        unsubscribeFromCommands={this.unsubscribeFromCommands}
+                       addToScore={this.addToScore}
+                       resetScore={this.resetScore}
+                       score={score}
                      />
             case DISPALY_GAME_OVER:
-              return <GameOver />
+              return <GameOver score={score} />
           }
         })()}
       </main>
