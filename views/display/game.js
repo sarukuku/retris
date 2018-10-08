@@ -1,17 +1,17 @@
 import { Component } from 'react'
 import { LEFT, RIGHT, DOWN, DROP, ROTATE } from '../../lib/commands'
 
-var COLS = 10
-var ROWS = 20
-var board = []
-var lose
-var interval
-var intervalRender
-var current // current moving shape
-var currentX
-var currentY // position of current shape
-var freezed // is current shape settled on the board?
-var shapes = [
+const COLS = 10
+const ROWS = 20
+let board = []
+let lose
+let interval
+let intervalRender
+let current // current moving shape
+let currentX
+let currentY // position of current shape
+let freezed // is current shape settled on the board?
+const shapes = [
     [ 1, 1, 1, 1 ],
     [ 1, 1, 1, 0,
       1 ],
@@ -26,13 +26,13 @@ var shapes = [
     [ 0, 1, 0, 0,
       1, 1, 1 ]
 ];
-var colors = [
+const colors = [
   'cyan', 'orange', 'blue', 'yellow', 'red', 'green', 'purple'
 ]
-var W = 300
-var H = 600
-var BLOCK_W = W / COLS
-var BLOCK_H = H / ROWS
+const W = 300
+const H = 600
+const BLOCK_W = W / COLS
+const BLOCK_H = H / ROWS
 
 export default class DisplayGame extends Component {
   constructor(props) {
@@ -61,28 +61,28 @@ export default class DisplayGame extends Component {
     switch ( command.value ) {
       case LEFT:
         if ( this.valid( -1 ) ) {
-            --currentX;
+          --currentX;
         }
         break;
       case RIGHT:
         if ( this.valid( 1 ) ) {
-            ++currentX;
+           ++currentX;
         }
         break;
       case DOWN:
         if ( this.valid( 0, 1 ) ) {
-            ++currentY;
+          ++currentY;
         }
         break;
       case ROTATE:
-        var rotated = this.rotate( current );
+        const rotated = this.rotate( current );
         if ( this.valid( 0, 0, rotated ) ) {
-            current = rotated;
+          current = rotated;
         }
         break;
       case DROP:
         while( this.valid(0, 1) ) {
-            ++currentY;
+          ++currentY;
         }
         this.tick();
         break;
@@ -96,21 +96,21 @@ export default class DisplayGame extends Component {
   // creates a new 4x4 shape in global variable 'current'
   // 4x4 so as to cover the size when the shape is rotated
   newShape = () => {
-    var id = Math.floor( Math.random() * shapes.length );
-    var shape = shapes[ id ]; // maintain id for color filling
+    let id = Math.floor( Math.random() * shapes.length );
+    let shape = shapes[ id ]; // maintain id for color filling
 
     current = [];
-    for ( var y = 0; y < 4; ++y ) {
-        current[ y ] = [];
-        for ( var x = 0; x < 4; ++x ) {
-            var i = 4 * y + x;
-            if ( typeof shape[ i ] != 'undefined' && shape[ i ] ) {
-                current[ y ][ x ] = id + 1;
-            }
-            else {
-                current[ y ][ x ] = 0;
-            }
+    for ( let y = 0; y < 4; ++y ) {
+      current[ y ] = [];
+      for ( let x = 0; x < 4; ++x ) {
+        const i = 4 * y + x;
+        if ( typeof shape[ i ] != 'undefined' && shape[ i ] ) {
+          current[ y ][ x ] = id + 1;
         }
+        else {
+          current[ y ][ x ] = 0;
+        }
+      }
     }
     
     // new shape starts to move
@@ -122,11 +122,11 @@ export default class DisplayGame extends Component {
 
   // clears the board
   init = () => {
-    for ( var y = 0; y < ROWS; ++y ) {
-        board[ y ] = [];
-        for ( var x = 0; x < COLS; ++x ) {
-            board[ y ][ x ] = 0;
-        }
+    for ( let y = 0; y < ROWS; ++y ) {
+      board[ y ] = [];
+      for ( let x = 0; x < COLS; ++x ) {
+        board[ y ][ x ] = 0;
+      }
     }
   }
 
@@ -150,24 +150,24 @@ export default class DisplayGame extends Component {
 
   // stop shape at its position and fix it to board
   freeze = () => {
-    for ( var y = 0; y < 4; ++y ) {
-        for ( var x = 0; x < 4; ++x ) {
-            if ( current[ y ][ x ] ) {
-                board[ y + currentY ][ x + currentX ] = current[ y ][ x ];
-            }
+    for ( let y = 0; y < 4; ++y ) {
+      for ( let x = 0; x < 4; ++x ) {
+        if ( current[ y ][ x ] ) {
+          board[ y + currentY ][ x + currentX ] = current[ y ][ x ];
         }
+      }
     }
     freezed = true;
   }
 
   // returns rotates the rotated shape 'current' perpendicularly anticlockwise
   rotate = current => {
-    var newCurrent = [];
-    for ( var y = 0; y < 4; ++y ) {
-        newCurrent[ y ] = [];
-        for ( var x = 0; x < 4; ++x ) {
-            newCurrent[ y ][ x ] = current[ 3 - x ][ y ];
-        }
+    let newCurrent = [];
+    for ( let y = 0; y < 4; ++y ) {
+      newCurrent[ y ] = [];
+      for ( let x = 0; x < 4; ++x ) {
+        newCurrent[ y ][ x ] = current[ 3 - x ][ y ];
+      }
     }
 
     return newCurrent;
@@ -175,23 +175,22 @@ export default class DisplayGame extends Component {
 
   // check if any lines are filled and clear them
   clearLines = () => {
-    for ( var y = ROWS - 1; y >= 0; --y ) {
-        var rowFilled = true;
-        for ( var x = 0; x < COLS; ++x ) {
-            if ( board[ y ][ x ] == 0 ) {
-                rowFilled = false;
-                break;
-            }
+    for ( let y = ROWS - 1; y >= 0; --y ) {
+      let rowFilled = true;
+      for ( let x = 0; x < COLS; ++x ) {
+        if ( board[ y ][ x ] == 0 ) {
+          rowFilled = false;
+          break;
         }
-        if ( rowFilled ) {
-            //document.getElementById( 'clearsound' ).play();
-            for ( var yy = y; yy > 0; --yy ) {
-                for ( var x = 0; x < COLS; ++x ) {
-                    board[ yy ][ x ] = board[ yy - 1 ][ x ];
-                }
-            }
-            ++y;
+      }
+      if ( rowFilled ) {
+        for ( let yy = y; yy > 0; --yy ) {
+          for ( let x = 0; x < COLS; ++x ) {
+            board[ yy ][ x ] = board[ yy - 1 ][ x ];
+          }
         }
+        ++y;
+      }
     }
   }
 
@@ -203,22 +202,24 @@ export default class DisplayGame extends Component {
     offsetY = currentY + offsetY;
     newCurrent = newCurrent || current;
 
-    for ( var y = 0; y < 4; ++y ) {
-        for ( var x = 0; x < 4; ++x ) {
-            if ( newCurrent[ y ][ x ] ) {
-                if ( typeof board[ y + offsetY ] == 'undefined'
-                  || typeof board[ y + offsetY ][ x + offsetX ] == 'undefined'
-                  || board[ y + offsetY ][ x + offsetX ]
-                  || x + offsetX < 0
-                  || y + offsetY >= ROWS
-                  || x + offsetX >= COLS ) {
-                    if (offsetY == 1 && freezed) {
-                        lose = true; // lose if the current shape is settled at the top most row
-                    } 
-                    return false;
-                }
+    for ( let y = 0; y < 4; ++y ) {
+      for ( let x = 0; x < 4; ++x ) {
+        if ( newCurrent[ y ][ x ] ) {
+          if (
+            typeof board[ y + offsetY ] == 'undefined'
+            || typeof board[ y + offsetY ][ x + offsetX ] == 'undefined'
+            || board[ y + offsetY ][ x + offsetX ]
+            || x + offsetX < 0
+            || y + offsetY >= ROWS
+            || x + offsetX >= COLS
+          ) {
+            if (offsetY == 1 && freezed) {
+              lose = true; // lose if the current shape is settled at the top most row
             }
+            return false;
+          }
         }
+      }
     }
     return true;
   }
@@ -248,24 +249,24 @@ export default class DisplayGame extends Component {
     this.state.context.clearRect( 0, 0, W, H );
 
     this.state.context.strokeStyle = 'black';
-    for ( var x = 0; x < COLS; ++x ) {
-        for ( var y = 0; y < ROWS; ++y ) {
-            if ( board[ y ][ x ] ) {
-                this.state.context.fillStyle = colors[ board[ y ][ x ] - 1 ];
-                this.drawBlock( x, y );
-            }
+    for ( let x = 0; x < COLS; ++x ) {
+      for ( let y = 0; y < ROWS; ++y ) {
+        if ( board[ y ][ x ] ) {
+          this.state.context.fillStyle = colors[ board[ y ][ x ] - 1 ];
+          this.drawBlock( x, y );
         }
+      }
     }
 
     this.state.context.fillStyle = 'red';
     this.state.context.strokeStyle = 'black';
-    for ( var y = 0; y < 4; ++y ) {
-        for ( var x = 0; x < 4; ++x ) {
-            if ( current[ y ][ x ] ) {
-                this.state.context.fillStyle = colors[ current[ y ][ x ] - 1 ];
-                this.drawBlock( currentX + x, currentY + y );
-            }
+    for ( let y = 0; y < 4; ++y ) {
+      for ( let x = 0; x < 4; ++x ) {
+        if ( current[ y ][ x ] ) {
+          this.state.context.fillStyle = colors[ current[ y ][ x ] - 1 ];
+          this.drawBlock( currentX + x, currentY + y );
         }
+      }
     }
   }
 
