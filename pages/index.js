@@ -31,7 +31,6 @@ export default class GameController extends Component {
   }
 
   updateGameState = newState => {
-    console.log(newState)
     const { queue, currentPlayerId, gameRunning } = JSON.parse(newState);
     if (!gameRunning) this.reset();
     else this.setState({ queue, currentPlayerId, gameRunning });

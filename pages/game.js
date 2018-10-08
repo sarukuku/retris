@@ -23,10 +23,6 @@ export default class Display extends Component {
     this.props.socket.emit('createGame')
   }
 
-  componentDidUpdate() {
-    this.props.socket.emit('createGame')
-  }
-
   addToScore = integer => {
     this.setState(prevState => {
       return { score: prevState.score + integer }
