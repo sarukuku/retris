@@ -8,12 +8,43 @@ const dev = process.env.NODE_ENV !== 'production'
 const nextApp = next({ dev })
 const nextHandler = nextApp.getRequestHandler()
 
-// socket.io server
+const db = {
+  queue: [],
+  currentPlayerId: null
+}
+
+const queueIsEmpty = () => db.queue.length === 0;
+
+const sendGameState = (socket) => {
+  io.emit('gameState', JSON.stringify(db));
+}
+
+const joinGame = socket => {
+  if (queueIsEmpty()) db.currentPlayerId = socket.id;
+  db.queue.push(socket.id);
+  sendGameState(socket);
+}
+
+const removeIdFromQueue = removeId => db.queue = db.queue.filter(id => id !== removeId);
+
+const leaveGame = socket => {
+  removeIdFromQueue(socket.id);
+  if (socket.id === db.currentPlayerId) {
+    db.currentPlayerId = db.queue[0];
+  }
+  sendGameState(socket);
+}
+
 io.on('connection', socket => {
+  joinGame(socket)
   socket.on('commands', (data) => {
-    socket.broadcast.emit('commands', data)
-  })
-})
+    socket.broadcast.emit('commands', data);
+  });
+
+  socket.on('disconnect', () => {
+    leaveGame(socket);
+  });
+});
 
 nextApp.prepare().then(() => {
   app.get('*', (req, res) => {

@@ -5,12 +5,40 @@ let commandCounter = 0
 
 export default class GameController extends Component {
   state = {
-    subscribe: false
+    subscribe: false,
+    subscribed: false,
+    queue: null,
+    currentPlayerId: null,
+    thisId: null
   }
 
-  static getDerivedStateFromProps (props, state) {
+  static getDerivedStateFromProps(props, state) {
     if (props.socket && !state.subscribe) return { subscribe: true }
-    return null
+    return null;
+  }
+
+  subscribe = () => {
+    if (this.state.subscribe && !this.state.subscribed) {
+      this.props.socket.on('gameState', this.updateGameState);
+      this.props.socket.on('connect', () => {
+        this.setState({ thisId: this.props.socket.id })
+      });
+      this.setState({ subscribed: true });
+    }
+  }
+
+  componentDidMount() {
+    this.subscribe()
+  }
+
+  componentDidUpdate() {
+    this.subscribe()
+  }
+
+  updateGameState = newState => {
+    const { queue, currentPlayerId } = JSON.parse(newState);
+    this.setState({ queue, currentPlayerId });
+    console.dir(this.state);
   }
 
   createCommand = value => {
@@ -42,7 +70,7 @@ export default class GameController extends Component {
     this.sendCommand(DOWN)
   }
 
-  render () {
+  render() {
     return (
       <Swipeable
         onSwipedRight={this.onSwipeRight}
@@ -51,7 +79,7 @@ export default class GameController extends Component {
         stopPropagation={true}
         delta={50}
       >
-        <main style={{width: '100%', height: '100%', position: 'fixed', backgroundColor: 'green'}} onClick={this.onTap}>
+        <main style={{ width: '100%', height: '100%', position: 'fixed', backgroundColor: 'green' }} onClick={this.onTap}>
           <ul>
             <li>Tap to rotate</li>
             <li>Swipe left or right to move sideways</li>
