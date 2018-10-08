@@ -37,8 +37,12 @@ const leaveGame = socket => {
 
 io.on('connection', socket => {
   joinGame(socket)
-  socket.on('commands', (data) => {
+  socket.on('commands', data => {
     socket.broadcast.emit('commands', data);
+  });
+
+  socket.on('start', () => {
+    console.log('start')
   });
 
   socket.on('disconnect', () => {
