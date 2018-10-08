@@ -1,5 +1,7 @@
 import { Component } from 'react'
 import { LEFT, RIGHT, DOWN, DROP, ROTATE } from '../../lib/commands'
+import JoinHelpBar from '../../components/joinHelpBar'
+import css from 'styled-jsx/css'
 
 const COLS = 10
 const ROWS = 20
@@ -277,10 +279,19 @@ export default class DisplayGame extends Component {
   render () {
     let { score } = this.props
 
+    const { className, styles } = css.resolve`
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+    `
+
     return (
       <React.Fragment>
         <canvas width='300' height='600' ref={this.canvasRef} />
         <h1>Score: {score}</h1>
+        <JoinHelpBar className={className} />
+        {styles}
         <style jsx>{`
           canvas {
             width: 300;

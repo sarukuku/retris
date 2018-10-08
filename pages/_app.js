@@ -3,6 +3,8 @@ import React from 'react'
 import io from 'socket.io-client'
 import Head from 'next/head'
 import '../node_modules/normalize.css/normalize.css'
+import { JOSEFIN } from '../lib/styles/fonts'
+import { BLACK } from '../lib/styles/colors'
 
 class MyApp extends App {
   static async getInitialProps ({ Component, ctx }) {
@@ -34,11 +36,14 @@ class MyApp extends App {
       <Container>
         <Head>
           <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, shrink-to-fit=no" />
+          <link href="https://fonts.googleapis.com/css?family=Josefin+Sans:400,700" rel="stylesheet"></link>
         </Head>
         <Component {...pageProps} socket={this.state.socket} />
         <style global jsx>{`
           body {
             overflow-y: hidden;
+            font-family: ${JOSEFIN};
+            color: ${BLACK};
           }
         `}</style>
       </Container>
