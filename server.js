@@ -8,22 +8,30 @@ const dev = process.env.NODE_ENV !== 'production'
 const nextApp = next({ dev })
 const nextHandler = nextApp.getRequestHandler()
 
+let hostId;
+
 const db = {
   queue: [],
   currentPlayerId: null
 }
 
-const queueIsEmpty = () => db.queue.length === 0;
+const clone = obj => JSON.parse(JSON.stringify(obj));
 
-const sendGameState = () => {
-  io. emit('gameState', JSON.stringify(db));
+const sendGameState = socket => {
+  // Use 'socket' param when sending the state to the single socket only.
+  const state = clone(db);
+  state.gameRunning = Boolean(hostId);
+  if (socket) socket.emit('gameState', JSON.stringify(state));
+  else io.emit('gameState', JSON.stringify(state));
 }
 
 const joinGame = socket => {
-  if (queueIsEmpty()) db.currentPlayerId = socket.id;
-  db.queue.push(socket.id);
-  sendGameState(socket);
-  socket.emit('gameJoined', socket.id);
+  if (db.queue.indexOf(socket.id) === -1) { // There apperars to be a slight change that joinGame triggers twice
+    if (db.queue.length === 0) db.currentPlayerId = socket.id;
+    db.queue.push(socket.id);
+    sendGameState();
+    socket.emit('gameJoined', socket.id);
+  }
 }
 
 const removeIdFromQueue = removeId => db.queue = db.queue.filter(id => id !== removeId);
@@ -33,16 +41,25 @@ const leaveGame = socket => {
   if (socket.id === db.currentPlayerId) {
     db.currentPlayerId = db.queue[0];
   }
-  sendGameState(socket);
+  if (socket.id === hostId) hostId = null;
+  sendGameState();
 }
 
 io.on('connection', socket => {
+  sendGameState(socket);
+
   socket.on('joinGame', () => {
     joinGame(socket)
   });
 
+  socket.on('createGame', () => {
+    hostId = socket.id;
+    sendGameState();
+  })
+
   socket.on('commands', data => {
-    socket.broadcast.emit('commands', data);
+    // send only to the host
+    io.to(hostId).emit('commands', data);
   });
 
   socket.on('start', () => {

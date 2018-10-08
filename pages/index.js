@@ -5,42 +5,36 @@ import JoinGame from '../views/controller/joinGame'
 
 export default class GameController extends Component {
   state = {
-    subscribe: false,
-    subscribed: false,
     queue: [],
     currentPlayerId: null,
     thisId: null,
-    gameRunning: false
-  }
-
-  static getDerivedStateFromProps(props, state) {
-    if (props.socket && !state.subscribe) return { subscribe: true }
-    return null;
-  }
-
-  subscribe = () => {
-    if (this.state.subscribe && !this.state.subscribed) {
-      this.props.socket.on('gameState', this.updateGameState);
-      this.props.socket.on('gameJoined', this.joinGame)
-      this.setState({ subscribed: true });
-    }
+    gameRunning: false, // 'Host' is present 
+    gameStarted: false // This player is playing the game
   }
 
   componentDidMount() {
-    this.subscribe()
+    this.props.socket.on('gameState', this.updateGameState);
+    this.props.socket.on('gameJoined', this.joinGame);
   }
 
   componentDidUpdate() {
-    this.subscribe()
+    this.props.socket.on('gameState', this.updateGameState);
+    this.props.socket.on('gameJoined', this.joinGame);
   }
 
   joinGame = id => {
     this.setState({ thisId: id })
   }
 
+  reset = () => {
+    this.setState({ queue: [], currentPlayerId: null, thisId: null, gameRunning: false, gameStarted: false });
+  }
+
   updateGameState = newState => {
-    const { queue, currentPlayerId } = JSON.parse(newState);
-    this.setState({ queue, currentPlayerId });
+    console.log(newState)
+    const { queue, currentPlayerId, gameRunning } = JSON.parse(newState);
+    if (!gameRunning) this.reset();
+    else this.setState({ queue, currentPlayerId, gameRunning });
   }
 
   isCurrentPlayer = () => {
@@ -48,20 +42,22 @@ export default class GameController extends Component {
   }
 
   start = () => {
-    this.setState({ gameRunning: true });
+    this.setState({ gameStarted: true });
   }
 
   stop = () => {
-    this.setState({ gameRunning: false });
+    this.setState({ gameStarted: false });
   }
 
   render() {
     return (
       <div>
         {(() => {
-          if (!this.state.thisId) {
+          if (!this.state.gameRunning) {
+            return (<div>Game is not running. Please try again.</div>)
+          } else if (!this.state.thisId) {
             return <JoinGame socket={this.props.socket} />;
-          } else if (this.isCurrentPlayer() && this.state.gameRunning) {
+          } else if (this.isCurrentPlayer() && this.state.gameStarted) {
             return <GameControls socket={this.props.socket} stop={this.stop} />;
           } else {
             return <GameQueue {...this.state} socket={this.props.socket} start={this.start} />;

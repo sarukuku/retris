@@ -7,7 +7,7 @@ import { JOSEFIN } from '../lib/styles/fonts'
 import { BLACK } from '../lib/styles/colors'
 
 class MyApp extends App {
-  static async getInitialProps ({ Component, ctx }) {
+  static async getInitialProps({ Component, ctx }) {
     let pageProps = {}
 
     if (Component.getInitialProps) {
@@ -21,24 +21,28 @@ class MyApp extends App {
     socket: null
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const socket = io()
-    this.setState({ socket })
+    socket.on('connect', () => {
+      this.setState({ socket })
+    })
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.state.socket.close()
   }
 
-  render () {
-    const {Component, pageProps} = this.props
+  render() {
+    const { Component, pageProps } = this.props
     return (
       <Container>
         <Head>
           <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, shrink-to-fit=no" />
           <link href="https://fonts.googleapis.com/css?family=Josefin+Sans:400,700" rel="stylesheet"></link>
         </Head>
-        <Component {...pageProps} socket={this.state.socket} />
+        {this.state.socket ? (
+          <Component {...pageProps} socket={this.state.socket} />
+        ) : (<div>loading...</div>)}
         <style global jsx>{`
           body {
             overflow-y: hidden;

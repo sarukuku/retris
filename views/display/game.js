@@ -47,18 +47,14 @@ export default class DisplayGame extends Component {
   
   componentDidMount () {
     this.setState({ context: this.canvasRef.current.getContext('2d') })
-    this.props.subscribeToCommands(this.handleCommand)
+    this.props.socket.on('commands', this.handleCommand)
     this.newGame()
   }
 
   componentDidUpdate () {
-    this.props.subscribeToCommands(this.handleCommand)
+    this.props.socket.on('commands', this.handleCommand)
   }
-
-  componentWillUnmount () {
-    this.props.unsubscribeFromCommands(this.handleCommand)
-  }
-
+  
   handleCommand = (command) => {
     switch ( command.value ) {
       case LEFT:

@@ -14,27 +14,17 @@ import { PETER_RIVER } from '../lib/styles/colors'
 export default class Display extends Component {
   state = {
     commands: [],
-    subscribe: false,
-    subscribed: false,
     context: null,
-    activeView: DISPLAY_GAME,
+    activeView: DISPLAY_WAITING,
     score: 0
   }
 
-  static getDerivedStateFromProps (props, state) {
-    if (props.socket && !state.subscribe) return { subscribe: true }
-    return null
+  componentDidMount() {
+    this.props.socket.emit('createGame')
   }
 
-  subscribeToCommands = callbackFunc => {
-    if (this.state.subscribe && !this.state.subscribed) {
-      this.props.socket.on('commands', callbackFunc)
-      this.setState({ subscribed: true })
-    }
-  }
-
-  unsubscribeFromCommands = callbackFunc => {
-    this.props.socket.off('commands', callbackFunc)
+  componentDidUpdate() {
+    this.props.socket.emit('createGame')
   }
 
   addToScore = integer => {
@@ -60,8 +50,7 @@ export default class Display extends Component {
               return <WaitingToStart />
             case DISPLAY_GAME:
               return <Game
-                       subscribeToCommands={this.subscribeToCommands}
-                       unsubscribeFromCommands={this.unsubscribeFromCommands}
+                       socket={this.props.socket}
                        addToScore={this.addToScore}
                        resetScore={this.resetScore}
                        score={score}
