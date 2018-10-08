@@ -4,7 +4,7 @@ export default class DisplayWaitingToStart extends Component {
   render () {
     return (
       <div className='wrap'>
-        <h1>Waiting for next player to start...</h1>
+        <h1>Waiting for next player in queue to start... 🤖</h1>
         <style jsx>{`
           .wrap {
             width: 100%;
