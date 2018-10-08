@@ -1,6 +1,7 @@
 import { Component } from 'react'
 import GameControls from '../views/controller/gameControls'
 import GameQueue from '../views/controller/queue'
+import JoinGame from '../views/controller/joinGame'
 
 export default class GameController extends Component {
   state = {
@@ -20,9 +21,7 @@ export default class GameController extends Component {
   subscribe = () => {
     if (this.state.subscribe && !this.state.subscribed) {
       this.props.socket.on('gameState', this.updateGameState);
-      this.props.socket.on('connect', () => {
-        this.setState({ thisId: this.props.socket.id })
-      });
+      this.props.socket.on('gameJoined', this.joinGame)
       this.setState({ subscribed: true });
     }
   }
@@ -35,10 +34,13 @@ export default class GameController extends Component {
     this.subscribe()
   }
 
+  joinGame = id => {
+    this.setState({ thisId: id })
+  }
+
   updateGameState = newState => {
     const { queue, currentPlayerId } = JSON.parse(newState);
     this.setState({ queue, currentPlayerId });
-    console.dir(this.state);
   }
 
   isCurrentPlayer = () => {
@@ -46,19 +48,25 @@ export default class GameController extends Component {
   }
 
   start = () => {
-    this.setState({ gameRunning: true});
+    this.setState({ gameRunning: true });
   }
 
   stop = () => {
-    this.setState({ gameRunning: false});
+    this.setState({ gameRunning: false });
   }
 
   render() {
     return (
       <div>
-        {(this.isCurrentPlayer() && this.state.gameRunning)? (
-          <GameControls socket={this.props.socket} stop={this.stop}/>
-        ) : (<GameQueue {...this.state} socket={this.props.socket} start={this.start}/>)}
+        {(() => {
+          if (!this.state.thisId) {
+            return <JoinGame socket={this.props.socket} />;
+          } else if (this.isCurrentPlayer() && this.state.gameRunning) {
+            return <GameControls socket={this.props.socket} stop={this.stop} />;
+          } else {
+            return <GameQueue {...this.state} socket={this.props.socket} start={this.start} />;
+          }
+        })()}
       </div>
     )
   }

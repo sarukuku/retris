@@ -15,14 +15,15 @@ const db = {
 
 const queueIsEmpty = () => db.queue.length === 0;
 
-const sendGameState = (socket) => {
-  io.emit('gameState', JSON.stringify(db));
+const sendGameState = () => {
+  io. emit('gameState', JSON.stringify(db));
 }
 
 const joinGame = socket => {
   if (queueIsEmpty()) db.currentPlayerId = socket.id;
   db.queue.push(socket.id);
   sendGameState(socket);
+  socket.emit('gameJoined', socket.id);
 }
 
 const removeIdFromQueue = removeId => db.queue = db.queue.filter(id => id !== removeId);
@@ -36,7 +37,10 @@ const leaveGame = socket => {
 }
 
 io.on('connection', socket => {
-  joinGame(socket)
+  socket.on('joinGame', () => {
+    joinGame(socket)
+  });
+
   socket.on('commands', data => {
     socket.broadcast.emit('commands', data);
   });
