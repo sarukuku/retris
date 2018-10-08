@@ -7,7 +7,7 @@ export default class GameController extends Component {
   state = {
     subscribe: false,
     subscribed: false,
-    queue: null,
+    queue: [],
     currentPlayerId: null,
     thisId: null
   }
@@ -70,6 +70,18 @@ export default class GameController extends Component {
     this.sendCommand(DOWN)
   }
 
+  isCurrentPlayer = () => {
+    return this.state.currentPlayerId === this.state.thisId;
+  }
+
+  queuePosition = () => {
+    const pos = '' + this.state.queue.indexOf(this.state.thisId);
+    if (pos.endsWith('1')) return `${pos}st`;
+    else if (pos.endsWith('2')) return `${pos}nd`;
+    else if (pos.endsWith('3')) return `${pos}rd`;
+    else return `${pos}th`;
+  }
+
   render() {
     return (
       <Swipeable
@@ -80,6 +92,11 @@ export default class GameController extends Component {
         delta={50}
       >
         <main style={{ width: '100%', height: '100%', position: 'fixed', backgroundColor: 'green' }} onClick={this.onTap}>
+          {this.isCurrentPlayer() ? (
+            <p>You are the next player. Press start to begin when ready.</p>
+          ) : (
+              <p>You are {this.queuePosition()} in the queue</p>
+            )}
           <ul>
             <li>Tap to rotate</li>
             <li>Swipe left or right to move sideways</li>
