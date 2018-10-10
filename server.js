@@ -19,6 +19,10 @@ const db = {
 
 const clone = obj => JSON.parse(JSON.stringify(obj));
 
+const removeIdFromQueue = removeId => db.queue = db.queue.filter(id => id !== removeId);
+
+const sendToHost = (command, data) => io.to(hostId).emit(command, data);
+
 const sendGameState = socket => {
   // Use 'socket' param when sending the state to the single socket only.
   const state = clone(db);
@@ -36,8 +40,6 @@ const joinGame = socket => {
   }
 }
 
-const removeIdFromQueue = removeId => db.queue = db.queue.filter(id => id !== removeId);
-
 const leaveGame = id => {
   removeIdFromQueue(id);
   if (id === db.currentPlayerId) {
@@ -47,8 +49,16 @@ const leaveGame = id => {
   sendGameState();
 }
 
-const sendToHost = (command, data) => {
-  io.to(hostId).emit(command, data);
+const gameOver = () => {
+  leaveGame(db.currentPlayerId);
+  const goToView = (!db.currentPlayerId && !db.queue.length)
+    ? gameStates.DISPLAY_WAITING
+    : gameStates.DISPLAY_WAITING_TO_START;
+  const data = {
+    queueLength: db.queue.length,
+    goToView: goToView
+  }
+  sendToHost('hostState', JSON.stringify(data));
 }
 
 io.on('connection', socket => {
@@ -68,17 +78,7 @@ io.on('connection', socket => {
   });
 
   socket.on('gameOver', () => {
-    if (socket.id === hostId) {
-      leaveGame(db.currentPlayerId);
-      const goToView = (!db.currentPlayerId && !db.queue.length)
-        ? gameStates.DISPLAY_WAITING
-        : gameStates.DISPLAY_WAITING_TO_START;
-      const data = {
-        queueLength: db.queue.length,
-        goToView: goToView
-      }
-      sendToHost('hostState', JSON.stringify(data));
-    }
+    if (socket.id === hostId) gameOver();
   });
 
   socket.on('start', () => {
