@@ -44,15 +44,20 @@ export default class DisplayGame extends Component {
       context: null
     }
   }
+
+  addListenerOnce(name, callback) {
+    this.props.socket.off(name);
+    this.props.socket.on(name, callback);
+  }
   
   componentDidMount () {
     this.setState({ context: this.canvasRef.current.getContext('2d') })
-    this.props.socket.on('commands', this.handleCommand)
+    this.addListenerOnce('commands', this.handleCommand)
     this.newGame()
   }
 
   componentDidUpdate () {
-    this.props.socket.on('commands', this.handleCommand)
+    this.addListenerOnce('commands', this.handleCommand)
   }
   
   handleCommand = (command) => {

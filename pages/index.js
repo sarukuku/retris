@@ -12,14 +12,19 @@ export default class GameController extends Component {
     gameStarted: false // This player is playing the game
   }
 
+  addListenerOnce(name, callback) {
+    this.props.socket.off(name);
+    this.props.socket.on(name, callback);
+  }
+
   componentDidMount() {
-    this.props.socket.on('gameState', this.updateGameState);
-    this.props.socket.on('gameJoined', this.joinGame);
+    this.addListenerOnce('gameState', this.updateGameState);
+    this.addListenerOnce('gameJoined', this.joinGame);
   }
 
   componentDidUpdate() {
-    this.props.socket.on('gameState', this.updateGameState);
-    this.props.socket.on('gameJoined', this.joinGame);
+    this.addListenerOnce('gameState', this.updateGameState);
+    this.addListenerOnce('gameJoined', this.joinGame);
   }
 
   joinGame = id => {
@@ -31,6 +36,7 @@ export default class GameController extends Component {
   }
 
   updateGameState = newState => {
+    console.log(newState);
     const { queue, currentPlayerId, gameRunning } = JSON.parse(newState);
     if (!gameRunning) this.reset();
     else this.setState({ queue, currentPlayerId, gameRunning });
