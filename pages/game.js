@@ -50,7 +50,7 @@ export default class Display extends Component {
 
   gameOver = () => {
     this.setState({ activeView: DISPALY_GAME_OVER});
-    this.props.socket.emit('gameOver');
+    setTimeout(() => this.props.socket.emit('gameOver'), 5000);
   }
 
   render () {
