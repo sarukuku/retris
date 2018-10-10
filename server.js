@@ -49,8 +49,8 @@ const joinGame = socket => {
     if (db.queue.length === 0) {
       db.currentPlayerId = socket.id;
     }
-    sendGameStateToHost()
     db.queue.push(socket.id);
+    sendGameStateToHost()
     sendGameState();
     socket.emit('gameJoined', socket.id);
   }

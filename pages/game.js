@@ -59,6 +59,7 @@ export default class Display extends Component {
 
     return (
       <main>
+        <p className="queue-length">There are {Math.max(0, this.state.queueLength - 1)} people in the queue</p>
         {(() => {
           switch(activeView) {
             case DISPLAY_WAITING:
@@ -84,6 +85,12 @@ export default class Display extends Component {
             background-size: 50px;
             background-repeat: no-repeat;
             background-position: 1vw 1vw;
+          }
+
+          .queue-length {
+            margin: 0;
+            text-align: right;
+            padding: 10px;
           }
         `}</style>
       </main>
