@@ -31,9 +31,23 @@ const sendGameState = socket => {
   else io.emit('gameState', JSON.stringify(state));
 }
 
+const sendGameStateToHost = () => {
+  const goToView = (!db.currentPlayerId && !db.queue.length)
+    ? gameStates.DISPLAY_WAITING
+    : gameStates.DISPLAY_WAITING_TO_START;
+  const data = {
+    queueLength: db.queue.length,
+    goToView: goToView
+  }
+  sendToHost('hostState', JSON.stringify(data));
+}
+
 const joinGame = socket => {
   if (db.queue.indexOf(socket.id) === -1) { // There apperars to be a slight change that joinGame triggers twice
-    if (db.queue.length === 0) db.currentPlayerId = socket.id;
+    if (db.queue.length === 0) {
+      db.currentPlayerId = socket.id;
+      sendGameStateToHost()
+    }
     db.queue.push(socket.id);
     sendGameState();
     socket.emit('gameJoined', socket.id);
@@ -51,14 +65,7 @@ const leaveGame = id => {
 
 const gameOver = () => {
   leaveGame(db.currentPlayerId);
-  const goToView = (!db.currentPlayerId && !db.queue.length)
-    ? gameStates.DISPLAY_WAITING
-    : gameStates.DISPLAY_WAITING_TO_START;
-  const data = {
-    queueLength: db.queue.length,
-    goToView: goToView
-  }
-  sendToHost('hostState', JSON.stringify(data));
+  sendGameStateToHost()
 }
 
 io.on('connection', socket => {
