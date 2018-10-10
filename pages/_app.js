@@ -21,16 +21,14 @@ class MyApp extends App {
     socket: null
   }
 
-  addListenerOnce(name, callback) {
-    this.props.socket.off(name);
-    this.props.socket.on(name, callback);
-  }
-
   componentDidMount() {
     const socket = io()
-    socket.on('connect', () => {
-      this.setState({ socket })
-    })
+
+    if (!socket.hasListeners(name)) {
+      socket.on('connect', () => {
+        this.setState({ socket })
+      })
+    }
   }
 
   componentWillUnmount() {

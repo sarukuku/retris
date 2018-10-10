@@ -12,19 +12,18 @@ export default class GameController extends Component {
     gameStarted: false // This player is playing the game
   }
 
-  addListenerOnce(name, callback) {
-    this.props.socket.off(name);
-    this.props.socket.on(name, callback);
+  addListener(name, callback) {
+    if (!this.props.socket.hasListeners(name)) this.props.socket.on(name, callback);
   }
 
   componentDidMount() {
-    this.addListenerOnce('gameState', this.updateGameState);
-    this.addListenerOnce('gameJoined', this.joinGame);
+    this.addListener('gameState', this.updateGameState);
+    this.addListener('gameJoined', this.joinGame);
   }
 
   componentDidUpdate() {
-    this.addListenerOnce('gameState', this.updateGameState);
-    this.addListenerOnce('gameJoined', this.joinGame);
+    this.addListener('gameState', this.updateGameState);
+    this.addListener('gameJoined', this.joinGame);
   }
 
   joinGame = id => {
