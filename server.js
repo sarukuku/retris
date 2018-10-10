@@ -8,12 +8,7 @@ const dev = process.env.NODE_ENV !== 'production'
 const nextApp = next({ dev })
 const nextHandler = nextApp.getRequestHandler()
 
-
-// TODO: Fix lib/views export
-const DISPLAY_WAITING = 'DISPLAY_WAITING'
-const DISPLAY_GAME = 'DISPLAY_GAME'
-const DISPLAY_WAITING_TO_START = 'DISPLAY_WAITING_TO_START'
-const DISPALY_GAME_OVER = 'DISPALY_GAME_OVER'
+const gameStates = require('./lib/views');
 
 let hostId;
 
@@ -76,8 +71,8 @@ io.on('connection', socket => {
     if (socket.id === hostId) {
       leaveGame(db.currentPlayerId);
       const goToView = (!db.currentPlayerId && !db.queue.length)
-        ? DISPLAY_WAITING
-        : DISPLAY_WAITING_TO_START;
+        ? gameStates.DISPLAY_WAITING
+        : gameStates.DISPLAY_WAITING_TO_START;
       const data = {
         queueLength: db.queue.length,
         goToView: goToView
