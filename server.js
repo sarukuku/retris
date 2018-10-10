@@ -89,7 +89,11 @@ io.on('connection', socket => {
   });
 
   socket.on('start', () => {
-    console.log('start')
+    const data = {
+      queueLength: db.queue.length,
+      goToView: gameStates.DISPLAY_GAME
+    };
+    sendToHost('hostState', JSON.stringify(data));
   });
 
   socket.on('disconnect', () => {
