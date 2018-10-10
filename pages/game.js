@@ -30,6 +30,7 @@ export default class Display extends Component {
   }
 
   updateState = data => {
+    console.log(data)
     const { queueLength, goToView } = JSON.parse(data);
     if (goToView === this.state.activeView || !goToView) {
       this.setState({ queueLength });
