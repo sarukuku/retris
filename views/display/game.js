@@ -31,8 +31,8 @@ const shapes = [
 const colors = [
   '#2ecc71', '#34495e', '#9b59b6', '#f1c40f', '#e74c3c', '#e67e22', '#1abc9c'
 ]
-const W = 300
-const H = 600
+const W = 400
+const H = 800
 const BLOCK_W = W / COLS
 const BLOCK_H = H / ROWS
 
@@ -288,7 +288,7 @@ export default class DisplayGame extends Component {
 
     return (
       <div className='wrap'>
-        <canvas width='300' height='600' ref={this.canvasRef} />
+        <canvas width={W} height={H} ref={this.canvasRef} />
         <h1>Score: {score}</h1>
         <JoinHelpBar className={className} />
         {styles}
