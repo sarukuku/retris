@@ -16,11 +16,26 @@ export default class Display extends Component {
     commands: [],
     context: null,
     activeView: DISPLAY_WAITING,
-    score: 0
+    score: 0,
+    queueLength: 0
+  }
+
+  addListener(name, callback) {
+    if (!this.props.socket.hasListeners(name)) this.props.socket.on(name, callback);
   }
 
   componentDidMount() {
-    this.props.socket.emit('createGame')
+    this.props.socket.emit('createGame');
+    this.addListener('hostState', this.updateState);
+  }
+
+  updateState = data => {
+    const { queueLength, goToView } = JSON.parse(data);
+    if (goToView === this.state.activeView || !goToView) {
+      this.setState({ queueLength });
+    } else {
+      this.setState({ queueLength, activeView: goToView});
+    }
   }
 
   addToScore = integer => {
@@ -31,6 +46,11 @@ export default class Display extends Component {
 
   resetScore = () => {
     this.setState({ score: 0 })
+  }
+
+  gameOver = () => {
+    this.setState({ activeView: DISPALY_GAME_OVER});
+    this.props.socket.emit('gameOver');
   }
 
   render () {
@@ -50,6 +70,7 @@ export default class Display extends Component {
                        addToScore={this.addToScore}
                        resetScore={this.resetScore}
                        score={score}
+                       onGameOver={this.gameOver}
                      />
             case DISPALY_GAME_OVER:
               return <GameOver score={score} />

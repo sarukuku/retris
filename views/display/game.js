@@ -217,7 +217,8 @@ export default class DisplayGame extends Component {
             || x + offsetX >= COLS
           ) {
             if (offsetY == 1 && freezed) {
-              lose = true; // lose if the current shape is settled at the top most row
+              lose = true; 
+              this.props.onGameOver();
             }
             return false;
           }

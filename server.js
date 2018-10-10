@@ -8,6 +8,13 @@ const dev = process.env.NODE_ENV !== 'production'
 const nextApp = next({ dev })
 const nextHandler = nextApp.getRequestHandler()
 
+
+// TODO: Fix lib/views export
+const DISPLAY_WAITING = 'DISPLAY_WAITING'
+const DISPLAY_GAME = 'DISPLAY_GAME'
+const DISPLAY_WAITING_TO_START = 'DISPLAY_WAITING_TO_START'
+const DISPALY_GAME_OVER = 'DISPALY_GAME_OVER'
+
 let hostId;
 
 const db = {
@@ -36,13 +43,17 @@ const joinGame = socket => {
 
 const removeIdFromQueue = removeId => db.queue = db.queue.filter(id => id !== removeId);
 
-const leaveGame = socket => {
-  removeIdFromQueue(socket.id);
-  if (socket.id === db.currentPlayerId) {
+const leaveGame = id => {
+  removeIdFromQueue(id);
+  if (id === db.currentPlayerId) {
     db.currentPlayerId = db.queue[0];
   }
-  if (socket.id === hostId) hostId = null;
+  if (id === hostId) hostId = null;
   sendGameState();
+}
+
+const sendToHost = (command, data) => {
+  io.to(hostId).emit(command, data);
 }
 
 io.on('connection', socket => {
@@ -58,8 +69,21 @@ io.on('connection', socket => {
   })
 
   socket.on('commands', data => {
-    // send only to the host
-    io.to(hostId).emit('commands', data);
+    sendToHost('commands', data);
+  });
+
+  socket.on('gameOver', () => {
+    if (socket.id === hostId) {
+      leaveGame(db.currentPlayerId);
+      const goToView = (!db.currentPlayerId && !db.queue.length)
+        ? DISPLAY_WAITING
+        : DISPLAY_WAITING_TO_START;
+      const data = {
+        queueLength: db.queue.length,
+        goToView: goToView
+      }
+      sendToHost('hostState', JSON.stringify(data));
+    }
   });
 
   socket.on('start', () => {
@@ -67,7 +91,7 @@ io.on('connection', socket => {
   });
 
   socket.on('disconnect', () => {
-    leaveGame(socket);
+    leaveGame(socket.id);
   });
 });
 
