@@ -5,6 +5,7 @@ import Head from 'next/head'
 import '../node_modules/normalize.css/normalize.css'
 import { JOSEFIN } from '../lib/styles/fonts'
 import { BLACK } from '../lib/styles/colors'
+import Loading from '../views/loading'
 
 class MyApp extends App {
   static async getInitialProps({ Component, ctx }) {
@@ -45,7 +46,7 @@ class MyApp extends App {
         </Head>
         {this.state.socket ? (
           <Component {...pageProps} socket={this.state.socket} />
-        ) : (<div>loading...</div>)}
+        ) : <Loading />}
         <style global jsx>{`
           body {
             overflow-y: hidden;
