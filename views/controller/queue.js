@@ -1,5 +1,5 @@
-import { Component } from 'react';
-import { START } from '../../lib/commands';
+import { Component } from 'react'
+import { PETER_RIVER, EMERALD } from '../../lib/styles/colors'
 
 export default class GameQueue extends Component {
   createCommand = value => {
@@ -27,20 +27,42 @@ export default class GameQueue extends Component {
 
   render() {
     return (
-      <main style={{ width: '100%', height: '100%', position: 'fixed', backgroundColor: 'green' }}>
+      <main className='wrap'>
         {this.isCurrentPlayer() ? (
-          <div>
-            <p>You are the next player. Press start to begin when ready.</p>
-            <button onClick={this.start}>Start the game!</button>
-          </div>
+          <React.Fragment>
+            <p>It's your turn to play! Press Start playing when you're ready.</p>
+            <button onClick={this.start}>Start playing</button>
+          </React.Fragment>
         ) : (
-            <p>You are {this.queuePosition()} in the queue</p>
+            <p>You are {this.queuePosition()} in the queue...</p>
           )}
-        <ul>
-          <li>Tap to rotate</li>
-          <li>Swipe left or right to move sideways</li>
-          <li>Swipe down to drop</li>
-        </ul>
+        <style jsx>{`
+          .wrap {
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            display: flex;
+            justify-content: center;
+            align-content: center;
+            align-items: center;
+            background-color: ${PETER_RIVER};
+            padding: 1rem;
+            flex-wrap: wrap;
+            text-align: center;
+          }
+
+          p {
+            width: 100%;
+          }
+
+          button {
+            border: 1px solid black;
+            padding: 1rem;
+            border-radius: 100px;
+            background: ${EMERALD};
+            box-shadow: 0px 0px 8px 0px rgba(0,0,0,0.75);
+          }
+        `}</style>
       </main>
     )
   }

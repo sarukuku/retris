@@ -1,6 +1,7 @@
 import { Component } from 'react';
 import Swipeable from 'react-swipeable';
 import { LEFT, RIGHT, DOWN, ROTATE } from '../../lib/commands';
+import { PETER_RIVER, BELIZE_HOLE } from '../../lib/styles/colors'
 
 export default class GameController extends Component {
   createCommand = value => {
@@ -39,13 +40,26 @@ export default class GameController extends Component {
         stopPropagation={true}
         delta={50}
       >
-        <main style={{ width: '100%', height: '100%', position: 'fixed', backgroundColor: 'green' }} onClick={this.onTap}>
-          <ul>
-            <li>Tap to rotate</li>
-            <li>Swipe left or right to move sideways</li>
-            <li>Swipe down to drop</li>
-          </ul>
+        <main className='wrap' onClick={this.onTap}>
+          <p>Tap and swipe to play!</p>
         </main>
+        <style jsx>{`
+          .wrap {
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: ${PETER_RIVER};
+            border: 6px solid ${BELIZE_HOLE};
+            padding: 2rem;
+          }
+
+          p {
+            color: ${BELIZE_HOLE};
+          }
+        `}</style>
       </Swipeable>
     )
   }

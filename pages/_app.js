@@ -48,10 +48,19 @@ class MyApp extends App {
           <Component {...pageProps} socket={this.state.socket} />
         ) : <Loading />}
         <style global jsx>{`
+          html {
+            box-sizing: border-box;
+          }
+
+          *, *:before, *:after {
+            box-sizing: inherit;
+          }
+          
           body {
             overflow-y: hidden;
             font-family: ${JOSEFIN};
             color: ${BLACK};
+            line-height: 1.1;
           }
         `}</style>
       </Container>

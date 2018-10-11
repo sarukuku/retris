@@ -2,6 +2,7 @@ import { Component } from 'react'
 import GameControls from '../views/controller/gameControls'
 import GameQueue from '../views/controller/queue'
 import JoinGame from '../views/controller/joinGame'
+import GameNotRunning from '../views/controller/notRunning'
 
 export default class GameController extends Component {
   state = {
@@ -58,7 +59,7 @@ export default class GameController extends Component {
       <div>
         {(() => {
           if (!this.state.gameRunning) {
-            return (<div>Game is not running. Please try again.</div>)
+            return <GameNotRunning />
           } else if (!this.state.thisId) {
             return <JoinGame socket={this.props.socket} />;
           } else if (this.isCurrentPlayer() && this.state.gameStarted) {
