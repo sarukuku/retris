@@ -1,10 +1,9 @@
-import { Component } from 'react'
+import { Component } from "react"
 
 export default class GameNotRunning extends Component {
-
   render() {
     return (
-      <div className='wrap'>
+      <div className="wrap">
         <p>The game display isn't connected. Please connect it first.</p>
         <style jsx>{`
           .wrap {

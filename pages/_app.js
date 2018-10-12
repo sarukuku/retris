@@ -1,11 +1,11 @@
-import App, { Container } from 'next/app'
-import React from 'react'
-import io from 'socket.io-client'
-import Head from 'next/head'
-import '../node_modules/normalize.css/normalize.css'
-import { JOSEFIN } from '../lib/styles/fonts'
-import { BLACK } from '../lib/styles/colors'
-import Loading from '../views/loading'
+import App, { Container } from "next/app"
+import React from "react"
+import io from "socket.io-client"
+import Head from "next/head"
+import "../node_modules/normalize.css/normalize.css"
+import { JOSEFIN } from "../lib/styles/fonts"
+import { BLACK } from "../lib/styles/colors"
+import Loading from "../views/loading"
 
 class MyApp extends App {
   static async getInitialProps({ Component, ctx }) {
@@ -26,7 +26,7 @@ class MyApp extends App {
     const socket = io()
 
     if (!socket.hasListeners(name)) {
-      socket.on('connect', () => {
+      socket.on("connect", () => {
         this.setState({ socket })
       })
     }
@@ -41,21 +41,31 @@ class MyApp extends App {
     return (
       <Container>
         <Head>
-          <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, shrink-to-fit=no" />
-          <link href="https://fonts.googleapis.com/css?family=Josefin+Sans:400,700" rel="stylesheet"></link>
+          <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, shrink-to-fit=no"
+          />
+          <link
+            href="https://fonts.googleapis.com/css?family=Josefin+Sans:400,700"
+            rel="stylesheet"
+          />
         </Head>
         {this.state.socket ? (
           <Component {...pageProps} socket={this.state.socket} />
-        ) : <Loading />}
+        ) : (
+          <Loading />
+        )}
         <style global jsx>{`
           html {
             box-sizing: border-box;
           }
 
-          *, *:before, *:after {
+          *,
+          *:before,
+          *:after {
             box-sizing: inherit;
           }
-          
+
           body {
             overflow-y: hidden;
             font-family: ${JOSEFIN};

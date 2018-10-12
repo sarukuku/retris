@@ -1,23 +1,24 @@
-import { Component } from 'react'
-import { isBrowser } from '../helpers'
-import { WHITE, EMERALD } from '../lib/styles/colors'
+import { Component } from "react"
+import { isBrowser } from "../helpers"
+import { WHITE, EMERALD } from "../lib/styles/colors"
 
 export default class JoinHelpBar extends Component {
   constructor(props) {
     super(props)
     this.icon = React.createRef()
-  }
-
-  state = {
-    intervalId: null
+    this.state = {
+      intervalId: null
+    }
   }
 
   toggleAnimationClass() {
-    this.icon.current.classList.toggle('animate')
+    this.icon.current.classList.toggle("animate")
   }
 
   componentDidMount() {
-    if (!isBrowser()) { return }
+    if (!isBrowser()) {
+      return
+    }
 
     const id = setInterval(() => {
       this.toggleAnimationClass()
@@ -26,14 +27,23 @@ export default class JoinHelpBar extends Component {
   }
 
   componentWillUnmount() {
-    if (!isBrowser()) { return }
+    if (!isBrowser()) {
+      return
+    }
     clearInterval(this.state.intervalId)
   }
-  
-  render () {
+
+  render() {
     return (
       <div className={`help-bar ${this.props.className}`}>
-        <p>{`To play go to ${ (isBrowser()) ? window.location.origin : '...'} to start playing!`} <span className='icon' ref={this.icon}>🎮</span></p>
+        <p>
+          {`To play go to ${
+            isBrowser() ? window.location.origin : "..."
+          } to start playing!`}{" "}
+          <span className="icon" ref={this.icon}>
+            🎮
+          </span>
+        </p>
         <style jsx>{`
           .help-bar {
             background-color: ${EMERALD};
@@ -52,23 +62,28 @@ export default class JoinHelpBar extends Component {
           }
 
           .icon.animate {
-            animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+            animation: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
           }
 
           @keyframes shake {
-            10%, 90% {
+            10%,
+            90% {
               transform: translate3d(-1px, 0, 0);
             }
-            
-            20%, 80% {
+
+            20%,
+            80% {
               transform: translate3d(2px, 0, 0);
             }
 
-            30%, 50%, 70% {
+            30%,
+            50%,
+            70% {
               transform: translate3d(-4px, 0, 0);
             }
 
-            40%, 60% {
+            40%,
+            60% {
               transform: translate3d(4px, 0, 0);
             }
           }

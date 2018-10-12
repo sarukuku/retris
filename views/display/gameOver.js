@@ -1,9 +1,9 @@
-import { Component } from 'react'
-import JoinHelpBar from '../../components/joinHelpBar'
-import css from 'styled-jsx/css'
+import { Component } from "react"
+import JoinHelpBar from "../../components/joinHelpBar"
+import css from "styled-jsx/css"
 
 export default class DisplayGameOver extends Component {
-  render () {
+  render() {
     const { score } = this.props
 
     const { className, styles } = css.resolve`
@@ -14,7 +14,7 @@ export default class DisplayGameOver extends Component {
     `
 
     return (
-      <div className='wrap'>
+      <div className="wrap">
         <h1>💥 Game Over 💥</h1>
         <h1>You got {score} points 😬</h1>
         <JoinHelpBar className={className} />

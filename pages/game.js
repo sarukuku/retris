@@ -1,15 +1,15 @@
-import { Component } from 'react'
+import { Component } from "react"
 import {
   DISPLAY_WAITING,
   DISPLAY_WAITING_TO_START,
   DISPLAY_GAME,
   DISPALY_GAME_OVER
-} from '../lib/views'
-import Waiting from '../views/display/waiting'
-import WaitingToStart from '../views/display/waitingToStart'
-import Game from '../views/display/game'
-import GameOver from '../views/display/gameOver'
-import { PETER_RIVER } from '../lib/styles/colors'
+} from "../lib/views"
+import Waiting from "../views/display/waiting"
+import WaitingToStart from "../views/display/waitingToStart"
+import Game from "../views/display/game"
+import GameOver from "../views/display/gameOver"
+import { PETER_RIVER } from "../lib/styles/colors"
 
 export default class Display extends Component {
   state = {
@@ -21,21 +21,21 @@ export default class Display extends Component {
   }
 
   addListener(name, callback) {
-    if (!this.props.socket.hasListeners(name)) this.props.socket.on(name, callback);
+    if (!this.props.socket.hasListeners(name))
+      this.props.socket.on(name, callback)
   }
 
   componentDidMount() {
-    this.props.socket.emit('createGame');
-    this.addListener('hostState', this.updateState);
+    this.props.socket.emit("createGame")
+    this.addListener("hostState", this.updateState)
   }
 
   updateState = data => {
-    console.log(data)
-    const { queueLength, goToView } = JSON.parse(data);
+    const { queueLength, goToView } = JSON.parse(data)
     if (goToView === this.state.activeView || !goToView) {
-      this.setState({ queueLength });
+      this.setState({ queueLength })
     } else {
-      this.setState({ queueLength, activeView: goToView});
+      this.setState({ queueLength, activeView: goToView })
     }
   }
 
@@ -50,30 +50,35 @@ export default class Display extends Component {
   }
 
   gameOver = () => {
-    this.setState({ activeView: DISPALY_GAME_OVER});
-    setTimeout(() => this.props.socket.emit('gameOver'), 5000);
+    this.setState({ activeView: DISPALY_GAME_OVER })
+    setTimeout(() => this.props.socket.emit("gameOver"), 5000)
   }
 
-  render () {
+  render() {
     let { activeView, score } = this.state
 
     return (
       <main>
-        <p className="queue-length">There are {Math.max(0, this.state.queueLength - 1)} people in the queue</p>
+        <p className="queue-length">
+          There are {Math.max(0, this.state.queueLength - 1)} people in the
+          queue
+        </p>
         {(() => {
-          switch(activeView) {
+          switch (activeView) {
             case DISPLAY_WAITING:
               return <Waiting />
             case DISPLAY_WAITING_TO_START:
               return <WaitingToStart />
             case DISPLAY_GAME:
-              return <Game
-                       socket={this.props.socket}
-                       addToScore={this.addToScore}
-                       resetScore={this.resetScore}
-                       score={score}
-                       onGameOver={this.gameOver}
-                     />
+              return (
+                <Game
+                  socket={this.props.socket}
+                  addToScore={this.addToScore}
+                  resetScore={this.resetScore}
+                  score={score}
+                  onGameOver={this.gameOver}
+                />
+              )
             case DISPALY_GAME_OVER:
               return <GameOver score={score} />
           }
@@ -81,7 +86,7 @@ export default class Display extends Component {
         <style jsx>{`
           main {
             background-color: ${PETER_RIVER};
-            background-image: url('/static/r-symbol.png');
+            background-image: url("/static/r-symbol.png");
             background-size: 50px;
             background-repeat: no-repeat;
             background-position: 1vw 1vw;

@@ -1,15 +1,14 @@
-import { Component } from 'react'
-import { PETER_RIVER, EMERALD } from '../../lib/styles/colors'
+import { Component } from "react"
+import { PETER_RIVER, EMERALD } from "../../lib/styles/colors"
 
 export default class JoinGame extends Component {
-  
   joinGame = () => {
-    this.props.socket.emit('joinGame')
+    this.props.socket.emit("joinGame")
   }
 
   render() {
     return (
-      <div className='wrap'>
+      <div className="wrap">
         <button onClick={this.joinGame}>Join the game</button>
         <style jsx>{`
           .wrap {
@@ -27,7 +26,7 @@ export default class JoinGame extends Component {
             padding: 1rem;
             border-radius: 100px;
             background: ${EMERALD};
-            box-shadow: 0px 0px 8px 0px rgba(0,0,0,0.75);
+            box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.75);
           }
         `}</style>
       </div>

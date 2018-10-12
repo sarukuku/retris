@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "dependencies": {
     "@zeit/next-css": "^1.0.1",
+    "babel-eslint": "^10.0.1",
+    "concurrently": "^4.0.1",
     "express": "^4.15.2",
     "next": "latest",
     "normalize.css": "^8.0.0",
@@ -13,8 +15,16 @@
     "socket.io-client": "^1.7.3"
   },
   "scripts": {
-    "dev": "node server.js",
+    "dev": "concurrently --kill-others \"npm run start-dev\" \"npm run pretty\"",
     "build": "next build",
-    "start": "NODE_ENV=production node server.js"
+    "start": "NODE_ENV=production node server.js",
+    "start-dev": "node server.js",
+    "pretty": "npx onchange '**/*.js' -- prettier --write {{changed}}"
+  },
+  "devDependencies": {
+    "eslint": "^5.6.1",
+    "eslint-config-prettier": "^3.1.0",
+    "eslint-plugin-prettier": "^3.0.0",
+    "prettier": "^1.14.3"
   }
 }

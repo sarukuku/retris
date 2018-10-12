@@ -1,11 +1,10 @@
-import { Component } from 'react';
+import { Component } from "react"
 
 export default class Loading extends Component {
-
   render() {
     return (
       <main>
-        <img src='/static/r-symbol.png' />
+        <img src="/static/r-symbol.png" />
         <style jsx>{`
           img {
             position: fixed;
@@ -13,13 +12,14 @@ export default class Loading extends Component {
             left: 50%;
             width: 20%;
             margin: -10% 0 0 -10%;
-            -webkit-animation:spin 3s linear infinite;
-            -moz-animation:spin 3s linear infinite;
-            animation:spin 3s linear infinite;
+            -webkit-animation: spin 3s linear infinite;
+            -moz-animation: spin 3s linear infinite;
+            animation: spin 3s linear infinite;
           }
 
           @-moz-keyframes spin {
-            49%, 51% {
+            49%,
+            51% {
               -moz-transform: scale(-1, 1);
             }
 
@@ -29,7 +29,8 @@ export default class Loading extends Component {
           }
 
           @-webkit-keyframes spin {
-            49%, 51% {
+            49%,
+            51% {
               -webkit-transform: scale(-1, 1);
             }
 
@@ -39,7 +40,8 @@ export default class Loading extends Component {
           }
 
           @keyframes spin {
-            49%, 51% {
+            49%,
+            51% {
               transform: scale(-1, 1);
             }
 

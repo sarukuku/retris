@@ -1,11 +1,13 @@
-import { Component } from 'react'
-import { isBrowser } from '../../helpers'
+import { Component } from "react"
+import { isBrowser } from "../../helpers"
 
 export default class DisplayWaiting extends Component {
-  render () {
+  render() {
     return (
-      <div className='wrap'>
-        <h1>{`Go to ${ (isBrowser()) ? window.location.origin : '...'} to start playing! 🎮`}</h1>
+      <div className="wrap">
+        <h1>{`Go to ${
+          isBrowser() ? window.location.origin : "..."
+        } to start playing! 🎮`}</h1>
         <style jsx>{`
           .wrap {
             width: 100%;

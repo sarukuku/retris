@@ -1,7 +1,7 @@
-import { Component } from 'react';
-import Swipeable from 'react-swipeable';
-import { LEFT, RIGHT, DOWN, ROTATE } from '../../lib/commands';
-import { PETER_RIVER, BELIZE_HOLE } from '../../lib/styles/colors'
+import { Component } from "react"
+import Swipeable from "react-swipeable"
+import { LEFT, RIGHT, DOWN, ROTATE } from "../../lib/commands"
+import { PETER_RIVER, BELIZE_HOLE } from "../../lib/styles/colors"
 
 export default class GameController extends Component {
   createCommand = value => {
@@ -12,7 +12,7 @@ export default class GameController extends Component {
 
   sendCommand = value => {
     const command = this.createCommand(value)
-    this.props.socket.emit('commands', command)
+    this.props.socket.emit("commands", command)
   }
 
   onTap = () => {
@@ -40,7 +40,7 @@ export default class GameController extends Component {
         stopPropagation={true}
         delta={50}
       >
-        <main className='wrap' onClick={this.onTap}>
+        <main className="wrap" onClick={this.onTap}>
           <p>Tap and swipe to play!</p>
         </main>
         <style jsx>{`
