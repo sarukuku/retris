@@ -1,4 +1,5 @@
 import { Component } from "react"
+import io from "socket.io-client"
 import {
   DISPLAY_WAITING,
   DISPLAY_WAITING_TO_START,
@@ -10,33 +11,31 @@ import WaitingToStart from "../views/display/waitingToStart"
 import Game from "../views/display/game"
 import GameOver from "../views/display/gameOver"
 import { PETER_RIVER } from "../lib/styles/colors"
-
+import { COMMAND_DISPLAY_JOIN, COMMAND_GAME_OVER } from "../lib/commands"
 export default class Display extends Component {
   state = {
-    commands: [],
-    context: null,
+    socket: null,
     activeView: DISPLAY_WAITING,
     score: 0,
     queueLength: 0
   }
 
-  addListener(name, callback) {
-    if (!this.props.socket.hasListeners(name))
-      this.props.socket.on(name, callback)
-  }
-
   componentDidMount() {
-    this.props.socket.emit("createGame")
-    this.addListener("hostState", this.updateState)
+    const socket = io("/display")
+
+    socket.on("connect", () => {
+      this.setState({ socket })
+      socket.emit(COMMAND_DISPLAY_JOIN)
+    })
+
+    socket.on("command", data => {
+      let { activeView, queueLength } = data
+      this.setState({ activeView, queueLength })
+    })
   }
 
-  updateState = data => {
-    const { queueLength, goToView } = JSON.parse(data)
-    if (goToView === this.state.activeView || !goToView) {
-      this.setState({ queueLength })
-    } else {
-      this.setState({ queueLength, activeView: goToView })
-    }
+  componentWillUnmount() {
+    this.state.socket.close()
   }
 
   addToScore = integer => {
@@ -50,19 +49,15 @@ export default class Display extends Component {
   }
 
   gameOver = () => {
-    this.setState({ activeView: DISPALY_GAME_OVER })
-    setTimeout(() => this.props.socket.emit("gameOver"), 5000)
+    this.state.socket.emit(COMMAND_GAME_OVER)
   }
 
   render() {
-    let { activeView, score } = this.state
+    let { activeView, score, socket } = this.state
 
     return (
       <main>
-        <p className="queue-length">
-          There are {Math.max(0, this.state.queueLength - 1)} people in the
-          queue
-        </p>
+        <p className="queue-length">{this.state.queueLength} people in queue</p>
         {(() => {
           switch (activeView) {
             case DISPLAY_WAITING:
@@ -72,7 +67,7 @@ export default class Display extends Component {
             case DISPLAY_GAME:
               return (
                 <Game
-                  socket={this.props.socket}
+                  socket={socket}
                   addToScore={this.addToScore}
                   resetScore={this.resetScore}
                   score={score}

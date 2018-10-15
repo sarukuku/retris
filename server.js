@@ -8,103 +8,209 @@ const dev = process.env.NODE_ENV !== "production"
 const nextApp = next({ dev })
 const nextHandler = nextApp.getRequestHandler()
 
-const gameStates = require("./lib/views")
+const R = require("ramda")
+const views = require("./lib/views")
+const commands = require("./lib/commands")
 
-let hostId
+// Controller groups
+const QUEUE_GROUP = "QUEUE_GROUP"
 
-const db = {
-  queue: [],
-  currentPlayerId: null,
-  gameInProgress: false
+let serverState = {
+  displays: [],
+  controllers: [],
+  activeController: null
 }
 
-const cloneObject = obj => Object.assign({}, obj)
-
-const removeIdFromQueue = removeId =>
-  (db.queue = db.queue.filter(id => id !== removeId))
-
-const sendToHost = (command, data) => io.to(hostId).emit(command, data)
-
-const sendGameState = socket => {
-  // Use 'socket' param when sending the state to the single socket only.
-  const state = cloneObject(db)
-  state.gameRunning = Boolean(hostId)
-  if (socket) socket.emit("gameState", JSON.stringify(state))
-  else io.emit("gameState", JSON.stringify(state))
+// Sent to all displays
+let displaysState = {
+  activeView: views.DISPLAY_WAITING,
+  queueLength: 0
 }
 
-const sendGameStateToHost = () => {
-  let goToView
-  if (!db.currentPlayerId && !db.queue.length)
-    goToView = gameStates.DISPLAY_WAITING
-  else if (!db.gameInProgress) goToView = gameStates.DISPLAY_WAITING_TO_START
-  else goToView = gameStates.DISPLAY_GAME
-  const data = {
-    queueLength: db.queue.length,
-    goToView: goToView
-  }
-  sendToHost("hostState", JSON.stringify(data))
+// Sent to all controllers except the active one
+let controllersState = {
+  activeView: views.CONTROLLER_JOIN,
+  queueLength: 0
 }
 
-const joinGame = socket => {
-  if (db.queue.indexOf(socket.id) === -1) {
-    // There apperars to be a slight change that joinGame triggers twice
-    if (db.queue.length === 0) {
-      db.currentPlayerId = socket.id
+// Sent only to the active controller
+let activeControllerState = {
+  activeView: views.CONTROLLER_START,
+  queueLength: 0
+}
+
+/**
+ * Handle commands related to displays
+ */
+let displays = io.of("/display")
+displays.on("connect", display => {
+  // Add a display to a list when it joins
+  display.on(commands.COMMAND_DISPLAY_JOIN, () => {
+    if (!R.contains(display, serverState.displays)) {
+      serverState.displays = R.append(display, serverState.displays)
     }
-    db.queue.push(socket.id)
-    sendGameStateToHost()
-    sendGameState()
-    socket.emit("gameJoined", socket.id)
-  }
-}
 
-const start = () => {
-  db.gameInProgress = true
-  sendGameStateToHost()
-}
-
-const leaveGame = id => {
-  removeIdFromQueue(id)
-  if (id === db.currentPlayerId) {
-    db.currentPlayerId = db.queue[0]
-  }
-  if (id === hostId) hostId = null
-  sendGameState()
-}
-
-const gameOver = () => {
-  leaveGame(db.currentPlayerId)
-  db.gameInProgress = false
-  sendGameStateToHost()
-}
-
-io.on("connection", socket => {
-  sendGameState(socket)
-
-  socket.on("joinGame", () => {
-    joinGame(socket)
+    // Update display state after join
+    display.emit(displaysState)
   })
 
-  socket.on("createGame", () => {
-    hostId = socket.id
-    sendGameState()
+  display.on(commands.COMMAND_GAME_OVER, () => {
+    // Update active controller
+    activeControllerState.queueLength = serverState.controllers.length
+    activeControllerState.activeView = views.CONTROLLER_GAME_OVER
+    serverState.activeController.emit("command", activeControllerState)
+
+    // Wait a bit before navigating away from the game over screen
+    setTimeout(() => {
+      // Update displays
+      displaysState.queueLength = serverState.controllers.length
+      if (serverState.controllers.length > 0) {
+        displaysState.activeView = views.DISPLAY_WAITING_TO_START
+      } else {
+        displaysState.activeView = views.DISPLAY_WAITING
+      }
+      displays.emit("command", displaysState)
+
+      // Update active controller
+      activeControllerState.queueLength = serverState.controllers.length
+      activeControllerState.activeView = views.CONTROLLER_JOIN
+      serverState.activeController.emit("command", activeControllerState)
+
+      // Pick new active controller
+      if (serverState.controllers.length > 0) {
+        serverState.activeController = serverState.controllers.shift()
+        serverState.activeController.leave(QUEUE_GROUP)
+
+        // Change the view of the active controller to confirm start
+        activeControllerState.queueLength = serverState.controllers.length
+        activeControllerState.activeView = views.CONTROLLER_START
+        serverState.activeController.emit("command", activeControllerState)
+
+        // Update other controllers
+        controllersState.activeView = views.CONTROLLER_IN_QUEUE
+        controllersState.queueLength = serverState.controllers.length
+        controllers.to(QUEUE_GROUP).emit("command", controllersState)
+      } else {
+        // Set active controller to empty
+        serverState.activeController = null
+      }
+    }, 4000)
   })
 
-  socket.on("commands", data => {
-    sendToHost("commands", data)
+  // Remove a display from the queue if it's lost
+  display.on("disconnect", () => {
+    serverState.displays = serverState.displays.filter(e => e !== display)
+  })
+})
+
+/**
+ * Handle commands related to controllers
+ */
+let controllers = io.of("/controller")
+controllers.on("connect", controller => {
+  // Add controller to controller queue when it joins (if it's not already there)
+  controller.on(commands.COMMAND_CONTROLLER_JOIN, () => {
+    if (!R.contains(controller, serverState.controllers)) {
+      serverState.controllers = R.append(controller, serverState.controllers)
+      controller.join(QUEUE_GROUP)
+    }
+
+    // Update controller state after join
+    controllersState.activeView = views.CONTROLLER_IN_QUEUE
+    controllersState.queueLength = serverState.controllers.length
+    controller.emit("command", controllersState)
+
+    // Update displays when a controller joins
+    if (serverState.activeController === null) {
+      // Update displays
+      displaysState.queueLength = serverState.controllers.length
+      displaysState.activeView = views.DISPLAY_WAITING_TO_START
+      displays.emit("command", displaysState)
+
+      // If we don't have a current player and someone just joined
+      // lets make the first one in the queue the active player
+      serverState.activeController = serverState.controllers.shift()
+      serverState.activeController.leave(QUEUE_GROUP)
+      activeControllerState.queueLength = serverState.controllers.length
+      activeControllerState.activeView = views.CONTROLLER_START
+      serverState.activeController.emit("command", activeControllerState)
+    } else {
+      controllersState.queueLength = serverState.controllers.length
+      controllersState.activeView = views.CONTROLLER_IN_QUEUE
+      controller.emit("command", controllersState)
+    }
+
+    // Update other controllers
+    controllersState.activeView = views.CONTROLLER_IN_QUEUE
+    controllersState.queueLength = serverState.controllers.length
+    controllers.to(QUEUE_GROUP).emit("command", controllersState)
   })
 
-  socket.on("gameOver", () => {
-    if (socket.id === hostId) gameOver()
+  // On game start command
+  controller.on(commands.COMMAND_START, () => {
+    // Update active controller
+    activeControllerState.queueLength = serverState.controllers.length
+    activeControllerState.activeView = views.CONTROLLER_GAME_CONTROLS
+    serverState.activeController.emit("command", activeControllerState)
+
+    // Update displays
+    displaysState.queueLength = serverState.controllers.length
+    displaysState.activeView = views.DISPLAY_GAME
+    displays.emit("command", displaysState)
   })
 
-  socket.on("start", () => {
-    start()
+  controller.on("gameCommand", command => {
+    switch (command) {
+      case commands.COMMAND_ROTATE:
+        displays.emit("gameCommand", commands.COMMAND_ROTATE)
+        break
+      case commands.COMMAND_RIGHT:
+        displays.emit("gameCommand", commands.COMMAND_RIGHT)
+        break
+      case commands.COMMAND_DOWN:
+        displays.emit("gameCommand", commands.COMMAND_DOWN)
+        break
+      case commands.COMMAND_LEFT:
+        displays.emit("gameCommand", commands.COMMAND_LEFT)
+        break
+    }
   })
 
-  socket.on("disconnect", () => {
-    leaveGame(socket.id)
+  controller.on("disconnect", () => {
+    // Remove a controller from the queue if it's there
+    serverState.controllers = serverState.controllers.filter(
+      e => e !== controller
+    )
+
+    // Remove controller from activeController if it's there
+    if (R.equals(serverState.activeController, controller)) {
+      // Select a new active controller if possible
+      if (serverState.controllers.length > 0) {
+        serverState.activeController = serverState.controllers.shift()
+        serverState.activeController.leave(QUEUE_GROUP)
+
+        // Change the view of the active controller to confirm start
+        activeControllerState.queueLength = serverState.controllers.length
+        activeControllerState.activeView = views.CONTROLLER_START
+        serverState.activeController.emit("command", activeControllerState)
+
+        // Update displays
+        displaysState.queueLength = serverState.controllers.length
+        displaysState.activeView = views.DISPLAY_WAITING_TO_START
+        displays.emit("command", displaysState)
+      } else {
+        serverState.activeController = null
+        // Update displays
+        displaysState.queueLength = serverState.controllers.length
+        displaysState.activeView = views.DISPLAY_WAITING
+        displays.emit("command", displaysState)
+      }
+    }
+
+    // Update other controllers
+    controllersState.activeView = views.CONTROLLER_IN_QUEUE
+    controllersState.queueLength = serverState.controllers.length
+    controllers.to(QUEUE_GROUP).emit("command", controllersState)
   })
 })
 

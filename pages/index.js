@@ -1,83 +1,77 @@
 import { Component } from "react"
+import io from "socket.io-client"
 import GameControls from "../views/controller/gameControls"
-import GameQueue from "../views/controller/queue"
+import GameQueue from "../views/controller/inQueue"
 import JoinGame from "../views/controller/joinGame"
+import ConfirmStartGame from "../views/controller/startGame"
 import GameNotRunning from "../views/controller/notRunning"
+import GameOver from "../views/controller/gameOver"
+import {
+  CONTROLLER_GAME_OFFLINE,
+  CONTROLLER_JOIN,
+  CONTROLLER_IN_QUEUE,
+  CONTROLLER_START,
+  CONTROLLER_GAME_CONTROLS,
+  CONTROLLER_GAME_OVER
+} from "../lib/views"
+import { COMMAND_CONTROLLER_JOIN, COMMAND_START } from "../lib/commands"
 
 export default class GameController extends Component {
   state = {
-    queue: [],
-    currentPlayerId: null,
-    thisId: null,
-    gameRunning: false, // 'Host' is present
-    gameStarted: false // This player is playing the game
+    socket: null,
+    activeView: CONTROLLER_JOIN,
+    queueLength: 0
   }
 
-  addListener(name, callback) {
-    if (!this.props.socket.hasListeners(name))
-      this.props.socket.on(name, callback)
+  joinGame = () => {
+    this.state.socket.emit(COMMAND_CONTROLLER_JOIN)
+  }
+
+  startGame = () => {
+    this.state.socket.emit(COMMAND_START)
   }
 
   componentDidMount() {
-    this.addListener("gameState", this.updateGameState)
-    this.addListener("gameJoined", this.joinGame)
-  }
+    const socket = io("/controller")
 
-  componentDidUpdate() {
-    this.addListener("gameState", this.updateGameState)
-    this.addListener("gameJoined", this.joinGame)
-  }
+    socket.on("connect", () => {
+      this.setState({ socket })
+    })
 
-  joinGame = id => {
-    this.setState({ thisId: id })
-  }
-
-  reset = () => {
-    this.setState({
-      queue: [],
-      currentPlayerId: null,
-      thisId: null,
-      gameRunning: false,
-      gameStarted: false
+    socket.on("command", data => {
+      let { activeView, queueLength } = data
+      this.setState({ activeView, queueLength })
     })
   }
 
-  updateGameState = newState => {
-    const { queue, currentPlayerId, gameRunning } = JSON.parse(newState)
-    if (!gameRunning) this.reset()
-    else this.setState({ queue, currentPlayerId, gameRunning })
-  }
-
-  isCurrentPlayer = () => {
-    return this.state.thisId && this.state.currentPlayerId === this.state.thisId
-  }
-
-  start = () => {
-    this.setState({ gameStarted: true })
-  }
-
-  stop = () => {
-    this.setState({ gameStarted: false })
+  componentWillUnmount() {
+    this.state.socket.close()
   }
 
   render() {
+    let { activeView, queueLength, socket } = this.state
+
     return (
       <div>
         {(() => {
-          if (!this.state.gameRunning) {
-            return <GameNotRunning />
-          } else if (!this.state.thisId) {
-            return <JoinGame socket={this.props.socket} />
-          } else if (this.isCurrentPlayer() && this.state.gameStarted) {
-            return <GameControls socket={this.props.socket} stop={this.stop} />
-          } else {
-            return (
-              <GameQueue
-                {...this.state}
-                socket={this.props.socket}
-                start={this.start}
-              />
-            )
+          switch (activeView) {
+            case CONTROLLER_GAME_OFFLINE:
+              return <GameNotRunning />
+            case CONTROLLER_JOIN:
+              return <JoinGame joinGame={this.joinGame} />
+            case CONTROLLER_IN_QUEUE:
+              return <GameQueue queueLength={queueLength} />
+            case CONTROLLER_START:
+              return <ConfirmStartGame startGame={this.startGame} />
+            case CONTROLLER_GAME_CONTROLS:
+              return (
+                <GameControls
+                  socket={socket}
+                  stop={() => console.log("stop game")}
+                />
+              )
+            case CONTROLLER_GAME_OVER:
+              return <GameOver />
           }
         })()}
       </div>

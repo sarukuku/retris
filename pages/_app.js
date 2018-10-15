@@ -1,14 +1,12 @@
 import App, { Container } from "next/app"
 import React from "react"
-import io from "socket.io-client"
 import Head from "next/head"
 import "../node_modules/normalize.css/normalize.css"
 import { JOSEFIN } from "../lib/styles/fonts"
 import { BLACK } from "../lib/styles/colors"
-import Loading from "../views/loading"
 
-class MyApp extends App {
-  static async getInitialProps({ Component, ctx }) {
+class Retris extends App {
+  static async getInitialProps({ Component, router, ctx }) {
     let pageProps = {}
 
     if (Component.getInitialProps) {
@@ -16,24 +14,6 @@ class MyApp extends App {
     }
 
     return { pageProps }
-  }
-
-  state = {
-    socket: null
-  }
-
-  componentDidMount() {
-    const socket = io()
-
-    if (!socket.hasListeners(name)) {
-      socket.on("connect", () => {
-        this.setState({ socket })
-      })
-    }
-  }
-
-  componentWillUnmount() {
-    this.state.socket.close()
   }
 
   render() {
@@ -50,11 +30,7 @@ class MyApp extends App {
             rel="stylesheet"
           />
         </Head>
-        {this.state.socket ? (
-          <Component {...pageProps} socket={this.state.socket} />
-        ) : (
-          <Loading />
-        )}
+        <Component {...pageProps} />
         <style global jsx>{`
           html {
             box-sizing: border-box;
@@ -78,4 +54,4 @@ class MyApp extends App {
   }
 }
 
-export default MyApp
+export default Retris
