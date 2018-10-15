@@ -2,14 +2,12 @@ import { Component } from "react"
 import { PETER_RIVER, EMERALD } from "../../lib/styles/colors"
 
 export default class JoinGame extends Component {
-  joinGame = () => {
-    this.props.socket.emit("joinGame")
-  }
-
   render() {
+    const { joinGame } = this.props
+
     return (
       <div className="wrap">
-        <button onClick={this.joinGame}>Join the game</button>
+        <button onClick={joinGame}>Join the game</button>
         <style jsx>{`
           .wrap {
             width: 100%;

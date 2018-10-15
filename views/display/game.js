@@ -1,5 +1,11 @@
 import { Component } from "react"
-import { LEFT, RIGHT, DOWN, DROP, ROTATE } from "../../lib/commands"
+import {
+  COMMAND_LEFT,
+  COMMAND_RIGHT,
+  COMMAND_DOWN,
+  COMMAND_DROP,
+  COMMAND_ROTATE
+} from "../../lib/commands"
 import JoinHelpBar from "../../components/joinHelpBar"
 import css from "styled-jsx/css"
 
@@ -45,45 +51,40 @@ export default class DisplayGame extends Component {
     }
   }
 
-  addListener(name, callback) {
-    if (!this.props.socket.hasListeners(name))
-      this.props.socket.on(name, callback)
-  }
-
   componentDidMount() {
     this.setState({ context: this.canvasRef.current.getContext("2d") })
-    this.addListener("commands", this.handleCommand)
+    this.props.socket.on("gameCommand", this.handleCommand)
     this.newGame()
   }
 
-  componentDidUpdate() {
-    this.addListener("commands", this.handleCommand)
+  componentWillUnmount() {
+    this.props.socket.removeListener("gameCommand", this.handleCommand)
   }
 
   handleCommand = command => {
-    switch (command.value) {
-      case LEFT:
+    switch (command) {
+      case COMMAND_LEFT:
         if (this.valid(-1)) {
           --currentX
         }
         break
-      case RIGHT:
+      case COMMAND_RIGHT:
         if (this.valid(1)) {
           ++currentX
         }
         break
-      case DOWN:
+      case COMMAND_DOWN:
         if (this.valid(0, 1)) {
           ++currentY
         }
         break
-      case ROTATE:
+      case COMMAND_ROTATE:
         const rotated = this.rotate(current)
         if (this.valid(0, 0, rotated)) {
           current = rotated
         }
         break
-      case DROP:
+      case COMMAND_DROP:
         while (this.valid(0, 1)) {
           ++currentY
         }
@@ -234,7 +235,7 @@ export default class DisplayGame extends Component {
     this.init()
     this.newShape()
     lose = false
-    interval = setInterval(this.tick, 100)
+    interval = setInterval(this.tick, 600)
   }
 
   clearAllIntervals = () => {
