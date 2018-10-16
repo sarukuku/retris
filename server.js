@@ -55,43 +55,22 @@ displays.on("connect", display => {
   })
 
   display.on(commands.COMMAND_GAME_OVER, () => {
-    // Update active controller
-    activeControllerState.queueLength = serverState.controllers.length
-    activeControllerState.activeView = views.CONTROLLER_GAME_OVER
-    serverState.activeController.emit("command", activeControllerState)
-
+    updateActiveController(views.CONTROLLER_GAME_OVER)
     // Wait a bit before navigating away from the game over screen
     setTimeout(() => {
-      // Update displays
-      displaysState.queueLength = serverState.controllers.length
-      if (serverState.controllers.length > 0) {
-        displaysState.activeView = views.DISPLAY_WAITING_TO_START
-      } else {
-        displaysState.activeView = views.DISPLAY_WAITING
-      }
-      displays.emit("command", displaysState)
+      const view =
+        R.length(serverState.controllers) > 0
+          ? views.DISPLAY_WAITING_TO_START
+          : views.DISPLAY_WAITING
+      updateDisplays(view)
+      updateActiveController(views.CONTROLLER_JOIN)
 
-      // Update active controller
-      activeControllerState.queueLength = serverState.controllers.length
-      activeControllerState.activeView = views.CONTROLLER_JOIN
-      serverState.activeController.emit("command", activeControllerState)
-
-      // Pick new active controller
       if (serverState.controllers.length > 0) {
         serverState.activeController = serverState.controllers.shift()
         serverState.activeController.leave(QUEUE_GROUP)
-
-        // Change the view of the active controller to confirm start
-        activeControllerState.queueLength = serverState.controllers.length
-        activeControllerState.activeView = views.CONTROLLER_START
-        serverState.activeController.emit("command", activeControllerState)
-
-        // Update other controllers
-        controllersState.activeView = views.CONTROLLER_IN_QUEUE
-        controllersState.queueLength = serverState.controllers.length
-        controllers.to(QUEUE_GROUP).emit("command", controllersState)
+        updateActiveController(views.CONTROLLER_START)
+        updateOtherControllers(views.CONTROLLER_IN_QUEUE)
       } else {
-        // Set active controller to empty
         serverState.activeController = null
       }
     }, 4000)
@@ -115,48 +94,24 @@ controllers.on("connect", controller => {
       controller.join(QUEUE_GROUP)
     }
 
-    // Update controller state after join
-    controllersState.activeView = views.CONTROLLER_IN_QUEUE
-    controllersState.queueLength = serverState.controllers.length
-    controller.emit("command", controllersState)
+    updateCurrentController(controller, views.CONTROLLER_IN_QUEUE)
 
-    // Update displays when a controller joins
     if (serverState.activeController === null) {
-      // Update displays
-      displaysState.queueLength = serverState.controllers.length
-      displaysState.activeView = views.DISPLAY_WAITING_TO_START
-      displays.emit("command", displaysState)
-
-      // If we don't have a current player and someone just joined
-      // lets make the first one in the queue the active player
+      updateDisplays(views.DISPLAY_WAITING_TO_START)
       serverState.activeController = serverState.controllers.shift()
       serverState.activeController.leave(QUEUE_GROUP)
-      activeControllerState.queueLength = serverState.controllers.length
-      activeControllerState.activeView = views.CONTROLLER_START
-      serverState.activeController.emit("command", activeControllerState)
+      updateActiveController(views.CONTROLLER_START)
     } else {
-      controllersState.queueLength = serverState.controllers.length
-      controllersState.activeView = views.CONTROLLER_IN_QUEUE
-      controller.emit("command", controllersState)
+      updateCurrentController(controller, views.CONTROLLER_IN_QUEUE)
     }
 
-    // Update other controllers
-    controllersState.activeView = views.CONTROLLER_IN_QUEUE
-    controllersState.queueLength = serverState.controllers.length
-    controllers.to(QUEUE_GROUP).emit("command", controllersState)
+    updateOtherControllers(views.CONTROLLER_IN_QUEUE)
   })
 
   // On game start command
   controller.on(commands.COMMAND_START, () => {
-    // Update active controller
-    activeControllerState.queueLength = serverState.controllers.length
-    activeControllerState.activeView = views.CONTROLLER_GAME_CONTROLS
-    serverState.activeController.emit("command", activeControllerState)
-
-    // Update displays
-    displaysState.queueLength = serverState.controllers.length
-    displaysState.activeView = views.DISPLAY_GAME
-    displays.emit("command", displaysState)
+    updateActiveController(views.CONTROLLER_GAME_CONTROLS)
+    updateDisplays(views.DISPLAY_GAME)
   })
 
   controller.on("gameCommand", command => {
@@ -185,34 +140,48 @@ controllers.on("connect", controller => {
     // Remove controller from activeController if it's there
     if (R.equals(serverState.activeController, controller)) {
       // Select a new active controller if possible
-      if (serverState.controllers.length > 0) {
+      if (R.length(serverState.controllers) > 0) {
         serverState.activeController = serverState.controllers.shift()
         serverState.activeController.leave(QUEUE_GROUP)
-
-        // Change the view of the active controller to confirm start
-        activeControllerState.queueLength = serverState.controllers.length
-        activeControllerState.activeView = views.CONTROLLER_START
-        serverState.activeController.emit("command", activeControllerState)
-
-        // Update displays
-        displaysState.queueLength = serverState.controllers.length
-        displaysState.activeView = views.DISPLAY_WAITING_TO_START
-        displays.emit("command", displaysState)
+        updateActiveController(views.CONTROLLER_START)
+        updateDisplays(views.DISPLAY_WAITING_TO_START)
       } else {
         serverState.activeController = null
-        // Update displays
-        displaysState.queueLength = serverState.controllers.length
-        displaysState.activeView = views.DISPLAY_WAITING
-        displays.emit("command", displaysState)
+        updateDisplays(views.DISPLAY_WAITING)
       }
     }
 
-    // Update other controllers
-    controllersState.activeView = views.CONTROLLER_IN_QUEUE
-    controllersState.queueLength = serverState.controllers.length
-    controllers.to(QUEUE_GROUP).emit("command", controllersState)
+    updateOtherControllers(views.CONTROLLER_IN_QUEUE)
   })
 })
+
+// Updates all controllers in queue
+const updateOtherControllers = view => {
+  controllersState.activeView = view
+  controllersState.queueLength = serverState.controllers.length
+  controllers.to(QUEUE_GROUP).emit("command", controllersState)
+}
+
+// Updates all displays
+const updateDisplays = view => {
+  displaysState.activeView = view
+  displaysState.queueLength = serverState.controllers.length
+  displays.emit("command", displaysState)
+}
+
+// Updates the active controller
+const updateActiveController = view => {
+  activeControllerState.activeView = view
+  activeControllerState.queueLength = serverState.controllers.length
+  serverState.activeController.emit("command", activeControllerState)
+}
+
+// Updates the state of the passed controller
+const updateCurrentController = (controller, view) => {
+  controllersState.queueLength = serverState.controllers.length
+  controllersState.activeView = view
+  controller.emit("command", controllersState)
+}
 
 nextApp.prepare().then(() => {
   app.get("*", (req, res) => {
