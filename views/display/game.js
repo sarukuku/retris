@@ -37,8 +37,8 @@ const colors = [
   "#e67e22",
   "#1abc9c"
 ]
-const W = 400
-const H = 800
+const W = 300
+const H = 600
 const BLOCK_W = W / COLS
 const BLOCK_H = H / ROWS
 
@@ -310,7 +310,7 @@ export default class DisplayGame extends Component {
             display: flex;
             text-align: center;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
           }
 
           canvas {

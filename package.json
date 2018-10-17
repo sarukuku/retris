@@ -1,5 +1,5 @@
 {
-  "name": "with-socket.io",
+  "name": "retris",
   "version": "1.0.0",
   "dependencies": {
     "@zeit/next-css": "^1.0.1",
