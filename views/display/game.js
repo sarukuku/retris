@@ -37,8 +37,8 @@ const colors = [
   "#e67e22",
   "#1abc9c"
 ]
-const W = 300
-const H = 600
+const W = 450
+const H = 900
 const BLOCK_W = W / COLS
 const BLOCK_H = H / ROWS
 
