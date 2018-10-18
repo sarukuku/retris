@@ -235,7 +235,7 @@ export default class DisplayGame extends Component {
     this.init()
     this.newShape()
     lose = false
-    interval = setInterval(this.tick, 600)
+    interval = setInterval(this.tick, 500)
   }
 
   clearAllIntervals = () => {
