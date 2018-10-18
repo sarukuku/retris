@@ -18,9 +18,20 @@
   "scripts": {
     "dev": "concurrently --kill-others \"npm run start-dev\" \"npm run pretty\"",
     "build": "next build",
-    "start": "NODE_ENV=production node server.js",
+    "heroku-postbuild": "next build",
+    "start": "NODE_ENV=production node server.js -p $PORT",
     "start-dev": "node server.js",
     "pretty": "npx onchange '**/*.js' -- prettier --write {{changed}}"
+  },
+  "engines": {
+    "node": "10"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sarukuku/retris"
+  },
+  "bugs": {
+    "url": "https://github.com/sarukuku/retris/issues"
   },
   "devDependencies": {
     "eslint": "^5.6.1",
