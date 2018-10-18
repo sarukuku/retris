@@ -56,7 +56,7 @@ displays.on("connect", display => {
 
   display.on(commands.COMMAND_GAME_OVER, () => {
     updateActiveController(views.CONTROLLER_GAME_OVER)
-    updateDisplays(views.DISPALY_GAME_OVER)
+    updateDisplays(views.DISPLAY_GAME_OVER)
     // Wait a bit before navigating away from the game over screen
     setTimeout(() => {
       const view =

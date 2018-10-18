@@ -4,7 +4,7 @@ import {
   DISPLAY_WAITING,
   DISPLAY_WAITING_TO_START,
   DISPLAY_GAME,
-  DISPALY_GAME_OVER
+  DISPLAY_GAME_OVER
 } from "../lib/views"
 import Waiting from "../views/display/waiting"
 import WaitingToStart from "../views/display/waitingToStart"
@@ -74,7 +74,7 @@ export default class Display extends Component {
                   onGameOver={this.gameOver}
                 />
               )
-            case DISPALY_GAME_OVER:
+            case DISPLAY_GAME_OVER:
               return <GameOver score={score} />
           }
         })()}
