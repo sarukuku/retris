@@ -15,26 +15,26 @@ const commands = require("./lib/commands")
 // Controller groups
 const QUEUE_GROUP = "QUEUE_GROUP"
 
-let serverState = {
+const serverState = {
   displays: [],
   controllers: [],
   activeController: null
 }
 
 // Sent to all displays
-let displaysState = {
+const displaysState = {
   activeView: views.DISPLAY_WAITING,
   queueLength: 0
 }
 
 // Sent to all controllers except the active one
-let controllersState = {
+const controllersState = {
   activeView: views.CONTROLLER_JOIN,
   queueLength: 0
 }
 
 // Sent only to the active controller
-let activeControllerState = {
+const activeControllerState = {
   activeView: views.CONTROLLER_START,
   queueLength: 0
 }
@@ -56,6 +56,7 @@ displays.on("connect", display => {
 
   display.on(commands.COMMAND_GAME_OVER, () => {
     updateActiveController(views.CONTROLLER_GAME_OVER)
+    updateDisplays(views.DISPLAY_GAME_OVER)
     // Wait a bit before navigating away from the game over screen
     setTimeout(() => {
       const view =
@@ -73,7 +74,7 @@ displays.on("connect", display => {
       } else {
         serverState.activeController = null
       }
-    }, 4000)
+    }, 5000)
   })
 
   // Remove a display from the queue if it's lost
