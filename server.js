@@ -174,7 +174,9 @@ const updateDisplays = view => {
 const updateActiveController = view => {
   activeControllerState.activeView = view
   activeControllerState.queueLength = serverState.controllers.length
-  serverState.activeController.emit("command", activeControllerState)
+  if (serverState.activeController !== null) {
+    serverState.activeController.emit("command", activeControllerState)
+  }
 }
 
 // Updates the state of the passed controller
