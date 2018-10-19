@@ -1,4 +1,4 @@
-import App, { Container } from "next/app"
+import App, { Container, AppComponentContext } from "next/app"
 import React from "react"
 import Head from "next/head"
 import "../../node_modules/normalize.css/normalize.css"
@@ -6,7 +6,7 @@ import { JOSEFIN } from "../lib/styles/fonts"
 import { BLACK } from "../lib/styles/colors"
 
 class Retris extends App {
-  static async getInitialProps({ Component, router, ctx }) {
+  static async getInitialProps({ Component, ctx }: AppComponentContext) {
     let pageProps = {}
 
     if (Component.getInitialProps) {

@@ -1,4 +1,4 @@
-import { Component } from "react"
+import React, { Component } from "react"
 import { PETER_RIVER } from "../../lib/styles/colors"
 
 export default class GameQueue extends Component {

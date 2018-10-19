@@ -1,4 +1,4 @@
-import { Component } from "react"
+import React, { Component } from "react"
 import io from "socket.io-client"
 import GameControls from "../views/controller/gameControls"
 import GameQueue from "../views/controller/inQueue"
@@ -6,29 +6,29 @@ import JoinGame from "../views/controller/joinGame"
 import ConfirmStartGame from "../views/controller/startGame"
 import GameNotRunning from "../views/controller/notRunning"
 import GameOver from "../views/controller/gameOver"
-import {
-  CONTROLLER_GAME_OFFLINE,
-  CONTROLLER_JOIN,
-  CONTROLLER_IN_QUEUE,
-  CONTROLLER_START,
-  CONTROLLER_GAME_CONTROLS,
-  CONTROLLER_GAME_OVER
-} from "../lib/views"
-import { COMMAND_CONTROLLER_JOIN, COMMAND_START } from "../lib/commands"
+import { views } from "../lib/views"
+import { commands } from "../lib/commands"
+import { ControllerState } from "src/server"
 
-export default class GameController extends Component {
-  state = {
+interface GameControllerState {
+  socket: typeof io.Socket | null
+  activeView: string
+  queueLength: number
+}
+
+export default class GameController extends Component<{}, GameControllerState> {
+  state: GameControllerState = {
     socket: null,
-    activeView: CONTROLLER_JOIN,
+    activeView: views.CONTROLLER_JOIN,
     queueLength: 0
   }
 
   joinGame = () => {
-    this.state.socket.emit(COMMAND_CONTROLLER_JOIN)
+    this.state.socket!.emit(commands.COMMAND_CONTROLLER_JOIN)
   }
 
   startGame = () => {
-    this.state.socket.emit(COMMAND_START)
+    this.state.socket!.emit(commands.COMMAND_START)
   }
 
   componentDidMount() {
@@ -38,14 +38,14 @@ export default class GameController extends Component {
       this.setState({ socket })
     })
 
-    socket.on("command", data => {
+    socket.on("command", (data: ControllerState) => {
       let { activeView, queueLength } = data
       this.setState({ activeView, queueLength })
     })
   }
 
   componentWillUnmount() {
-    this.state.socket.close()
+    this.state.socket!.close()
   }
 
   render() {
@@ -55,22 +55,17 @@ export default class GameController extends Component {
       <div>
         {(() => {
           switch (activeView) {
-            case CONTROLLER_GAME_OFFLINE:
+            case views.CONTROLLER_GAME_OFFLINE:
               return <GameNotRunning />
-            case CONTROLLER_JOIN:
+            case views.CONTROLLER_JOIN:
               return <JoinGame joinGame={this.joinGame} />
-            case CONTROLLER_IN_QUEUE:
+            case views.CONTROLLER_IN_QUEUE:
               return <GameQueue queueLength={queueLength} />
-            case CONTROLLER_START:
+            case views.CONTROLLER_START:
               return <ConfirmStartGame startGame={this.startGame} />
-            case CONTROLLER_GAME_CONTROLS:
-              return (
-                <GameControls
-                  socket={socket}
-                  stop={() => console.log("stop game")}
-                />
-              )
-            case CONTROLLER_GAME_OVER:
+            case views.CONTROLLER_GAME_CONTROLS:
+              return <GameControls socket={socket!} />
+            case views.CONTROLLER_GAME_OVER:
               return <GameOver />
           }
         })()}

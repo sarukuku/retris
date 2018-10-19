@@ -1,5 +1,5 @@
-import { Component } from "react"
-import { isBrowser } from "../../../helpers"
+import React, { Component } from "react"
+import { isBrowser } from "../../helpers"
 
 export default class DisplayWaiting extends Component {
   render() {

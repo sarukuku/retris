@@ -1,4 +1,4 @@
-import { Component } from "react"
+import React, { Component } from "react"
 
 export default class Loading extends Component {
   render() {
@@ -10,7 +10,7 @@ export default class Loading extends Component {
             position: fixed;
             top: 50%;
             left: 50%;
-            width: 20%;
+            width: 2 0%;
             margin: -10% 0 0 -10%;
             -webkit-animation: spin 3s linear infinite;
             -moz-animation: spin 3s linear infinite;

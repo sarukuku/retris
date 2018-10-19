@@ -1,11 +1,9 @@
-import { Component } from "react"
+import React, { Component } from "react"
 import JoinHelpBar from "../../components/joinHelpBar"
 import css from "styled-jsx/css"
 
-export default class DisplayGameOver extends Component {
+export default class DisplayWaitingToStart extends Component {
   render() {
-    const { score } = this.props
-
     const { className, styles } = css.resolve`
       position: fixed;
       bottom: 0;
@@ -15,8 +13,7 @@ export default class DisplayGameOver extends Component {
 
     return (
       <div className="wrap">
-        <h1>💥 Game Over 💥</h1>
-        <h1>You got {score} points 😬</h1>
+        <h1>Players in queue! Waiting for a player to start... 🤖</h1>
         <JoinHelpBar className={className} />
         {styles}
         <style jsx>{`
@@ -27,10 +24,6 @@ export default class DisplayGameOver extends Component {
             text-align: center;
             justify-content: center;
             align-items: center;
-          }
-
-          h1 {
-            width: 100%;
           }
         `}</style>
       </div>

@@ -1,14 +1,17 @@
-import { Component } from "react"
-import { PETER_RIVER, EMERALD } from "../../lib/styles/colors"
+import React, { Component } from "react"
+import { PETER_RIVER } from "../../lib/styles/colors"
 
-export default class GameQueue extends Component {
+interface GameQueueProps {
+  queueLength: number
+}
+
+export default class GameQueue extends Component<GameQueueProps> {
   render() {
-    const { startGame } = this.props
+    const { queueLength } = this.props
 
     return (
       <main className="wrap">
-        <p>It's your turn to play! Press Start when you're ready.</p>
-        <button onClick={startGame}>Start playing</button>
+        <p>{queueLength} people in queue. Wait for your turn.</p>
         <style jsx>{`
           .wrap {
             width: 100%;
@@ -26,14 +29,6 @@ export default class GameQueue extends Component {
 
           p {
             width: 100%;
-          }
-
-          button {
-            border: 1px solid black;
-            padding: 1rem;
-            border-radius: 100px;
-            background: ${EMERALD};
-            box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.75);
           }
         `}</style>
       </main>

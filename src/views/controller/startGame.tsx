@@ -1,13 +1,18 @@
-import { Component } from "react"
+import React, { Component } from "react"
 import { PETER_RIVER, EMERALD } from "../../lib/styles/colors"
 
-export default class JoinGame extends Component {
+interface GameQueueProps {
+  startGame: () => void
+}
+
+export default class GameQueue extends Component<GameQueueProps> {
   render() {
-    const { joinGame } = this.props
+    const { startGame } = this.props
 
     return (
-      <div className="wrap">
-        <button onClick={joinGame}>Join the game</button>
+      <main className="wrap">
+        <p>It's your turn to play! Press Start when you're ready.</p>
+        <button onClick={startGame}>Start playing</button>
         <style jsx>{`
           .wrap {
             width: 100%;
@@ -15,8 +20,16 @@ export default class JoinGame extends Component {
             position: fixed;
             display: flex;
             justify-content: center;
+            align-content: center;
             align-items: center;
             background-color: ${PETER_RIVER};
+            padding: 1rem;
+            flex-wrap: wrap;
+            text-align: center;
+          }
+
+          p {
+            width: 100%;
           }
 
           button {
@@ -27,7 +40,7 @@ export default class JoinGame extends Component {
             box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.75);
           }
         `}</style>
-      </div>
+      </main>
     )
   }
 }

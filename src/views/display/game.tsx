@@ -1,24 +1,20 @@
-import { Component } from "react"
-import {
-  COMMAND_LEFT,
-  COMMAND_RIGHT,
-  COMMAND_DOWN,
-  COMMAND_DROP,
-  COMMAND_ROTATE
-} from "../../lib/commands"
+import React, { Component } from "react"
+import io from "socket.io-client"
+
+import { commands } from "../../lib/commands"
 import JoinHelpBar from "../../components/joinHelpBar"
 import css from "styled-jsx/css"
 
 const COLS = 10
 const ROWS = 20
-let board = []
-let lose
-let interval
-let intervalRender
-let current // current moving shape
-let currentX
-let currentY // position of current shape
-let freezed // is current shape settled on the board?
+let board: number[][] = []
+let lose: boolean
+let interval: NodeJS.Timeout
+let intervalRender: NodeJS.Timeout
+let current: number[][] // current moving shape
+let currentX: number
+let currentY: number // position of current shape
+let freezed: boolean // is current shape settled on the board?
 const shapes = [
   [1, 1, 1, 1],
   [1, 1, 1, 0, 1],
@@ -42,8 +38,25 @@ const H = 900
 const BLOCK_W = W / COLS
 const BLOCK_H = H / ROWS
 
-export default class DisplayGame extends Component {
-  constructor(props) {
+interface DisplayGameProps {
+  score: number
+  socket: typeof io.Socket
+  addToScore: (score: number) => void
+  onGameOver: () => void
+  resetScore: () => void
+}
+
+interface DisplayGameState {
+  context: CanvasRenderingContext2D | null
+}
+
+export default class DisplayGame extends Component<
+  DisplayGameProps,
+  DisplayGameState
+> {
+  canvasRef: React.RefObject<HTMLCanvasElement>
+
+  constructor(props: DisplayGameProps) {
     super(props)
     this.canvasRef = React.createRef()
     this.state = {
@@ -52,7 +65,7 @@ export default class DisplayGame extends Component {
   }
 
   componentDidMount() {
-    this.setState({ context: this.canvasRef.current.getContext("2d") })
+    this.setState({ context: this.canvasRef.current!.getContext("2d") })
     this.props.socket.on("gameCommand", this.handleCommand)
     this.newGame()
   }
@@ -61,30 +74,30 @@ export default class DisplayGame extends Component {
     this.props.socket.removeListener("gameCommand", this.handleCommand)
   }
 
-  handleCommand = command => {
+  handleCommand = (command: string) => {
     switch (command) {
-      case COMMAND_LEFT:
+      case commands.COMMAND_LEFT:
         if (this.valid(-1)) {
           --currentX
         }
         break
-      case COMMAND_RIGHT:
+      case commands.COMMAND_RIGHT:
         if (this.valid(1)) {
           ++currentX
         }
         break
-      case COMMAND_DOWN:
+      case commands.COMMAND_DOWN:
         if (this.valid(0, 1)) {
           ++currentY
         }
         break
-      case COMMAND_ROTATE:
+      case commands.COMMAND_ROTATE:
         const rotated = this.rotate(current)
         if (this.valid(0, 0, rotated)) {
           current = rotated
         }
         break
-      case COMMAND_DROP:
+      case commands.COMMAND_DROP:
         while (this.valid(0, 1)) {
           ++currentY
         }
@@ -164,8 +177,8 @@ export default class DisplayGame extends Component {
   }
 
   // returns rotates the rotated shape 'current' perpendicularly anticlockwise
-  rotate = current => {
-    let newCurrent = []
+  rotate = (current: number[][]) => {
+    let newCurrent: number[][] = []
     for (let y = 0; y < 4; ++y) {
       newCurrent[y] = []
       for (let x = 0; x < 4; ++x) {
@@ -198,12 +211,9 @@ export default class DisplayGame extends Component {
   }
 
   // checks if the resulting position of current shape will be feasible
-  valid = (offsetX, offsetY, newCurrent) => {
-    offsetX = offsetX || 0
-    offsetY = offsetY || 0
+  valid = (offsetX = 0, offsetY = 0, newCurrent = current) => {
     offsetX = currentX + offsetX
     offsetY = currentY + offsetY
-    newCurrent = newCurrent || current
 
     for (let y = 0; y < 4; ++y) {
       for (let x = 0; x < 4; ++x) {
@@ -244,14 +254,14 @@ export default class DisplayGame extends Component {
   }
 
   // draw a single square at (x, y)
-  drawBlock = (x, y) => {
-    this.state.context.fillRect(
+  drawBlock = (x: number, y: number) => {
+    this.state.context!.fillRect(
       BLOCK_W * x,
       BLOCK_H * y,
       BLOCK_W - 1,
       BLOCK_H - 1
     )
-    this.state.context.strokeRect(
+    this.state.context!.strokeRect(
       BLOCK_W * x,
       BLOCK_H * y,
       BLOCK_W - 1,
@@ -261,24 +271,24 @@ export default class DisplayGame extends Component {
 
   // draws the board and the moving shape
   renderTetris = () => {
-    this.state.context.clearRect(0, 0, W, H)
+    this.state.context!.clearRect(0, 0, W, H)
 
-    this.state.context.strokeStyle = "black"
+    this.state.context!.strokeStyle = "black"
     for (let x = 0; x < COLS; ++x) {
       for (let y = 0; y < ROWS; ++y) {
         if (board[y][x]) {
-          this.state.context.fillStyle = colors[board[y][x] - 1]
+          this.state.context!.fillStyle = colors[board[y][x] - 1]
           this.drawBlock(x, y)
         }
       }
     }
 
-    this.state.context.fillStyle = "red"
-    this.state.context.strokeStyle = "black"
+    this.state.context!.fillStyle = "red"
+    this.state.context!.strokeStyle = "black"
     for (let y = 0; y < 4; ++y) {
       for (let x = 0; x < 4; ++x) {
         if (current[y][x]) {
-          this.state.context.fillStyle = colors[current[y][x] - 1]
+          this.state.context!.fillStyle = colors[current[y][x] - 1]
           this.drawBlock(currentX + x, currentY + y)
         }
       }

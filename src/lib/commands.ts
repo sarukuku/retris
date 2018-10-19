@@ -1,4 +1,4 @@
-module.exports = {
+export const commands = {
   COMMAND_LEFT: "COMMAND_LEFT",
   COMMAND_RIGHT: "COMMAND_RIGHT",
   COMMAND_DOWN: "COMMAND_DOWN",
