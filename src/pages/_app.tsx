@@ -2,8 +2,8 @@ import App, { Container, AppComponentContext } from "next/app"
 import React from "react"
 import Head from "next/head"
 import "../../node_modules/normalize.css/normalize.css"
-import { JOSEFIN } from "../lib/styles/fonts"
-import { BLACK } from "../lib/styles/colors"
+import { JOSEFIN } from "../styles/fonts"
+import { BLACK } from "../styles/colors"
 
 class Retris extends App {
   static async getInitialProps({ Component, ctx }: AppComponentContext) {

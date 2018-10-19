@@ -1,5 +1,5 @@
 import React, { Component } from "react"
-import { PETER_RIVER } from "../../lib/styles/colors"
+import { PETER_RIVER } from "../../styles/colors"
 
 export class GameOver extends Component {
   render() {

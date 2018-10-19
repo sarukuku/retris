@@ -1,5 +1,5 @@
 import React, { Component } from "react"
-import { PETER_RIVER, EMERALD } from "../../lib/styles/colors"
+import { PETER_RIVER, EMERALD } from "../../styles/colors"
 
 interface StartGameProps {
   startGame: () => void

@@ -3,9 +3,8 @@ import { createServer } from "http"
 import socketio from "socket.io"
 import next from "next"
 import R from "ramda"
-
-import { views } from "./lib/views"
-import { commands } from "./lib/commands"
+import { views } from "./views"
+import { commands } from "./commands"
 
 const port = parseInt(process.env.PORT || "3000", 10)
 const dev = process.env.NODE_ENV !== "production"

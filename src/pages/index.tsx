@@ -6,18 +6,21 @@ import { JoinGame } from "../views/controller/join-game"
 import { StartGame } from "../views/controller/start-game"
 import { NotRunning } from "../views/controller/not-running"
 import { GameOver } from "../views/controller/game-over"
-import { views } from "../lib/views"
-import { commands } from "../lib/commands"
+import { views } from "../views"
+import { commands } from "../commands"
 import { ControllerState } from "../server"
 
-interface IndexState {
+interface ControllerComponentState {
   socket: typeof io.Socket | null
   activeView: string
   queueLength: number
 }
 
-export default class Index extends Component<{}, IndexState> {
-  state: IndexState = {
+export default class Controller extends Component<
+  {},
+  ControllerComponentState
+> {
+  state: ControllerComponentState = {
     socket: null,
     activeView: views.CONTROLLER_JOIN,
     queueLength: 0

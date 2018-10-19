@@ -1,8 +1,8 @@
 import React, { Component } from "react"
 import Swipeable from "react-swipeable"
 import io from "socket.io-client"
-import { commands } from "../../lib/commands"
-import { PETER_RIVER, BELIZE_HOLE } from "../../lib/styles/colors"
+import { commands } from "../../commands"
+import { PETER_RIVER, BELIZE_HOLE } from "../../styles/colors"
 
 interface GameControllerProps {
   socket: typeof io.Socket

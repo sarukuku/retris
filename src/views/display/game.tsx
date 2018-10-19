@@ -1,16 +1,15 @@
 import React, { Component } from "react"
 import io from "socket.io-client"
-
-import { commands } from "../../lib/commands"
-import { JoinHelpBar } from "../../components/join-help-bar"
 import css from "styled-jsx/css"
+import { commands } from "../../commands"
+import { JoinHelpBar } from "../../components/join-help-bar"
 
 const COLS = 10
 const ROWS = 20
 let board: number[][] = []
 let lose: boolean
-let interval: NodeJS.Timeout
-let intervalRender: NodeJS.Timeout
+let interval: number
+let intervalRender: number
 let current: number[][] // current moving shape
 let currentX: number
 let currentY: number // position of current shape
@@ -238,11 +237,11 @@ export class Game extends Component<DisplayGameProps, DisplayGameState> {
   newGame = () => {
     this.props.resetScore()
     this.clearAllIntervals()
-    intervalRender = setInterval(this.renderTetris, 30)
+    intervalRender = window.setInterval(this.renderTetris, 30)
     this.init()
     this.newShape()
     lose = false
-    interval = setInterval(this.tick, 500)
+    interval = window.setInterval(this.tick, 500)
   }
 
   clearAllIntervals = () => {

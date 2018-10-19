@@ -1,13 +1,13 @@
 import React, { Component } from "react"
 import { isBrowser } from "../helpers"
-import { WHITE, EMERALD } from "../lib/styles/colors"
+import { WHITE, EMERALD } from "../styles/colors"
 
 interface JoinHelpBarProps {
   className: string
 }
 
 interface JoinHelpBarState {
-  intervalId: NodeJS.Timeout | null
+  intervalId: number | null
 }
 
 export class JoinHelpBar extends Component<JoinHelpBarProps, JoinHelpBarState> {
@@ -30,7 +30,7 @@ export class JoinHelpBar extends Component<JoinHelpBarProps, JoinHelpBarState> {
       return
     }
 
-    const id = setInterval(() => {
+    const id = window.setInterval(() => {
       this.toggleAnimationClass()
     }, 2000)
     this.setState({ intervalId: id })
