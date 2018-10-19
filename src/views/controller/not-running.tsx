@@ -1,21 +1,24 @@
 import React, { Component } from "react"
-import { isBrowser } from "../../helpers"
 
-export class Waiting extends Component {
+export class NotRunning extends Component {
   render() {
     return (
       <div className="wrap">
-        <h1>{`Go to ${
-          isBrowser() ? window.location.origin : "..."
-        } to start playing! 🎮`}</h1>
+        <p>The game display isn't connected. Please connect it first.</p>
         <style jsx>{`
           .wrap {
             width: 100%;
-            height: 100vh;
+            height: 100%;
+            position: fixed;
             display: flex;
-            text-align: center;
             justify-content: center;
             align-items: center;
+            text-align: center;
+            border: 2px solid black;
+          }
+
+          p {
+            padding: 5vw;
           }
         `}</style>
       </div>

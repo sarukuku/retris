@@ -8,7 +8,7 @@ interface GameControllerProps {
   socket: typeof io.Socket
 }
 
-export default class GameController extends Component<GameControllerProps> {
+export class GameController extends Component<GameControllerProps> {
   sendCommand = (value: string) => {
     this.props.socket.emit("gameCommand", value)
   }

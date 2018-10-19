@@ -10,10 +10,7 @@ interface JoinHelpBarState {
   intervalId: NodeJS.Timeout | null
 }
 
-export default class JoinHelpBar extends Component<
-  JoinHelpBarProps,
-  JoinHelpBarState
-> {
+export class JoinHelpBar extends Component<JoinHelpBarProps, JoinHelpBarState> {
   icon: React.RefObject<HTMLElement>
 
   constructor(props: JoinHelpBarProps) {

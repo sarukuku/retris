@@ -2,7 +2,7 @@ import React, { Component } from "react"
 import io from "socket.io-client"
 
 import { commands } from "../../lib/commands"
-import JoinHelpBar from "../../components/joinHelpBar"
+import { JoinHelpBar } from "../../components/join-help-bar"
 import css from "styled-jsx/css"
 
 const COLS = 10
@@ -50,10 +50,7 @@ interface DisplayGameState {
   context: CanvasRenderingContext2D | null
 }
 
-export default class DisplayGame extends Component<
-  DisplayGameProps,
-  DisplayGameState
-> {
+export class Game extends Component<DisplayGameProps, DisplayGameState> {
   canvasRef: React.RefObject<HTMLCanvasElement>
 
   constructor(props: DisplayGameProps) {

@@ -1,10 +1,11 @@
 import React, { Component } from "react"
+import { PETER_RIVER } from "../../lib/styles/colors"
 
-export default class GameNotRunning extends Component {
+export class GameOver extends Component {
   render() {
     return (
-      <div className="wrap">
-        <p>The game display isn't connected. Please connect it first.</p>
+      <main className="wrap">
+        <p>Game Over!</p>
         <style jsx>{`
           .wrap {
             width: 100%;
@@ -12,16 +13,19 @@ export default class GameNotRunning extends Component {
             position: fixed;
             display: flex;
             justify-content: center;
+            align-content: center;
             align-items: center;
+            background-color: ${PETER_RIVER};
+            padding: 1rem;
+            flex-wrap: wrap;
             text-align: center;
-            border: 2px solid black;
           }
 
           p {
-            padding: 5vw;
+            width: 100%;
           }
         `}</style>
-      </div>
+      </main>
     )
   }
 }

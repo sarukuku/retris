@@ -5,7 +5,7 @@ interface JoinGameProps {
   joinGame: () => void
 }
 
-export default class JoinGame extends Component<JoinGameProps> {
+export class JoinGame extends Component<JoinGameProps> {
   render() {
     const { joinGame } = this.props
 

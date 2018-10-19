@@ -1,13 +1,13 @@
 import React, { Component } from "react"
 import io from "socket.io-client"
 import { views } from "../lib/views"
-import Waiting from "../views/display/waiting"
-import WaitingToStart from "../views/display/waitingToStart"
-import Game from "../views/display/game"
-import GameOver from "../views/display/gameOver"
+import { Waiting } from "../views/display/waiting"
+import { WaitingToStart } from "../views/display/waiting-to-start"
+import { Game } from "../views/display/game"
+import { GameOver } from "../views/display/game-over"
 import { PETER_RIVER } from "../lib/styles/colors"
 import { commands } from "../lib/commands"
-import { DisplayState } from "src/server"
+import { DisplayState } from "../server"
 
 interface DisplayComponentState {
   socket: typeof io.Socket | null

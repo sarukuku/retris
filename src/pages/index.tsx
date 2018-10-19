@@ -1,23 +1,23 @@
 import React, { Component } from "react"
 import io from "socket.io-client"
-import GameControls from "../views/controller/gameControls"
-import GameQueue from "../views/controller/inQueue"
-import JoinGame from "../views/controller/joinGame"
-import ConfirmStartGame from "../views/controller/startGame"
-import GameNotRunning from "../views/controller/notRunning"
-import GameOver from "../views/controller/gameOver"
+import { GameController } from "../views/controller/game-controller"
+import { InQueue } from "../views/controller/in-queue"
+import { JoinGame } from "../views/controller/join-game"
+import { StartGame } from "../views/controller/start-game"
+import { NotRunning } from "../views/controller/not-running"
+import { GameOver } from "../views/controller/game-over"
 import { views } from "../lib/views"
 import { commands } from "../lib/commands"
-import { ControllerState } from "src/server"
+import { ControllerState } from "../server"
 
-interface GameControllerState {
+interface IndexState {
   socket: typeof io.Socket | null
   activeView: string
   queueLength: number
 }
 
-export default class GameController extends Component<{}, GameControllerState> {
-  state: GameControllerState = {
+export default class Index extends Component<{}, IndexState> {
+  state: IndexState = {
     socket: null,
     activeView: views.CONTROLLER_JOIN,
     queueLength: 0
@@ -56,15 +56,15 @@ export default class GameController extends Component<{}, GameControllerState> {
         {(() => {
           switch (activeView) {
             case views.CONTROLLER_GAME_OFFLINE:
-              return <GameNotRunning />
+              return <NotRunning />
             case views.CONTROLLER_JOIN:
               return <JoinGame joinGame={this.joinGame} />
             case views.CONTROLLER_IN_QUEUE:
-              return <GameQueue queueLength={queueLength} />
+              return <InQueue queueLength={queueLength} />
             case views.CONTROLLER_START:
-              return <ConfirmStartGame startGame={this.startGame} />
+              return <StartGame startGame={this.startGame} />
             case views.CONTROLLER_GAME_CONTROLS:
-              return <GameControls socket={socket!} />
+              return <GameController socket={socket!} />
             case views.CONTROLLER_GAME_OVER:
               return <GameOver />
           }
