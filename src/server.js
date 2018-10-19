@@ -5,7 +5,7 @@ const next = require("next")
 
 const port = parseInt(process.env.PORT, 10) || 3000
 const dev = process.env.NODE_ENV !== "production"
-const nextApp = next({ dev })
+const nextApp = next({ dev, dir: "./src" })
 const nextHandler = nextApp.getRequestHandler()
 
 const R = require("ramda")
