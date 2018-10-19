@@ -5,6 +5,7 @@ const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin")
 
 module.exports = withTypescript(
   withCSS({
+    distDir: "../dist",
     webpack(config, options) {
       // Do not run type checking twice:
       if (options.isServer)
