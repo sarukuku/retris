@@ -1,14 +1,14 @@
 import React, { Component } from "react"
 import io from "socket.io-client"
-import { GameController } from "../views/controller/game-controller"
-import { InQueue } from "../views/controller/in-queue"
-import { JoinGame } from "../views/controller/join-game"
-import { StartGame } from "../views/controller/start-game"
-import { NotRunning } from "../views/controller/not-running"
-import { GameOver } from "../views/controller/game-over"
-import { views } from "../views"
 import { commands } from "../commands"
 import { ControllerState } from "../server"
+import { views } from "../views"
+import { GameController } from "../views/controller/game-controller"
+import { GameOver } from "../views/controller/game-over"
+import { InQueue } from "../views/controller/in-queue"
+import { JoinGame } from "../views/controller/join-game"
+import { NotRunning } from "../views/controller/not-running"
+import { StartGame } from "../views/controller/start-game"
 
 interface ControllerComponentState {
   socket: typeof io.Socket | null
@@ -23,7 +23,7 @@ export default class Controller extends Component<
   state: ControllerComponentState = {
     socket: null,
     activeView: views.CONTROLLER_JOIN,
-    queueLength: 0
+    queueLength: 0,
   }
 
   joinGame = () => {
@@ -42,7 +42,7 @@ export default class Controller extends Component<
     })
 
     socket.on("command", (data: ControllerState) => {
-      let { activeView, queueLength } = data
+      const { activeView, queueLength } = data
       this.setState({ activeView, queueLength })
     })
   }
@@ -52,7 +52,7 @@ export default class Controller extends Component<
   }
 
   render() {
-    let { activeView, queueLength, socket } = this.state
+    const { activeView, queueLength, socket } = this.state
 
     return (
       <div>

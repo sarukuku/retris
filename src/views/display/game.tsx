@@ -6,7 +6,7 @@ import { JoinHelpBar } from "../../components/join-help-bar"
 
 const COLS = 10
 const ROWS = 20
-let board: number[][] = []
+const board: number[][] = []
 let lose: boolean
 let interval: number
 let intervalRender: number
@@ -21,7 +21,7 @@ const shapes = [
   [1, 1, 0, 0, 1, 1],
   [1, 1, 0, 0, 0, 1, 1],
   [0, 1, 1, 0, 1, 1],
-  [0, 1, 0, 0, 1, 1, 1]
+  [0, 1, 0, 0, 1, 1, 1],
 ]
 const colors = [
   "#2ecc71",
@@ -30,7 +30,7 @@ const colors = [
   "#f1c40f",
   "#e74c3c",
   "#e67e22",
-  "#1abc9c"
+  "#1abc9c",
 ]
 const W = 450
 const H = 900
@@ -56,7 +56,7 @@ export class Game extends Component<DisplayGameProps, DisplayGameState> {
     super(props)
     this.canvasRef = React.createRef()
     this.state = {
-      context: null
+      context: null,
     }
   }
 
@@ -88,7 +88,7 @@ export class Game extends Component<DisplayGameProps, DisplayGameState> {
         }
         break
       case commands.COMMAND_ROTATE:
-        const rotated = this.rotate(current)
+        const rotated = this.rotate()
         if (this.valid(0, 0, rotated)) {
           current = rotated
         }
@@ -108,15 +108,15 @@ export class Game extends Component<DisplayGameProps, DisplayGameState> {
   // creates a new 4x4 shape in global variable 'current'
   // 4x4 so as to cover the size when the shape is rotated
   newShape = () => {
-    let id = Math.floor(Math.random() * shapes.length)
-    let shape = shapes[id] // maintain id for color filling
+    const id = Math.floor(Math.random() * shapes.length)
+    const shape = shapes[id] // maintain id for color filling
 
     current = []
     for (let y = 0; y < 4; ++y) {
       current[y] = []
       for (let x = 0; x < 4; ++x) {
         const i = 4 * y + x
-        if (typeof shape[i] != "undefined" && shape[i]) {
+        if (typeof shape[i] !== "undefined" && shape[i]) {
           current[y][x] = id + 1
         } else {
           current[y][x] = 0
@@ -145,9 +145,8 @@ export class Game extends Component<DisplayGameProps, DisplayGameState> {
   tick = () => {
     if (this.valid(0, 1)) {
       ++currentY
-    }
-    // if the element settled
-    else {
+    } else {
+      // if the element settled
       this.freeze()
       this.valid(0, 1)
       this.clearLines()
@@ -173,8 +172,8 @@ export class Game extends Component<DisplayGameProps, DisplayGameState> {
   }
 
   // returns rotates the rotated shape 'current' perpendicularly anticlockwise
-  rotate = (current: number[][]) => {
-    let newCurrent: number[][] = []
+  rotate = () => {
+    const newCurrent: number[][] = []
     for (let y = 0; y < 4; ++y) {
       newCurrent[y] = []
       for (let x = 0; x < 4; ++x) {
@@ -190,7 +189,7 @@ export class Game extends Component<DisplayGameProps, DisplayGameState> {
     for (let y = ROWS - 1; y >= 0; --y) {
       let rowFilled = true
       for (let x = 0; x < COLS; ++x) {
-        if (board[y][x] == 0) {
+        if (board[y][x] === 0) {
           rowFilled = false
           break
         }
@@ -215,14 +214,14 @@ export class Game extends Component<DisplayGameProps, DisplayGameState> {
       for (let x = 0; x < 4; ++x) {
         if (newCurrent[y][x]) {
           if (
-            typeof board[y + offsetY] == "undefined" ||
-            typeof board[y + offsetY][x + offsetX] == "undefined" ||
+            typeof board[y + offsetY] === "undefined" ||
+            typeof board[y + offsetY][x + offsetX] === "undefined" ||
             board[y + offsetY][x + offsetX] ||
             x + offsetX < 0 ||
             y + offsetY >= ROWS ||
             x + offsetX >= COLS
           ) {
-            if (offsetY == 1 && freezed) {
+            if (offsetY === 1 && freezed) {
               lose = true
               this.props.onGameOver()
             }
@@ -255,13 +254,13 @@ export class Game extends Component<DisplayGameProps, DisplayGameState> {
       BLOCK_W * x,
       BLOCK_H * y,
       BLOCK_W - 1,
-      BLOCK_H - 1
+      BLOCK_H - 1,
     )
     this.state.context!.strokeRect(
       BLOCK_W * x,
       BLOCK_H * y,
       BLOCK_W - 1,
-      BLOCK_H - 1
+      BLOCK_H - 1,
     )
   }
 
@@ -294,7 +293,7 @@ export class Game extends Component<DisplayGameProps, DisplayGameState> {
   // END TETRIS FUNCTIONS
 
   render() {
-    let { score } = this.props
+    const { score } = this.props
 
     const { className, styles } = css.resolve`
       position: fixed;

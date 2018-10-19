@@ -17,7 +17,7 @@ export class JoinHelpBar extends Component<JoinHelpBarProps, JoinHelpBarState> {
     super(props)
     this.icon = React.createRef()
     this.state = {
-      intervalId: null
+      intervalId: null,
     }
   }
 

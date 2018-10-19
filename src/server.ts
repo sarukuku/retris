@@ -1,10 +1,10 @@
 import express from "express"
 import { createServer } from "http"
-import socketio from "socket.io"
 import next from "next"
 import R from "ramda"
-import { views } from "./views"
+import socketio from "socket.io"
 import { commands } from "./commands"
+import { views } from "./views"
 
 const port = parseInt(process.env.PORT || "3000", 10)
 const dev = process.env.NODE_ENV !== "production"
@@ -26,7 +26,7 @@ interface ServerState {
 const serverState: ServerState = {
   displays: [],
   controllers: [],
-  activeController: null
+  activeController: null,
 }
 
 export interface DisplayState {
@@ -37,7 +37,7 @@ export interface DisplayState {
 // Sent to all displays
 const displaysState = {
   activeView: views.DISPLAY_WAITING,
-  queueLength: 0
+  queueLength: 0,
 }
 
 export interface ControllerState {
@@ -48,19 +48,19 @@ export interface ControllerState {
 // Sent to all controllers except the active one
 const controllersState: ControllerState = {
   activeView: views.CONTROLLER_JOIN,
-  queueLength: 0
+  queueLength: 0,
 }
 
 // Sent only to the active controller
 const activeControllerState = {
   activeView: views.CONTROLLER_START,
-  queueLength: 0
+  queueLength: 0,
 }
 
 /**
  * Handle commands related to displays
  */
-let displays = io.of("/display")
+const displays = io.of("/display")
 displays.on("connect", display => {
   // Add a display to a list when it joins
   display.on(commands.COMMAND_DISPLAY_JOIN, () => {
@@ -104,7 +104,7 @@ displays.on("connect", display => {
 /**
  * Handle commands related to controllers
  */
-let controllers = io.of("/controller")
+const controllers = io.of("/controller")
 controllers.on("connect", controller => {
   // Add controller to controller queue when it joins (if it's not already there)
   controller.on(commands.COMMAND_CONTROLLER_JOIN, () => {
@@ -153,7 +153,7 @@ controllers.on("connect", controller => {
   controller.on("disconnect", () => {
     // Remove a controller from the queue if it's there
     serverState.controllers = serverState.controllers.filter(
-      e => e !== controller
+      e => e !== controller,
     )
 
     // Remove controller from activeController if it's there
@@ -210,7 +210,9 @@ nextApp.prepare().then(() => {
   })
 
   server.listen(port, (err: Error) => {
-    if (err) throw err
-    console.log(`> Ready on http://localhost:${port}`)
+    if (err) {
+      throw err
+    }
+    console.log(`> Ready on http://localhost:${port}`) // tslint:disable-line:no-console
   })
 })

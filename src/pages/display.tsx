@@ -1,13 +1,13 @@
 import React, { Component } from "react"
 import io from "socket.io-client"
-import { views } from "../views"
-import { Waiting } from "../views/display/waiting"
-import { WaitingToStart } from "../views/display/waiting-to-start"
-import { Game } from "../views/display/game"
-import { GameOver } from "../views/display/game-over"
-import { PETER_RIVER } from "../styles/colors"
 import { commands } from "../commands"
 import { DisplayState } from "../server"
+import { PETER_RIVER } from "../styles/colors"
+import { views } from "../views"
+import { Game } from "../views/display/game"
+import { GameOver } from "../views/display/game-over"
+import { Waiting } from "../views/display/waiting"
+import { WaitingToStart } from "../views/display/waiting-to-start"
 
 interface DisplayComponentState {
   socket: typeof io.Socket | null
@@ -21,7 +21,7 @@ export default class Display extends Component<{}, DisplayComponentState> {
     socket: null,
     activeView: views.DISPLAY_WAITING,
     score: 0,
-    queueLength: 0
+    queueLength: 0,
   }
 
   componentDidMount() {
@@ -33,7 +33,7 @@ export default class Display extends Component<{}, DisplayComponentState> {
     })
 
     socket.on("command", (data: DisplayState) => {
-      let { activeView, queueLength } = data
+      const { activeView, queueLength } = data
       this.setState({ activeView, queueLength })
     })
   }
@@ -57,7 +57,7 @@ export default class Display extends Component<{}, DisplayComponentState> {
   }
 
   render() {
-    let { activeView, score, socket } = this.state
+    const { activeView, score, socket } = this.state
 
     return (
       <main>

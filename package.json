@@ -22,8 +22,9 @@
   },
   "scripts": {
     "dev": "concurrently --kill-others \"yarn start-dev\" \"yarn pretty\"",
-    "build": "next build src && tsc",
+    "build": "yarn lint && next build src && tsc",
     "heroku-postbuild": "yarn build",
+    "lint": "tslint -c tslint.json 'src/**/*.{ts,tsx}'",
     "start": "NODE_ENV=production node dist/server.js -p $PORT",
     "start-dev": "ts-node src/server.ts --typeCheck --compilerOptions '{\"module\":\"commonjs\"}'",
     "pretty": "npx onchange 'src/**/*.{ts,tsx}' -- prettier --write {{changed}}"
@@ -49,6 +50,7 @@
     "fork-ts-checker-webpack-plugin": "^0.4.10",
     "prettier": "^1.14.3",
     "ts-node": "^7.0.1",
+    "tslint": "^5.11.0",
     "typescript": "^3.1.3"
   }
 }
