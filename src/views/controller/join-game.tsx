@@ -1,7 +1,11 @@
-import { Component } from "react"
-import { PETER_RIVER, EMERALD } from "../../lib/styles/colors"
+import React, { Component } from "react"
+import { PETER_RIVER, EMERALD } from "../../styles/colors"
 
-export default class JoinGame extends Component {
+interface JoinGameProps {
+  joinGame: () => void
+}
+
+export class JoinGame extends Component<JoinGameProps> {
   render() {
     const { joinGame } = this.props
 

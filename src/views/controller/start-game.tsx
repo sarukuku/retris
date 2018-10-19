@@ -1,7 +1,11 @@
-import { Component } from "react"
-import { PETER_RIVER, EMERALD } from "../../lib/styles/colors"
+import React, { Component } from "react"
+import { PETER_RIVER, EMERALD } from "../../styles/colors"
 
-export default class GameQueue extends Component {
+interface StartGameProps {
+  startGame: () => void
+}
+
+export class StartGame extends Component<StartGameProps> {
   render() {
     const { startGame } = this.props
 

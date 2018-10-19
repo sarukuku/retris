@@ -1,7 +1,7 @@
-import { Component } from "react"
-import { isBrowser } from "../../../helpers"
+import React, { Component } from "react"
+import { isBrowser } from "../../helpers"
 
-export default class DisplayWaiting extends Component {
+export class Waiting extends Component {
   render() {
     return (
       <div className="wrap">

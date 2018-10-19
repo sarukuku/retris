@@ -1,8 +1,12 @@
-import { Component } from "react"
-import JoinHelpBar from "../../components/joinHelpBar"
+import React, { Component } from "react"
 import css from "styled-jsx/css"
+import { JoinHelpBar } from "../../components/join-help-bar"
 
-export default class DisplayGameOver extends Component {
+interface GameOverProps {
+  score: number
+}
+
+export class GameOver extends Component<GameOverProps> {
   render() {
     const { score } = this.props
 

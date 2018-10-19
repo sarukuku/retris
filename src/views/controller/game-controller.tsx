@@ -1,32 +1,32 @@
-import { Component } from "react"
+import React, { Component } from "react"
 import Swipeable from "react-swipeable"
-import {
-  COMMAND_LEFT,
-  COMMAND_RIGHT,
-  COMMAND_DOWN,
-  COMMAND_ROTATE
-} from "../../lib/commands"
-import { PETER_RIVER, BELIZE_HOLE } from "../../lib/styles/colors"
+import io from "socket.io-client"
+import { commands } from "../../commands"
+import { PETER_RIVER, BELIZE_HOLE } from "../../styles/colors"
 
-export default class GameController extends Component {
-  sendCommand = value => {
+interface GameControllerProps {
+  socket: typeof io.Socket
+}
+
+export class GameController extends Component<GameControllerProps> {
+  sendCommand = (value: string) => {
     this.props.socket.emit("gameCommand", value)
   }
 
   onTap = () => {
-    this.sendCommand(COMMAND_ROTATE)
+    this.sendCommand(commands.COMMAND_ROTATE)
   }
 
   onSwipeRight = () => {
-    this.sendCommand(COMMAND_RIGHT)
+    this.sendCommand(commands.COMMAND_RIGHT)
   }
 
   onSwipeLeft = () => {
-    this.sendCommand(COMMAND_LEFT)
+    this.sendCommand(commands.COMMAND_LEFT)
   }
 
   onSwipeDown = () => {
-    this.sendCommand(COMMAND_DOWN)
+    this.sendCommand(commands.COMMAND_DOWN)
   }
 
   render() {

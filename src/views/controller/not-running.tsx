@@ -1,6 +1,6 @@
-import { Component } from "react"
+import React, { Component } from "react"
 
-export default class GameNotRunning extends Component {
+export class NotRunning extends Component {
   render() {
     return (
       <div className="wrap">

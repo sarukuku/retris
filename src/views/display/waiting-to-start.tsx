@@ -1,8 +1,8 @@
-import { Component } from "react"
-import JoinHelpBar from "../../components/joinHelpBar"
+import React, { Component } from "react"
 import css from "styled-jsx/css"
+import { JoinHelpBar } from "../../components/join-help-bar"
 
-export default class DisplayWaitingToStart extends Component {
+export class WaitingToStart extends Component {
   render() {
     const { className, styles } = css.resolve`
       position: fixed;

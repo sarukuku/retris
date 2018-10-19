@@ -1,18 +1,28 @@
-import { Component } from "react"
-import { isBrowser } from "../../helpers"
-import { WHITE, EMERALD } from "../lib/styles/colors"
+import React, { Component } from "react"
+import { isBrowser } from "../helpers"
+import { WHITE, EMERALD } from "../styles/colors"
 
-export default class JoinHelpBar extends Component {
-  constructor(props) {
+interface JoinHelpBarProps {
+  className: string
+}
+
+interface JoinHelpBarState {
+  intervalId: number | null
+}
+
+export class JoinHelpBar extends Component<JoinHelpBarProps, JoinHelpBarState> {
+  icon: React.RefObject<HTMLElement>
+
+  constructor(props: JoinHelpBarProps) {
     super(props)
     this.icon = React.createRef()
     this.state = {
-      intervalId: null
+      intervalId: null,
     }
   }
 
   toggleAnimationClass() {
-    this.icon.current.classList.toggle("animate")
+    this.icon.current!.classList.toggle("animate")
   }
 
   componentDidMount() {
@@ -20,7 +30,7 @@ export default class JoinHelpBar extends Component {
       return
     }
 
-    const id = setInterval(() => {
+    const id = window.setInterval(() => {
       this.toggleAnimationClass()
     }, 2000)
     this.setState({ intervalId: id })
@@ -30,7 +40,7 @@ export default class JoinHelpBar extends Component {
     if (!isBrowser()) {
       return
     }
-    clearInterval(this.state.intervalId)
+    clearInterval(this.state.intervalId!)
   }
 
   render() {

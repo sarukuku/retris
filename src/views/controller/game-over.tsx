@@ -1,13 +1,11 @@
-import { Component } from "react"
-import { PETER_RIVER } from "../../lib/styles/colors"
+import React, { Component } from "react"
+import { PETER_RIVER } from "../../styles/colors"
 
-export default class GameQueue extends Component {
+export class GameOver extends Component {
   render() {
-    const { queueLength } = this.props
-
     return (
       <main className="wrap">
-        <p>{queueLength} people in queue. Wait for your turn.</p>
+        <p>Game Over!</p>
         <style jsx>{`
           .wrap {
             width: 100%;
