@@ -17,8 +17,8 @@
   },
   "scripts": {
     "dev": "concurrently --kill-others \"npm run start-dev\" \"npm run pretty\"",
-    "build": "next build",
-    "heroku-postbuild": "next build",
+    "build": "next build src",
+    "heroku-postbuild": "yarn build",
     "start": "NODE_ENV=production node server.js -p $PORT",
     "start-dev": "node src/server.js",
     "pretty": "npx onchange 'src/**/*.js' -- prettier --write {{changed}}"
