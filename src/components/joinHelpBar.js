@@ -1,5 +1,5 @@
 import { Component } from "react"
-import { isBrowser } from "../helpers"
+import { isBrowser } from "../../helpers"
 import { WHITE, EMERALD } from "../lib/styles/colors"
 
 export default class JoinHelpBar extends Component {

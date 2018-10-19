@@ -1,7 +1,7 @@
 import App, { Container } from "next/app"
 import React from "react"
 import Head from "next/head"
-import "../node_modules/normalize.css/normalize.css"
+import "../../node_modules/normalize.css/normalize.css"
 import { JOSEFIN } from "../lib/styles/fonts"
 import { BLACK } from "../lib/styles/colors"
 
