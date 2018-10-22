@@ -1,7 +1,7 @@
 import React, { Component } from "react"
 import io from "socket.io-client"
 import { commands } from "../commands"
-import { ControllerState } from "../server"
+import { ControllerState } from "../server/state"
 import { views } from "../views"
 import { GameController } from "../views/controller/game-controller"
 import { GameOver } from "../views/controller/game-over"
@@ -41,9 +41,9 @@ export default class Controller extends Component<
       this.setState({ socket })
     })
 
-    socket.on("command", (data: ControllerState) => {
-      const { activeView, queueLength } = data
-      this.setState({ activeView, queueLength })
+    socket.on("state", (data: ControllerState) => {
+      const { activeView } = data
+      this.setState({ activeView })
     })
   }
 

@@ -36,8 +36,8 @@
     "build": "yarn lint && next build src && tsc",
     "heroku-postbuild": "yarn build",
     "lint": "tslint -c tslint.json 'src/**/*.{ts,tsx}'",
-    "start": "NODE_ENV=production node dist/server.js -p $PORT",
-    "start-dev": "ts-node src/server.ts --typeCheck --compilerOptions '{\"module\":\"commonjs\"}'",
+    "start": "NODE_ENV=production node dist/index.js -p $PORT",
+    "start-dev": "ts-node src/index.ts --typeCheck --compilerOptions '{\"module\":\"commonjs\"}'",
     "pretty": "npx onchange 'src/**/*.{ts,tsx}' -- prettier --write {{changed}}",
     "test": "jest"
   },

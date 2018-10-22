@@ -62,12 +62,12 @@ export class Game extends Component<DisplayGameProps, DisplayGameState> {
 
   componentDidMount() {
     this.setState({ context: this.canvasRef.current!.getContext("2d") })
-    this.props.socket.on("gameCommand", this.handleCommand)
+    this.props.socket.on("action", this.handleCommand)
     this.newGame()
   }
 
   componentWillUnmount() {
-    this.props.socket.removeListener("gameCommand", this.handleCommand)
+    this.props.socket.removeListener("action", this.handleCommand)
   }
 
   handleCommand = (command: string) => {

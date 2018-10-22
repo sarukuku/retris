@@ -1,7 +1,7 @@
 import React, { Component } from "react"
 import io from "socket.io-client"
 import { commands } from "../commands"
-import { DisplayState } from "../server"
+import { DisplayState } from "../server/state"
 import { PETER_RIVER } from "../styles/colors"
 import { views } from "../views"
 import { Game } from "../views/display/game"
@@ -29,12 +29,10 @@ export default class Display extends Component<{}, DisplayComponentState> {
 
     socket.on("connect", () => {
       this.setState({ socket })
-      socket.emit(commands.COMMAND_DISPLAY_JOIN)
     })
 
-    socket.on("command", (data: DisplayState) => {
-      const { activeView, queueLength } = data
-      this.setState({ activeView, queueLength })
+    socket.on("state", (data: DisplayState) => {
+      this.setState(data)
     })
   }
 

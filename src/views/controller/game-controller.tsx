@@ -10,7 +10,7 @@ interface GameControllerProps {
 
 export class GameController extends Component<GameControllerProps> {
   sendCommand = (value: string) => {
-    this.props.socket.emit("gameCommand", value)
+    this.props.socket.emit("action", value)
   }
 
   onTap = () => {
