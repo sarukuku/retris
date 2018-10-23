@@ -5,5 +5,5 @@ export const commands = {
   TAP: "TAP",
   START: "START",
   GAME_OVER: "GAME_OVER",
-  CONTROLLER_JOIN: "CONTROLLER_JOIN",
+  JOIN: "JOIN",
 }

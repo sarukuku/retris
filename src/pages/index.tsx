@@ -22,12 +22,12 @@ export default class Controller extends Component<
 > {
   state: ControllerComponentState = {
     socket: null,
-    activeView: views.CONTROLLER_JOIN,
+    activeView: views.JOIN,
     queueLength: 0,
   }
 
   joinGame = () => {
-    this.state.socket!.emit(commands.CONTROLLER_JOIN)
+    this.state.socket!.emit(commands.JOIN)
   }
 
   startGame = () => {
@@ -59,7 +59,7 @@ export default class Controller extends Component<
           switch (activeView) {
             case views.CONTROLLER_GAME_OFFLINE:
               return <NotRunning />
-            case views.CONTROLLER_JOIN:
+            case views.JOIN:
               return <JoinGame joinGame={this.joinGame} />
             case views.CONTROLLER_IN_QUEUE:
               return <InQueue queueLength={queueLength} />

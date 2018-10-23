@@ -84,6 +84,78 @@ describe("on controller connect", () => {
   })
 })
 
+describe(`on controller ${commands.JOIN}`, () => {
+  test("invoke onControllerJoin", async () => {
+    const url = "/test"
+    const controller = io.of(url)
+    const testEvent = "command received"
+    const state = createTestState()
+    state.onControllerJoin = async () => {
+      controller.emit(testEvent)
+    }
+    createTestSocketIOServer({ state, controller })
+    const socket = await connect(url)
+
+    socket.emit(commands.JOIN)
+
+    await expect(waitForEmission(socket, testEvent)).resolves.toBeUndefined()
+  })
+})
+
+describe(`on controller ${commands.START}`, () => {
+  test("invoke onControllerStart", async () => {
+    const url = "/test"
+    const controller = io.of(url)
+    const testEvent = "command received"
+    const state = createTestState()
+    state.onControllerStart = async () => {
+      controller.emit(testEvent)
+    }
+    createTestSocketIOServer({ state, controller })
+    const socket = await connect(url)
+
+    socket.emit(commands.START)
+
+    await expect(waitForEmission(socket, testEvent)).resolves.toBeUndefined()
+  })
+})
+
+describe("on controller action", () => {
+  test("invoke onControllerAction", async () => {
+    const url = "/test"
+    const controller = io.of(url)
+    const testEvent = "command received"
+    const state = createTestState()
+    state.onControllerAction = async action => {
+      controller.emit(testEvent, action)
+    }
+    createTestSocketIOServer({ state, controller })
+    const socket = await connect(url)
+
+    socket.emit("action", commands.TAP)
+
+    await expect(
+      waitForEmission(socket, testEvent, commands.TAP),
+    ).resolves.toBeUndefined()
+  })
+})
+
+describe("on controller disconnect", () => {
+  test("invoke onControllerDisconnect", async () => {
+    const url = "/test"
+    const controller = io.of(url)
+    const state = createTestState()
+    state.onControllerDisconnect = jest.fn()
+
+    createTestSocketIOServer({ state, controller })
+    const socket = await connect(url)
+    socket.disconnect()
+    await waitForAllClientsToDisconnect(controller)
+
+    await expect(state.onControllerDisconnect).toHaveBeenCalled()
+  })
+})
+
 function createTestSocketIOServer({
   state = createTestState(),
   display = io.of("/display"),
@@ -100,8 +172,19 @@ function connect(url: string): Promise<SocketIOClient.Socket> {
 function waitForEmission(
   socket: SocketIOClient.Socket,
   event: string,
+  payload?: any,
 ): Promise<void> {
-  return new Promise(resolve => socket.on(event, resolve))
+  return new Promise(resolve =>
+    socket.on(event, (receivedPayload: any) => {
+      if (typeof payload === "undefined") {
+        return resolve()
+      }
+
+      if (payload === receivedPayload) {
+        return resolve()
+      }
+    }),
+  )
 }
 
 function waitForAllClientsToDisconnect(

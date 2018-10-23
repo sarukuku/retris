@@ -71,7 +71,7 @@ export class State {
     await wait(this.gameOverTimeout)
 
     if (this.activeController) {
-      this.activeController.updateState({ activeView: views.CONTROLLER_JOIN })
+      this.activeController.updateState({ activeView: views.JOIN })
     }
 
     this.assignNewActiveController()

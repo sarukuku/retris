@@ -24,7 +24,7 @@ export function createSocketIOServer(
     const controller = new SocketIOController(controllerSocket)
     state.onControllerConnect(controller)
 
-    controllerSocket.on(commands.CONTROLLER_JOIN, () => {
+    controllerSocket.on(commands.JOIN, () => {
       state.onControllerJoin(controller)
     })
 
