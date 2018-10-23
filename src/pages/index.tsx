@@ -27,11 +27,11 @@ export default class Controller extends Component<
   }
 
   joinGame = () => {
-    this.state.socket!.emit(commands.COMMAND_CONTROLLER_JOIN)
+    this.state.socket!.emit(commands.CONTROLLER_JOIN)
   }
 
   startGame = () => {
-    this.state.socket!.emit(commands.COMMAND_START)
+    this.state.socket!.emit(commands.START)
   }
 
   componentDidMount() {

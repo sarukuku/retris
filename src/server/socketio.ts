@@ -11,7 +11,7 @@ export function createSocketIOServer(
     const display = new SocketIODisplay(displaySocket)
     state.onDisplayConnect(display)
 
-    displaySocket.on(commands.COMMAND_GAME_OVER, () => {
+    displaySocket.on(commands.GAME_OVER, () => {
       state.onDisplayGameOver()
     })
 
@@ -24,11 +24,11 @@ export function createSocketIOServer(
     const controller = new SocketIOController(controllerSocket)
     state.onControllerConnect(controller)
 
-    controllerSocket.on(commands.COMMAND_CONTROLLER_JOIN, () => {
+    controllerSocket.on(commands.CONTROLLER_JOIN, () => {
       state.onControllerJoin(controller)
     })
 
-    controllerSocket.on(commands.COMMAND_START, () => {
+    controllerSocket.on(commands.START, () => {
       state.onControllerStart(controller)
     })
 

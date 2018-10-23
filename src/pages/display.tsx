@@ -66,7 +66,7 @@ export default class Display extends Component<
   }
 
   gameOver = () => {
-    this.state.socket!.emit(commands.COMMAND_GAME_OVER)
+    this.state.socket!.emit(commands.GAME_OVER)
   }
 
   render() {

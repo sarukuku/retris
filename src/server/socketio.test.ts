@@ -36,7 +36,7 @@ describe("on display connect", () => {
   })
 })
 
-describe(`on display ${commands.COMMAND_GAME_OVER}`, () => {
+describe(`on display ${commands.GAME_OVER}`, () => {
   test("invoke onDisplayGameOver", async () => {
     const url = "/test"
     const display = io.of(url)
@@ -48,7 +48,7 @@ describe(`on display ${commands.COMMAND_GAME_OVER}`, () => {
     createTestSocketIOServer({ state, display })
     const socket = await connect(url)
 
-    socket.emit(commands.COMMAND_GAME_OVER)
+    socket.emit(commands.GAME_OVER)
 
     await expect(waitForEmission(socket, testEvent)).resolves.toBeUndefined()
   })
