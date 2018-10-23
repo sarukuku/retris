@@ -1,25 +1,13 @@
-import { Server as HTTPServer } from "http"
-import socketio, { Server } from "socket.io"
+import { Namespace } from "socket.io"
 import { commands } from "../commands"
-import {
-  SocketIODisplays,
-  SocketIOControllers,
-  SocketIODisplay,
-  SocketIOController,
-} from "./socketio-adapters"
+import { SocketIODisplay, SocketIOController } from "./socketio-adapters"
 import { State } from "./state"
 
-export function createSocketIOServer(server: HTTPServer): Server {
-  const io = socketio(server)
-  const displayNamespace = io.of("/display")
-  const controllerNamespace = io.of("/controller")
-
-  const state = new State(
-    new SocketIODisplays(displayNamespace),
-    new SocketIOControllers(),
-  )
-
-  displayNamespace.on("connect", displaySocket => {
+export function createSocketIOServer(
+  state: State,
+  namespaces: { display: Namespace; controller: Namespace },
+): void {
+  namespaces.display.on("connect", displaySocket => {
     const display = new SocketIODisplay(displaySocket)
     state.onDisplayConnect(display)
 
@@ -32,7 +20,7 @@ export function createSocketIOServer(server: HTTPServer): Server {
     })
   })
 
-  controllerNamespace.on("connect", controllerSocket => {
+  namespaces.controller.on("connect", controllerSocket => {
     const controller = new SocketIOController(controllerSocket)
     state.onControllerConnect(controller)
 
@@ -52,6 +40,4 @@ export function createSocketIOServer(server: HTTPServer): Server {
       state.onControllerDisconnect(controller)
     })
   })
-
-  return io
 }
