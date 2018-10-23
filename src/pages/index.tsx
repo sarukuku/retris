@@ -41,9 +41,8 @@ export default class Controller extends Component<
       this.setState({ socket })
     })
 
-    socket.on("state", (data: ControllerState) => {
-      const { activeView } = data
-      this.setState({ activeView })
+    socket.on("state", (state: Required<ControllerState>) => {
+      this.setState(state)
     })
   }
 

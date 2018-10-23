@@ -31,7 +31,7 @@ export default class Display extends Component<{}, DisplayComponentState> {
       this.setState({ socket })
     })
 
-    socket.on("state", (data: DisplayState) => {
+    socket.on("state", (data: Required<DisplayState>) => {
       this.setState(data)
     })
   }
