@@ -72,12 +72,16 @@ export class TestDisplay implements Display {
 
 export class TestControllers implements Controllers {
   controllers: Controller[] = []
+  state: ControllerState | undefined
 
   add(controller: Controller): void {
     this.controllers.push(controller)
   }
   remove(controller: Controller): void {
     this.controllers = this.controllers.filter(c => c !== controller)
+  }
+  updateState(state: ControllerState) {
+    this.state = state
   }
 }
 

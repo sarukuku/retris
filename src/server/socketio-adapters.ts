@@ -37,12 +37,18 @@ export class SocketIODisplays implements Displays {
 }
 
 export class SocketIOControllers implements Controllers {
+  constructor(private namespace: Namespace) {}
+
   add(): void {
     return // automatically handled by socketio
   }
 
   remove(): void {
     return // automatically handled by socketio
+  }
+
+  updateState(state: ControllerState): void {
+    this.namespace.emit("state", state)
   }
 }
 

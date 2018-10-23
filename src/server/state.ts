@@ -31,6 +31,7 @@ export interface ControllerState {
 export interface Controllers {
   add(controller: Controller): void
   remove(controller: Controller): void
+  updateState(state: ControllerState): void
 }
 
 export class State {
@@ -97,6 +98,7 @@ export class State {
   private addToControllerQueue(controller: Controller): void {
     this.controllerQueue.push(controller)
     this.displays.updateState({ queueLength: this.controllerQueue.length })
+    this.controllers.updateState({ queueLength: this.controllerQueue.length })
   }
 
   onControllerStart(controller: Controller) {
@@ -126,6 +128,7 @@ export class State {
   private removeFromControllerQueue(controller: Controller): void {
     this.controllerQueue = this.controllerQueue.filter(c => c !== controller)
     this.displays.updateState({ queueLength: this.controllerQueue.length })
+    this.controllers.updateState({ queueLength: this.controllerQueue.length })
   }
 
   private handleGameEnd() {

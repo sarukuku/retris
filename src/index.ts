@@ -24,7 +24,7 @@ nextApp.prepare().then(() => {
 
   const state = new State(
     new SocketIODisplays(displayNamespace),
-    new SocketIOControllers(),
+    new SocketIOControllers(controllerNamespace),
   )
   createSocketIOServer(state, {
     display: displayNamespace,
