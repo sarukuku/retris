@@ -2,28 +2,28 @@ import { isEmpty } from "ramda"
 import { views } from "../views"
 
 export interface Display {
-  updateState(state: Partial<DisplayState>): void
+  updateState(state: DisplayState): void
 }
 
 export interface Displays {
   add(display: Display): void
   remove(display: Display): void
-  updateState(state: Partial<DisplayState>): void
+  updateState(state: DisplayState): void
   sendAction(action: string): void
   getState(): DisplayState | undefined
 }
 
 export interface DisplayState {
-  activeView: string
-  queueLength: number
+  activeView?: string
+  queueLength?: number
 }
 
 export interface Controller {
-  updateState(state: Partial<ControllerState>): void
+  updateState(state: ControllerState): void
 }
 
 export interface ControllerState {
-  activeView: string
+  activeView?: string
 }
 
 export interface Controllers {
@@ -32,13 +32,26 @@ export interface Controllers {
 }
 
 export class State {
-  private activeController?: Controller
-  private controllerQueue: Controller[] = []
+  protected activeController?: Controller
+  protected controllerQueue: Controller[] = []
+  protected initialDisplayState: DisplayState
+  protected gameOverTimeout: number
 
-  constructor(private displays: Displays, private controllers: Controllers) {}
+  constructor(
+    protected displays: Displays,
+    protected controllers: Controllers,
+    {
+      initialDisplayState = INITIAL_DISPLAY_STATE,
+      gameOverTimeout = FIVE_SECONDS,
+    } = {},
+  ) {
+    this.initialDisplayState = initialDisplayState
+    this.gameOverTimeout = gameOverTimeout
+  }
 
   onDisplayConnect(display: Display) {
-    const currentDisplayState = this.displays.getState() || initialDisplayState
+    const currentDisplayState =
+      this.displays.getState() || this.initialDisplayState
     display.updateState(currentDisplayState)
     this.displays.add(display)
   }
@@ -52,7 +65,7 @@ export class State {
 
     this.displays.updateState({ activeView: views.DISPLAY_GAME_OVER })
 
-    await wait(FIVE_SECONDS)
+    await wait(this.gameOverTimeout)
 
     if (this.activeController) {
       this.activeController.updateState({ activeView: views.CONTROLLER_JOIN })
@@ -70,14 +83,18 @@ export class State {
   }
 
   onControllerJoin(controller: Controller) {
-    if (isEmpty(this.controllerQueue)) {
+    if (!this.activeController) {
       this.activeController = controller
       this.activeController.updateState({ activeView: views.CONTROLLER_START })
     } else {
-      this.controllerQueue.push(controller)
       controller.updateState({ activeView: views.CONTROLLER_IN_QUEUE })
-      this.displays.updateState({ queueLength: this.controllerQueue.length })
+      this.addToControllerQueue(controller)
     }
+  }
+
+  private addToControllerQueue(controller: Controller): void {
+    this.controllerQueue.push(controller)
+    this.displays.updateState({ queueLength: this.controllerQueue.length })
   }
 
   onControllerStart(controller: Controller) {
@@ -97,12 +114,16 @@ export class State {
 
   onControllerDisconnect(controller: Controller) {
     if (this.controllerQueue.includes(controller)) {
-      this.controllerQueue = this.controllerQueue.filter(c => c === controller)
-      this.displays.updateState({ queueLength: this.controllerQueue.length })
+      this.removeFromControllerQueue(controller)
     }
 
     this.handleGameEnd()
     this.controllers.remove(controller)
+  }
+
+  private removeFromControllerQueue(controller: Controller): void {
+    this.controllerQueue = this.controllerQueue.filter(c => c !== controller)
+    this.displays.updateState({ queueLength: this.controllerQueue.length })
   }
 
   private handleGameEnd() {
@@ -111,13 +132,13 @@ export class State {
       this.activeController = undefined
     } else {
       this.displays.updateState({ activeView: views.DISPLAY_WAITING_TO_START })
-      this.activeController = this.controllerQueue.pop()!
+      this.activeController = this.controllerQueue.shift()!
       this.activeController.updateState({ activeView: views.CONTROLLER_START })
     }
   }
 }
 
-const initialDisplayState = {
+export const INITIAL_DISPLAY_STATE = {
   activeView: views.DISPLAY_WAITING,
 }
 

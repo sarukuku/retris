@@ -9,24 +9,28 @@ import {
 } from "./state"
 
 export class SocketIODisplays implements Displays {
-  private state: DisplayState
+  private state: DisplayState | undefined
 
   constructor(private namespace: Namespace) {}
 
   add(): void {
-    return
+    return // automatically handled by socketio
   }
+
   remove(): void {
-    return
+    return // automatically handled by socketio
   }
-  updateState(state: Partial<DisplayState>): void {
-    const previousState = this.state || {}
-    this.state = { ...previousState, ...state }
+
+  updateState(state: DisplayState): void {
+    const currentState = this.getState()
+    this.state = { ...currentState, ...state }
     this.namespace.emit("state", state)
   }
+
   sendAction(action: string): void {
     this.namespace.emit("action", action)
   }
+
   getState(): DisplayState | undefined {
     return this.state
   }
@@ -34,17 +38,18 @@ export class SocketIODisplays implements Displays {
 
 export class SocketIOControllers implements Controllers {
   add(): void {
-    return
+    return // automatically handled by socketio
   }
+
   remove(): void {
-    return
+    return // automatically handled by socketio
   }
 }
 
 export class SocketIODisplay implements Display {
   constructor(private socket: Socket) {}
 
-  updateState(state: Partial<DisplayState>): void {
+  updateState(state: DisplayState): void {
     this.socket.emit("state", state)
   }
 }
@@ -52,7 +57,7 @@ export class SocketIODisplay implements Display {
 export class SocketIOController implements Controller {
   constructor(private socket: Socket) {}
 
-  updateState(state: Partial<ControllerState>): void {
+  updateState(state: ControllerState): void {
     this.socket.emit("state", state)
   }
 }
