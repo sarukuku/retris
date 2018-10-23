@@ -2,10 +2,11 @@ import express from "express"
 import { createServer } from "http"
 import next from "next"
 import socketio from "socket.io"
+import { logger } from "./logger"
 import { createSocketIOServer } from "./server/socketio"
 import {
-  SocketIODisplays,
   SocketIOControllers,
+  SocketIODisplays,
 } from "./server/socketio-adapters"
 import { State } from "./server/state"
 
@@ -38,6 +39,6 @@ nextApp.prepare().then(() => {
     if (err) {
       throw err
     }
-    console.log(`> Ready on http://localhost:${port}`) // tslint:disable-line:no-console
+    logger.info(`> Ready on http://localhost:${port}`)
   })
 })

@@ -25,6 +25,7 @@ export interface Controller {
 
 export interface ControllerState {
   activeView?: string
+  queueLength?: number
 }
 
 export interface Controllers {
