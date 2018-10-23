@@ -74,7 +74,7 @@ export class State {
       this.activeController.updateState({ activeView: views.CONTROLLER_JOIN })
     }
 
-    this.handleGameEnd()
+    this.assignNewActiveController()
   }
 
   onDisplayDisconnect(display: Display) {
@@ -89,6 +89,7 @@ export class State {
     if (!this.activeController) {
       this.activeController = controller
       this.activeController.updateState({ activeView: views.CONTROLLER_START })
+      this.displays.updateState({ activeView: views.DISPLAY_WAITING_TO_START })
     } else {
       controller.updateState({ activeView: views.CONTROLLER_IN_QUEUE })
       this.addToControllerQueue(controller)
@@ -117,11 +118,11 @@ export class State {
   }
 
   onControllerDisconnect(controller: Controller) {
-    if (this.controllerQueue.includes(controller)) {
-      this.removeFromControllerQueue(controller)
+    if (controller === this.activeController) {
+      this.assignNewActiveController()
     }
 
-    this.handleGameEnd()
+    this.removeFromControllerQueue(controller)
     this.controllers.remove(controller)
   }
 
@@ -131,7 +132,7 @@ export class State {
     this.controllers.updateState({ queueLength: this.controllerQueue.length })
   }
 
-  private handleGameEnd() {
+  private assignNewActiveController() {
     if (isEmpty(this.controllerQueue)) {
       this.displays.updateState({ activeView: views.DISPLAY_WAITING })
       this.activeController = undefined

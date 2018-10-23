@@ -73,6 +73,7 @@ export class TestDisplay implements Display {
 export class TestControllers implements Controllers {
   controllers: Controller[] = []
   state: ControllerState | undefined
+  stateUpdates: ControllerState[] = []
 
   add(controller: Controller): void {
     this.controllers.push(controller)
@@ -80,8 +81,10 @@ export class TestControllers implements Controllers {
   remove(controller: Controller): void {
     this.controllers = this.controllers.filter(c => c !== controller)
   }
-  updateState(state: ControllerState) {
-    this.state = state
+  updateState(state: DisplayState): void {
+    this.stateUpdates.push(state)
+    const currentState = this.state || {}
+    this.state = { ...currentState, ...state }
   }
 }
 

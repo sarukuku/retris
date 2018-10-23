@@ -181,6 +181,18 @@ describe("onControllerJoin", () => {
         { activeView: views.CONTROLLER_START },
       ])
     })
+
+    test(`set displays view to ${views.DISPLAY_WAITING_TO_START}`, () => {
+      const displays = new TestDisplays()
+      const state = createTestState({ displays })
+      const controller = new TestController()
+
+      state.onControllerJoin(controller)
+
+      expect(displays.stateUpdates).toEqual([
+        { activeView: views.DISPLAY_WAITING_TO_START },
+      ])
+    })
   })
 
   describe("if active controller exists", () => {
@@ -209,14 +221,27 @@ describe("onControllerJoin", () => {
     })
 
     test("set displays queueLength to 1", () => {
-      const state = createTestState()
+      const displays = new TestDisplays()
+      const state = createTestState({ displays })
       const controller = new TestController()
       const activeController = new TestController()
       state.setActiveContoller(activeController)
 
       state.onControllerJoin(controller)
 
-      expect(state.getControllerQueue()).toHaveLength(1)
+      expect(displays.stateUpdates).toEqual([{ queueLength: 1 }])
+    })
+
+    test("set controllers queueLength to 1", () => {
+      const controllers = new TestControllers()
+      const state = createTestState({ controllers })
+      const controller = new TestController()
+      const activeController = new TestController()
+      state.setActiveContoller(activeController)
+
+      state.onControllerJoin(controller)
+
+      expect(controllers.stateUpdates).toEqual([{ queueLength: 1 }])
     })
   })
 })
@@ -272,6 +297,20 @@ describe("onControllerDisconnect", () => {
     expect(controllers.controllers).toEqual([])
   })
 
+  describe("if not the active controller disconnects", () => {
+    test("don't replace with new one", () => {
+      const activeController = new TestController()
+      const otherController = new TestController()
+      const controllers = new TestControllers()
+      const state = createTestState({ controllers })
+      state.setActiveContoller(activeController)
+
+      state.onControllerDisconnect(otherController)
+
+      expect(state.getActiveController()).toBe(activeController)
+    })
+  })
+
   describe("if controller is in queue", () => {
     test("remove controller from queue", () => {
       const controller = new TestController()
@@ -285,14 +324,29 @@ describe("onControllerDisconnect", () => {
     })
 
     test("set displays queueLenght to 0", () => {
+      const activeController = new TestController()
       const controller = new TestController()
       const displays = new TestDisplays()
       const state = createTestState({ displays })
+      state.setActiveContoller(activeController)
       state.setControllerQueue([controller])
 
-      state.onControllerDisconnect(controller)
+      state.onControllerDisconnect(activeController)
 
       expect(displays.stateUpdates).toContainEqual({ queueLength: 0 })
+    })
+
+    test("set controllers queueLenght to 0", () => {
+      const activeController = new TestController()
+      const controller = new TestController()
+      const controllers = new TestControllers()
+      const state = createTestState({ controllers })
+      state.setActiveContoller(activeController)
+      state.setControllerQueue([controller])
+
+      state.onControllerDisconnect(activeController)
+
+      expect(controllers.stateUpdates).toContainEqual({ queueLength: 0 })
     })
   })
 
@@ -323,11 +377,9 @@ describe("onControllerDisconnect", () => {
 
       await state.onControllerDisconnect(activeController)
 
-      expect(displays.stateUpdates).toEqual([
-        {
-          activeView: views.DISPLAY_WAITING_TO_START,
-        },
-      ])
+      expect(displays.stateUpdates).toContainEqual({
+        activeView: views.DISPLAY_WAITING_TO_START,
+      })
     })
   })
 })
