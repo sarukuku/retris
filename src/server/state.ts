@@ -1,4 +1,5 @@
 import { isEmpty } from "ramda"
+import { wait } from "../helpers"
 import { views } from "../views"
 
 export interface Display {
@@ -140,10 +141,7 @@ export class State {
 
 export const INITIAL_DISPLAY_STATE = {
   activeView: views.DISPLAY_WAITING,
+  queueLength: 0,
 }
 
 const FIVE_SECONDS = 5000
-
-function wait(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms))
-}

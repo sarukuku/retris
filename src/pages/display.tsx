@@ -1,3 +1,4 @@
+import { NextContext } from "next"
 import React, { Component } from "react"
 import io from "socket.io-client"
 import { commands } from "../commands"
@@ -9,6 +10,10 @@ import { GameOver } from "../views/display/game-over"
 import { Waiting } from "../views/display/waiting"
 import { WaitingToStart } from "../views/display/waiting-to-start"
 
+interface DisplayProps {
+  address: string
+}
+
 interface DisplayComponentState {
   socket: typeof io.Socket | null
   activeView: string
@@ -16,12 +21,22 @@ interface DisplayComponentState {
   queueLength: number
 }
 
-export default class Display extends Component<{}, DisplayComponentState> {
+export default class Display extends Component<
+  DisplayProps,
+  DisplayComponentState
+> {
   state: DisplayComponentState = {
     socket: null,
     activeView: views.DISPLAY_WAITING,
     score: 0,
     queueLength: 0,
+  }
+
+  static async getInitialProps(ctx: NextContext) {
+    if (ctx.req) {
+      return { address: ctx.req.headers.host }
+    }
+    return { address: window.location.origin }
   }
 
   componentDidMount() {
@@ -55,6 +70,7 @@ export default class Display extends Component<{}, DisplayComponentState> {
   }
 
   render() {
+    const { address } = this.props
     const { activeView, score, socket } = this.state
 
     return (
@@ -63,7 +79,7 @@ export default class Display extends Component<{}, DisplayComponentState> {
         {(() => {
           switch (activeView) {
             case views.DISPLAY_WAITING:
-              return <Waiting />
+              return <Waiting address={address} />
             case views.DISPLAY_WAITING_TO_START:
               return <WaitingToStart />
             case views.DISPLAY_GAME:
