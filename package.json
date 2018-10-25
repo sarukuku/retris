@@ -10,6 +10,7 @@
     "@types/react-swipeable": "4.2.2",
     "@types/socket.io": "1.4.38",
     "@types/socket.io-client": "1.4.32",
+    "@types/storybook__react": "3.0.9",
     "@types/styled-jsx": "2.2.7",
     "@zeit/next-css": "1.0.1",
     "@zeit/next-typescript": "1.1.1",
@@ -39,7 +40,9 @@
     "start": "NODE_ENV=production node dist/index.js -p $PORT",
     "start-dev": "ts-node src/index.ts --typeCheck --compilerOptions '{\"module\":\"commonjs\"}'",
     "pretty": "npx onchange 'src/**/*.{ts,tsx}' -- prettier --write {{changed}}",
-    "test": "jest"
+    "test": "jest",
+    "storybook": "start-storybook --quiet -p 3001",
+    "build-storybook": "build-storybook"
   },
   "engines": {
     "node": "10"
@@ -51,5 +54,13 @@
   "bugs": {
     "url": "https://github.com/sarukuku/retris/issues"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/core": "^7.1.2",
+    "@storybook/addon-actions": "^4.0.0-rc.6",
+    "@storybook/addon-links": "^4.0.0-rc.6",
+    "@storybook/addons": "^4.0.0-rc.6",
+    "@storybook/react": "^4.0.0-rc.6",
+    "babel-loader": "^8.0.4"
+  }
 }
