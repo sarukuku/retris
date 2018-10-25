@@ -5,6 +5,7 @@
   "rules": {
     "semicolon": [true, "never"],
     "member-access": false,
+    "variable-name": false,
     "member-ordering": false,
     "interface-name": false,
     "ordered-imports": [
