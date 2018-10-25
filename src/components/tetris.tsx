@@ -1,4 +1,4 @@
-import React, { Component } from "react"
+import React, { Component, Fragment } from "react"
 import { Game } from "../games/tetris/game"
 import { Matrix } from "../games/tetris/matrix"
 
@@ -7,7 +7,7 @@ interface TetrisState {
 }
 
 export class Tetris extends Component<{}, TetrisState> {
-  game = new Game(10, 10, this.onGameCycle)
+  game = new Game(10, 10, board => this.onGameCycle(board))
   state: TetrisState = { board: [] }
 
   private onGameCycle(board: Matrix) {
@@ -21,19 +21,15 @@ export class Tetris extends Component<{}, TetrisState> {
   render() {
     const { board } = this.state
     return (
-      <>
+      <Fragment>
         <div className="board">
-          {board.map(row => (
-            <div className="row">
-              {row.map(cell => (
-                <>
-                  <div className="cell" />
-                  <style jsx>{`
-                    .cell {
-                      background-color: ${cell ? cell.color : "white"};
-                    }
-                  `}</style>
-                </>
+          {board.map((row, rowIndex) => (
+            <div key={`row-${rowIndex}`} className="row">
+              {row.map((_, cellIndex) => (
+                <div
+                  key={`row-${rowIndex}-cell-${cellIndex}`}
+                  className="cell"
+                />
               ))}
             </div>
           ))}
@@ -54,7 +50,7 @@ export class Tetris extends Component<{}, TetrisState> {
             height: 100%;
           }
         `}</style>
-      </>
+      </Fragment>
     )
   }
 }

@@ -14,7 +14,7 @@ interface Position {
   y: number
 }
 
-const CYCLE_DURATION = 100
+const CYCLE_DURATION = 1000
 
 type OnGameCycle = (board: Matrix) => void
 
@@ -34,7 +34,7 @@ export class Game {
 
   async start() {
     this.addNewActive()
-    while (this.isGameLost) {
+    while (!this.isGameLost) {
       await wait(this.cycleDuration)
       this.runCycle()
       this.onGameCycle(this.board)
