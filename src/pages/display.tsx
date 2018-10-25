@@ -1,13 +1,18 @@
+import { NextContext } from "next"
 import React, { Component } from "react"
 import io from "socket.io-client"
 import { commands } from "../commands"
-import { DisplayState } from "../server"
+import { DisplayState } from "../server/state"
 import { PETER_RIVER } from "../styles/colors"
 import { views } from "../views"
 import { Game } from "../views/display/game"
 import { GameOver } from "../views/display/game-over"
 import { Waiting } from "../views/display/waiting"
 import { WaitingToStart } from "../views/display/waiting-to-start"
+
+interface DisplayProps {
+  address: string
+}
 
 interface DisplayComponentState {
   socket: typeof io.Socket | null
@@ -16,7 +21,10 @@ interface DisplayComponentState {
   queueLength: number
 }
 
-export default class Display extends Component<{}, DisplayComponentState> {
+export default class Display extends Component<
+  DisplayProps,
+  DisplayComponentState
+> {
   state: DisplayComponentState = {
     socket: null,
     activeView: views.DISPLAY_WAITING,
@@ -24,17 +32,22 @@ export default class Display extends Component<{}, DisplayComponentState> {
     queueLength: 0,
   }
 
+  static async getInitialProps(ctx: NextContext) {
+    if (ctx.req) {
+      return { address: ctx.req.headers.host }
+    }
+    return { address: window.location.origin }
+  }
+
   componentDidMount() {
     const socket = io("/display")
 
     socket.on("connect", () => {
       this.setState({ socket })
-      socket.emit(commands.COMMAND_DISPLAY_JOIN)
     })
 
-    socket.on("command", (data: DisplayState) => {
-      const { activeView, queueLength } = data
-      this.setState({ activeView, queueLength })
+    socket.on("state", (data: Required<DisplayState>) => {
+      this.setState(data)
     })
   }
 
@@ -53,10 +66,11 @@ export default class Display extends Component<{}, DisplayComponentState> {
   }
 
   gameOver = () => {
-    this.state.socket!.emit(commands.COMMAND_GAME_OVER)
+    this.state.socket!.emit(commands.GAME_OVER)
   }
 
   render() {
+    const { address } = this.props
     const { activeView, score, socket } = this.state
 
     return (
@@ -65,7 +79,7 @@ export default class Display extends Component<{}, DisplayComponentState> {
         {(() => {
           switch (activeView) {
             case views.DISPLAY_WAITING:
-              return <Waiting />
+              return <Waiting address={address} />
             case views.DISPLAY_WAITING_TO_START:
               return <WaitingToStart />
             case views.DISPLAY_GAME:

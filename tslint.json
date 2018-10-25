@@ -5,6 +5,7 @@
   "rules": {
     "semicolon": [true, "never"],
     "member-access": false,
+    "member-ordering": false,
     "interface-name": false,
     "ordered-imports": [
       true,
@@ -14,7 +15,8 @@
       }
     ],
     "object-literal-sort-keys": false,
-    "arrow-parens": false
+    "arrow-parens": false,
+    "max-classes-per-file": false
   },
   "rulesDirectory": []
 }

@@ -62,42 +62,36 @@ export class Game extends Component<DisplayGameProps, DisplayGameState> {
 
   componentDidMount() {
     this.setState({ context: this.canvasRef.current!.getContext("2d") })
-    this.props.socket.on("gameCommand", this.handleCommand)
+    this.props.socket.on("action", this.handleCommand)
     this.newGame()
   }
 
   componentWillUnmount() {
-    this.props.socket.removeListener("gameCommand", this.handleCommand)
+    this.props.socket.removeListener("action", this.handleCommand)
   }
 
   handleCommand = (command: string) => {
     switch (command) {
-      case commands.COMMAND_LEFT:
+      case commands.LEFT:
         if (this.valid(-1)) {
           --currentX
         }
         break
-      case commands.COMMAND_RIGHT:
+      case commands.RIGHT:
         if (this.valid(1)) {
           ++currentX
         }
         break
-      case commands.COMMAND_DOWN:
+      case commands.DOWN:
         if (this.valid(0, 1)) {
           ++currentY
         }
         break
-      case commands.COMMAND_ROTATE:
+      case commands.TAP:
         const rotated = this.rotate()
         if (this.valid(0, 0, rotated)) {
           current = rotated
         }
-        break
-      case commands.COMMAND_DROP:
-        while (this.valid(0, 1)) {
-          ++currentY
-        }
-        this.tick()
         break
     }
     this.render()

@@ -1,13 +1,15 @@
 import React, { Component } from "react"
-import { isBrowser } from "../../helpers"
 
-export class Waiting extends Component {
+interface WaitingProps {
+  address: string
+}
+
+export class Waiting extends Component<WaitingProps> {
   render() {
+    const { address } = this.props
     return (
       <div className="wrap">
-        <h1>{`Go to ${
-          isBrowser() ? window.location.origin : "..."
-        } to start playing! 🎮`}</h1>
+        <h1>{`Go to ${address} to start playing! 🎮`}</h1>
         <style jsx>{`
           .wrap {
             width: 100%;

@@ -10,23 +10,23 @@ interface GameControllerProps {
 
 export class GameController extends Component<GameControllerProps> {
   sendCommand = (value: string) => {
-    this.props.socket.emit("gameCommand", value)
+    this.props.socket.emit("action", value)
   }
 
   onTap = () => {
-    this.sendCommand(commands.COMMAND_ROTATE)
+    this.sendCommand(commands.TAP)
   }
 
   onSwipeRight = () => {
-    this.sendCommand(commands.COMMAND_RIGHT)
+    this.sendCommand(commands.RIGHT)
   }
 
   onSwipeLeft = () => {
-    this.sendCommand(commands.COMMAND_LEFT)
+    this.sendCommand(commands.LEFT)
   }
 
   onSwipeDown = () => {
-    this.sendCommand(commands.COMMAND_DOWN)
+    this.sendCommand(commands.DOWN)
   }
 
   render() {

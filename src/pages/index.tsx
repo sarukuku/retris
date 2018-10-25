@@ -1,7 +1,7 @@
 import React, { Component } from "react"
 import io from "socket.io-client"
 import { commands } from "../commands"
-import { ControllerState } from "../server"
+import { ControllerState } from "../server/state"
 import { views } from "../views"
 import { GameController } from "../views/controller/game-controller"
 import { GameOver } from "../views/controller/game-over"
@@ -22,16 +22,16 @@ export default class Controller extends Component<
 > {
   state: ControllerComponentState = {
     socket: null,
-    activeView: views.CONTROLLER_JOIN,
+    activeView: views.JOIN,
     queueLength: 0,
   }
 
   joinGame = () => {
-    this.state.socket!.emit(commands.COMMAND_CONTROLLER_JOIN)
+    this.state.socket!.emit(commands.JOIN)
   }
 
   startGame = () => {
-    this.state.socket!.emit(commands.COMMAND_START)
+    this.state.socket!.emit(commands.START)
   }
 
   componentDidMount() {
@@ -41,9 +41,8 @@ export default class Controller extends Component<
       this.setState({ socket })
     })
 
-    socket.on("command", (data: ControllerState) => {
-      const { activeView, queueLength } = data
-      this.setState({ activeView, queueLength })
+    socket.on("state", (state: Required<ControllerState>) => {
+      this.setState(state)
     })
   }
 
@@ -60,7 +59,7 @@ export default class Controller extends Component<
           switch (activeView) {
             case views.CONTROLLER_GAME_OFFLINE:
               return <NotRunning />
-            case views.CONTROLLER_JOIN:
+            case views.JOIN:
               return <JoinGame joinGame={this.joinGame} />
             case views.CONTROLLER_IN_QUEUE:
               return <InQueue queueLength={queueLength} />

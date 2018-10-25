@@ -13,7 +13,7 @@ export class WaitingToStart extends Component {
 
     return (
       <div className="wrap">
-        <h1>Players in queue! Waiting for a player to start... 🤖</h1>
+        <h1>Waiting for a player to start... 🤖</h1>
         <JoinHelpBar className={className} />
         {styles}
         <style jsx>{`
