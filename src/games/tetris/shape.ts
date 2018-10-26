@@ -3,6 +3,11 @@ import { Matrix } from "./matrix"
 
 const _ = undefined
 
+export interface Position {
+  x: number
+  y: number
+}
+
 export class Shape {
   protected constructor(protected matrix: Matrix) {}
 
@@ -12,6 +17,22 @@ export class Shape {
 
   rotate() {
     this.matrix = Shape.reverseColumns(transpose(this.matrix))
+  }
+
+  getCellPositions(): Position[] {
+    const positions: Position[] = []
+    this.matrix.forEach((row, rowIndex) =>
+      row.forEach((cell, columnIndex) => {
+        if (!cell) {
+          return
+        }
+        positions.push({
+          x: columnIndex,
+          y: rowIndex,
+        })
+      }),
+    )
+    return positions
   }
 
   private static reverseColumns(matrix: Matrix): Matrix {

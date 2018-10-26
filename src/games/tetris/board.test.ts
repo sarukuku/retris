@@ -1,5 +1,5 @@
-import { Board } from "./board"
-import { getNextShape as _getNextShape } from "./get-next-shape"
+import { Board, OnBoardChange, OnGameOver, Active } from "./board"
+import { getNextShape as _getNextShape, GetNextShape } from "./get-next-shape"
 import { Matrix, createEmptyMatrix } from "./matrix"
 import { Shape } from "./shape"
 
@@ -189,15 +189,117 @@ test("observe board after a step and 2 down", () => {
   expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
 })
 
+test("observe board after current active reached bottom", () => {
+  const color = "red"
+  const o = { color }
+  const onBoardChange = jest.fn()
+  const initialMatrix = [
+    [_, _, _, _, _, _, _, _, _, _], //
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, o, o, _, _, _, _],
+    [_, _, _, _, o, o, _, _, _, _],
+  ]
+  const board = createBoard({
+    onBoardChange,
+    matrix: initialMatrix,
+    active: {
+      position: {
+        x: 4,
+        y: 8,
+      },
+      shape: Shape.createOShape(color),
+      hasAlreadyHitBottom: false,
+    },
+  })
+
+  board.step()
+
+  const expectedBoard = [
+    [_, _, _, _, _, _, _, _, _, _], //
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, o, o, _, _, _, _],
+    [_, _, _, _, o, o, _, _, _, _],
+  ]
+
+  expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
+})
+
+test("observe board after current active reached bottom (shape already present)", () => {
+  const o = { color: "red" }
+  const onBoardChange = jest.fn()
+  const initialMatrix = [
+    [_, _, _, _, _, _, _, _, _, _], //
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, o, o, _, _, _, _],
+    [_, _, _, _, o, o, _, _, _, _],
+    [_, _, _, _, o, _, _, _, _, _],
+  ]
+  const board = createBoard({
+    onBoardChange,
+    matrix: initialMatrix,
+    active: {
+      position: {
+        x: 4,
+        y: 7,
+      },
+      shape: Shape.createOShape(o.color),
+      hasAlreadyHitBottom: false,
+    },
+  })
+
+  board.step()
+
+  const expectedBoard = [
+    [_, _, _, _, _, _, _, _, _, _], //
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, o, o, _, _, _, _],
+    [_, _, _, _, o, o, _, _, _, _],
+    [_, _, _, _, o, _, _, _, _, _],
+  ]
+
+  expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
+})
+
+interface CreateBoardOptions {
+  getNextShape?: GetNextShape
+  onBoardChange?: OnBoardChange
+  onGameOver?: OnGameOver
+  matrix?: Matrix
+  active?: Active
+}
+
 function createBoard({
   getNextShape = _getNextShape,
   onBoardChange = (_board: Matrix) => {
     return
   },
-  onboardOver = () => {
+  onGameOver = () => {
     return
   },
   matrix = createEmptyMatrix(10, 10),
-} = {}) {
-  return new Board(onBoardChange, onboardOver, getNextShape, matrix)
+  active,
+}: CreateBoardOptions = {}) {
+  return new Board(onBoardChange, onGameOver, getNextShape, matrix, active)
 }
