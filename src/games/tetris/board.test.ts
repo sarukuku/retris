@@ -49,16 +49,16 @@ test("add shape to board", () => {
 test("observe board after 3 steps", () => {
   const color = "red"
   const onBoardChange = jest.fn()
-  const game = createBoard({
+  const board = createBoard({
     columnCount: 10,
     rowCount: 10,
     getNextShape: () => Shape.createTShape(color),
     onBoardChange,
   })
 
-  game.step()
-  game.step()
-  game.step()
+  board.step()
+  board.step()
+  board.step()
 
   const o = { color }
   const expectedBoard = [
@@ -77,6 +77,130 @@ test("observe board after 3 steps", () => {
   expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
 })
 
+test("observe board after 2 steps and a rotation", () => {
+  const color = "red"
+  const onBoardChange = jest.fn()
+  const board = createBoard({
+    columnCount: 10,
+    rowCount: 10,
+    getNextShape: () => Shape.createZShape(color),
+    onBoardChange,
+  })
+
+  board.step()
+  board.step()
+  board.rotate()
+
+  const o = { color }
+  const expectedBoard = [
+    [_, _, _, _, _, _, _, _, _, _], //
+    [_, _, _, _, _, _, o, _, _, _],
+    [_, _, _, _, _, o, o, _, _, _],
+    [_, _, _, _, _, o, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+  ]
+
+  expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
+})
+
+test("observe board after a step and 2 lefts", () => {
+  const color = "red"
+  const onBoardChange = jest.fn()
+  const board = createBoard({
+    columnCount: 10,
+    rowCount: 10,
+    getNextShape: () => Shape.createSShape(color),
+    onBoardChange,
+  })
+
+  board.step()
+  board.left()
+  board.left()
+
+  const o = { color }
+  const expectedBoard = [
+    [_, _, _, o, o, _, _, _, _, _], //
+    [_, _, o, o, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+  ]
+
+  expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
+})
+
+test("observe board after a step and 2 right", () => {
+  const color = "red"
+  const onBoardChange = jest.fn()
+  const board = createBoard({
+    columnCount: 10,
+    rowCount: 10,
+    getNextShape: () => Shape.createOShape(color),
+    onBoardChange,
+  })
+
+  board.step()
+  board.right()
+  board.right()
+
+  const o = { color }
+  const expectedBoard = [
+    [_, _, _, _, _, _, o, o, _, _], //
+    [_, _, _, _, _, _, o, o, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+  ]
+
+  expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
+})
+
+test("observe board after a step and 2 down", () => {
+  const color = "red"
+  const onBoardChange = jest.fn()
+  const board = createBoard({
+    columnCount: 10,
+    rowCount: 10,
+    getNextShape: () => Shape.createOShape(color),
+    onBoardChange,
+  })
+
+  board.step()
+  board.down()
+  board.down()
+
+  const o = { color }
+  const expectedBoard = [
+    [_, _, _, _, _, _, _, _, _, _], //
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, o, o, _, _, _, _],
+    [_, _, _, _, o, o, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+  ]
+
+  expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
+})
+
 function createBoard({
   columnCount = 10,
   rowCount = 10,
@@ -84,7 +208,7 @@ function createBoard({
   onBoardChange = (_board: Matrix) => {
     return
   },
-  onGameOver = () => {
+  onboardOver = () => {
     return
   },
 } = {}) {
@@ -92,7 +216,7 @@ function createBoard({
     columnCount,
     rowCount,
     onBoardChange,
-    onGameOver,
+    onboardOver,
     getNextShape,
   )
 }

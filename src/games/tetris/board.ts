@@ -17,8 +17,11 @@ type OnBoardChange = (board: Matrix) => void
 
 type OnGameOver = () => void
 
+function createEmptyBoard(columnCount: number, rowCount: number): Matrix {
+  return times(() => times(always(undefined), columnCount), rowCount)
+}
+
 export class Board {
-  protected matrix: Matrix
   private active: Active | undefined
 
   constructor(
@@ -27,8 +30,8 @@ export class Board {
     public onBoardChange: OnBoardChange,
     public onGameOver: OnGameOver,
     private getNextShape: GetNextShape,
+    private matrix = createEmptyBoard(columnCount, rowCount),
   ) {
-    this.matrix = times(() => times(always(undefined), columnCount), rowCount)
     this.invalidateBoard()
   }
 
@@ -83,7 +86,7 @@ export class Board {
 
   private executeStep() {
     if (!this.active) {
-      this.addNewActiveShape()
+      this.spawnNewActiveShape()
       return
     }
 
@@ -94,7 +97,7 @@ export class Board {
       }
 
       this.addActiveShapeToBoard()
-      this.addNewActiveShape()
+      this.spawnNewActiveShape()
       return
     }
 
@@ -134,7 +137,7 @@ export class Board {
     return false
   }
 
-  private addNewActiveShape() {
+  private spawnNewActiveShape() {
     const middleX = Math.floor((this.columnCount - 1) / 2)
 
     this.active = {
