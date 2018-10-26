@@ -180,7 +180,7 @@ tests.map(
     test(`${name} initial`, () => {
       const shape = createShape(color)
 
-      expect(shape.draw()).toEqual(initial)
+      expect(shape.matrix).toEqual(initial)
     })
 
     test(`${name} rotateOnce`, () => {
@@ -188,7 +188,7 @@ tests.map(
 
       shape.rotate()
 
-      expect(shape.draw()).toEqual(rotateOnce)
+      expect(shape.matrix).toEqual(rotateOnce)
     })
 
     test(`${name} rotateTwice`, () => {
@@ -197,7 +197,7 @@ tests.map(
       shape.rotate()
       shape.rotate()
 
-      expect(shape.draw()).toEqual(rotateTwice)
+      expect(shape.matrix).toEqual(rotateTwice)
     })
 
     test(`${name} rotateThrice`, () => {
@@ -207,7 +207,7 @@ tests.map(
       shape.rotate()
       shape.rotate()
 
-      expect(shape.draw()).toEqual(rotateThrice)
+      expect(shape.matrix).toEqual(rotateThrice)
     })
   },
 )

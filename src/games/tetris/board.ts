@@ -6,7 +6,6 @@ import { Shape, Position } from "./shape"
 export interface Active {
   shape: Shape
   position: Position
-  hasAlreadyHitBottom: boolean
 }
 
 export type OnBoardChange = (board: Matrix) => void
@@ -14,6 +13,8 @@ export type OnBoardChange = (board: Matrix) => void
 export type OnGameOver = () => void
 
 export class Board {
+  private hasActiveAlreadyHitBottom: boolean
+
   constructor(
     public onBoardChange: OnBoardChange,
     public onGameOver: OnGameOver,
@@ -80,17 +81,18 @@ export class Board {
     }
 
     if (this.isActiveAtBottom()) {
-      if (this.active.hasAlreadyHitBottom) {
-        // this.addActiveToBoard()
+      if (this.hasActiveAlreadyHitBottom) {
+        this.matrix = this.mergeActiveToBoard()
+        this.active = undefined
         return
       }
 
-      this.active.hasAlreadyHitBottom = true
+      this.hasActiveAlreadyHitBottom = true
       return
     }
 
-    if (this.active.hasAlreadyHitBottom) {
-      this.active.hasAlreadyHitBottom = false
+    if (this.hasActiveAlreadyHitBottom) {
+      this.hasActiveAlreadyHitBottom = false
     }
 
     this.active.position.y++
@@ -133,23 +135,23 @@ export class Board {
       return
     }
 
-    const { position, shape } = this.active
-
-    const board = clone(this.matrix)
-
-    shape.draw().map((row, rowIndex) => {
-      row.map((cell, columnIndex) => {
-        const rowWithOffset = rowIndex + position.y
-        const columnWithOffset = columnIndex + position.x
-
-        if (!board[rowWithOffset][columnWithOffset]) {
-          board[rowWithOffset][columnWithOffset] = cell
-        }
-      })
-    })
-
+    const board = this.mergeActiveToBoard()
     this.onBoardChange(board)
     return
+  }
+
+  private mergeActiveToBoard(): Matrix {
+    const { position, shape } = this.active!
+
+    const board = clone(this.matrix)
+    shape.matrix.forEach((row, rowIndex) => {
+      row.forEach((cell, columnIndex) => {
+        const rowWithOffset = rowIndex + position.y
+        const columnWithOffset = columnIndex + position.x
+        board[rowWithOffset][columnWithOffset] = cell
+      })
+    })
+    return board
   }
 
   private spawnNewActiveShape(): void {
@@ -158,8 +160,8 @@ export class Board {
     this.active = {
       shape: this.getNextShape(),
       position: { x: middleX, y: 0 },
-      hasAlreadyHitBottom: false,
     }
+    this.hasActiveAlreadyHitBottom = false
   }
 
   private get columnCount(): number {

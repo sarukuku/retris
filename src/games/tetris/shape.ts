@@ -9,11 +9,7 @@ export interface Position {
 }
 
 export class Shape {
-  protected constructor(protected matrix: Matrix) {}
-
-  draw() {
-    return this.matrix
-  }
+  protected constructor(public matrix: Matrix) {}
 
   rotate() {
     this.matrix = Shape.reverseColumns(transpose(this.matrix))

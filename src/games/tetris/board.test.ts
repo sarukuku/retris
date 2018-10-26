@@ -193,15 +193,12 @@ test("active reached bottom", () => {
   const color = "red"
   const o = { color }
   const onBoardChange = jest.fn()
+  const bottomOfBoard = { x: 4, y: 8 }
   const board = createBoard({
     onBoardChange,
     active: {
-      position: {
-        x: 4,
-        y: 8,
-      },
+      position: bottomOfBoard,
       shape: Shape.createOShape(color),
-      hasAlreadyHitBottom: false,
     },
   })
 
@@ -238,16 +235,16 @@ test("active reached bottom (shape already present)", () => {
     [_, _, _, _, _, _, _, _, _, _],
     [_, _, _, _, o, _, _, _, _, _],
   ]
+  const aboveInitialCell = {
+    x: 4,
+    y: 7,
+  }
   const board = createBoard({
     onBoardChange,
     matrix: initialMatrix,
     active: {
-      position: {
-        x: 4,
-        y: 7,
-      },
+      position: aboveInitialCell,
       shape: Shape.createOShape(o.color),
-      hasAlreadyHitBottom: false,
     },
   })
 
@@ -284,16 +281,16 @@ test("active reached bottom but dodges to the left", () => {
     [_, _, _, _, _, _, _, _, _, _],
     [_, _, _, _, _, o, _, _, _, _],
   ]
+  const aboveInitialCell = {
+    x: 4,
+    y: 7,
+  }
   const board = createBoard({
     onBoardChange,
     matrix: initialMatrix,
     active: {
-      position: {
-        x: 4,
-        y: 7,
-      },
+      position: aboveInitialCell,
       shape: Shape.createOShape(o.color),
-      hasAlreadyHitBottom: false,
     },
   })
 
@@ -312,6 +309,39 @@ test("active reached bottom but dodges to the left", () => {
     [_, _, _, _, _, _, _, _, _, _],
     [_, _, _, o, o, _, _, _, _, _],
     [_, _, _, o, o, o, _, _, _, _],
+  ]
+
+  expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
+})
+
+test("active reached bottom twice, new shape spawns", () => {
+  const o = { color: "red" }
+  const onBoardChange = jest.fn()
+  const bottomOfBoard = { x: 4, y: 8 }
+  const board = createBoard({
+    onBoardChange,
+    active: {
+      position: bottomOfBoard,
+      shape: Shape.createOShape(o.color),
+    },
+    getNextShape: () => Shape.createIShape(o.color),
+  })
+
+  board.step()
+  board.step()
+  board.step()
+
+  const expectedBoard = [
+    [_, _, _, _, _, _, o, _, _, _], //
+    [_, _, _, _, _, _, o, _, _, _],
+    [_, _, _, _, _, _, o, _, _, _],
+    [_, _, _, _, _, _, o, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, o, o, _, _, _, _],
+    [_, _, _, _, o, o, _, _, _, _],
   ]
 
   expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
