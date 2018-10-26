@@ -1,4 +1,4 @@
-import { always, times, clone } from "ramda"
+import { clone } from "ramda"
 import { GetNextShape } from "./get-next-shape"
 import { Matrix } from "./matrix"
 import { Shape } from "./shape"
@@ -17,20 +17,14 @@ type OnBoardChange = (board: Matrix) => void
 
 type OnGameOver = () => void
 
-function createEmptyBoard(columnCount: number, rowCount: number): Matrix {
-  return times(() => times(always(undefined), columnCount), rowCount)
-}
-
 export class Board {
   private active: Active | undefined
 
   constructor(
-    private columnCount: number,
-    rowCount: number,
     public onBoardChange: OnBoardChange,
     public onGameOver: OnGameOver,
     private getNextShape: GetNextShape,
-    private matrix = createEmptyBoard(columnCount, rowCount),
+    private matrix: Matrix,
   ) {
     this.invalidateBoard()
   }
@@ -144,6 +138,16 @@ export class Board {
       shape: this.getNextShape(),
       position: { x: middleX, y: 0 },
     }
+  }
+
+  private get columnCount(): number {
+    const firstRow = this.matrix[0]
+
+    if (!firstRow) {
+      return 0
+    }
+
+    return firstRow.length
   }
 
   private addActiveShapeToBoard() {
