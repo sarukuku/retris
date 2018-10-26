@@ -66,9 +66,9 @@ export class Shape {
   static createTShape(color: string) {
     const x = { color }
     return new Shape([
-      [_, _, _], //
+      [_, x, _], //
       [x, x, x],
-      [_, x, _],
+      [_, _, _],
     ])
   }
 

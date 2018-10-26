@@ -2,6 +2,8 @@ import { times } from "ramda"
 import { pick } from "../../helpers"
 import { Shape } from "./shape"
 
+export type GetNextShape = () => Shape
+
 export function getNextShape(): Shape {
   const createShape = pick(shapes)
   const color = pick(colors)

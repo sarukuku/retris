@@ -129,23 +129,23 @@ const tests = [
     name: "T shape",
     createShape: Shape.createTShape,
     initial: [
-      [_, _, _], //
-      [x, x, x],
-      [_, x, _],
-    ],
-    rotateOnce: [
-      [_, x, _], //
-      [x, x, _],
-      [_, x, _],
-    ],
-    rotateTwice: [
       [_, x, _], //
       [x, x, x],
       [_, _, _],
     ],
-    rotateThrice: [
+    rotateOnce: [
       [_, x, _], //
       [_, x, x],
+      [_, x, _],
+    ],
+    rotateTwice: [
+      [_, _, _], //
+      [x, x, x],
+      [_, x, _],
+    ],
+    rotateThrice: [
+      [_, x, _], //
+      [x, x, _],
       [_, x, _],
     ],
   },
