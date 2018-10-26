@@ -82,7 +82,7 @@ export class Board {
 
     if (this.isActiveAtBottom()) {
       if (this.hasActiveAlreadyHitBottom) {
-        this.matrix = this.mergeActiveToBoard()
+        this.matrix = this.addActiveToBoard()
         this.active = undefined
         return
       }
@@ -105,7 +105,7 @@ export class Board {
 
     const activeShapeCellPositions = this.active.shape
       .getCellPositions()
-      .map(p => this.toBoardCellPositions(p))
+      .map(p => this.toBoardCellPosition(p))
 
     const isAtBottom = activeShapeCellPositions.some(
       p => this.isAtBottomRow(p) || this.isAboveOccupiedCell(p),
@@ -114,7 +114,7 @@ export class Board {
     return isAtBottom
   }
 
-  private toBoardCellPositions({ x, y }: Position): Position {
+  private toBoardCellPosition({ x, y }: Position): Position {
     const { position } = this.active!
     return { x: x + position.x, y: y + position.y }
   }
@@ -135,22 +135,21 @@ export class Board {
       return
     }
 
-    const board = this.mergeActiveToBoard()
+    const board = this.addActiveToBoard()
     this.onBoardChange(board)
     return
   }
 
-  private mergeActiveToBoard(): Matrix {
-    const { position, shape } = this.active!
+  private addActiveToBoard(): Matrix {
+    const { shape } = this.active!
 
     const board = clone(this.matrix)
-    shape.matrix.forEach((row, rowIndex) => {
-      row.forEach((cell, columnIndex) => {
-        const rowWithOffset = rowIndex + position.y
-        const columnWithOffset = columnIndex + position.x
-        board[rowWithOffset][columnWithOffset] = cell
-      })
+    shape.getCellPositions().forEach(({ x, y }) => {
+      const shapeCell = shape.matrix[y][x]
+      const boardCellPosition = this.toBoardCellPosition({ x, y })
+      board[boardCellPosition.y][boardCellPosition.x] = shapeCell
     })
+
     return board
   }
 
