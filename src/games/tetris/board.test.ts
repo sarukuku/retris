@@ -44,7 +44,7 @@ test("add shape to board", () => {
   expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
 })
 
-test("observe board after 3 steps", () => {
+test("3 steps", () => {
   const color = "red"
   const onBoardChange = jest.fn()
   const board = createBoard({
@@ -73,7 +73,7 @@ test("observe board after 3 steps", () => {
   expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
 })
 
-test("observe board after 2 steps and a rotation", () => {
+test("2 steps and a rotation", () => {
   const color = "red"
   const onBoardChange = jest.fn()
   const board = createBoard({
@@ -102,7 +102,7 @@ test("observe board after 2 steps and a rotation", () => {
   expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
 })
 
-test("observe board after a step and 2 lefts", () => {
+test("a step and 2 lefts", () => {
   const color = "red"
   const onBoardChange = jest.fn()
   const board = createBoard({
@@ -131,7 +131,7 @@ test("observe board after a step and 2 lefts", () => {
   expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
 })
 
-test("observe board after a step and 2 right", () => {
+test("a step and 2 right", () => {
   const color = "red"
   const onBoardChange = jest.fn()
   const board = createBoard({
@@ -160,7 +160,7 @@ test("observe board after a step and 2 right", () => {
   expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
 })
 
-test("observe board after a step and 2 down", () => {
+test("a step and 2 down", () => {
   const color = "red"
   const onBoardChange = jest.fn()
   const board = createBoard({
@@ -189,25 +189,12 @@ test("observe board after a step and 2 down", () => {
   expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
 })
 
-test("observe board after current active reached bottom", () => {
+test("active reached bottom", () => {
   const color = "red"
   const o = { color }
   const onBoardChange = jest.fn()
-  const initialMatrix = [
-    [_, _, _, _, _, _, _, _, _, _], //
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, o, o, _, _, _, _],
-    [_, _, _, _, o, o, _, _, _, _],
-  ]
   const board = createBoard({
     onBoardChange,
-    matrix: initialMatrix,
     active: {
       position: {
         x: 4,
@@ -236,7 +223,7 @@ test("observe board after current active reached bottom", () => {
   expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
 })
 
-test("observe board after current active reached bottom (shape already present)", () => {
+test("active reached bottom (shape already present)", () => {
   const o = { color: "red" }
   const onBoardChange = jest.fn()
   const initialMatrix = [
@@ -247,8 +234,8 @@ test("observe board after current active reached bottom (shape already present)"
     [_, _, _, _, _, _, _, _, _, _],
     [_, _, _, _, _, _, _, _, _, _],
     [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, o, o, _, _, _, _],
-    [_, _, _, _, o, o, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
     [_, _, _, _, o, _, _, _, _, _],
   ]
   const board = createBoard({
@@ -277,6 +264,54 @@ test("observe board after current active reached bottom (shape already present)"
     [_, _, _, _, o, o, _, _, _, _],
     [_, _, _, _, o, o, _, _, _, _],
     [_, _, _, _, o, _, _, _, _, _],
+  ]
+
+  expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
+})
+
+test("active reached bottom but dodges to the left", () => {
+  const o = { color: "red" }
+  const onBoardChange = jest.fn()
+  const initialMatrix = [
+    [_, _, _, _, _, _, _, _, _, _], //
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, o, _, _, _, _],
+  ]
+  const board = createBoard({
+    onBoardChange,
+    matrix: initialMatrix,
+    active: {
+      position: {
+        x: 4,
+        y: 7,
+      },
+      shape: Shape.createOShape(o.color),
+      hasAlreadyHitBottom: false,
+    },
+  })
+
+  board.step()
+  board.left()
+  board.step()
+
+  const expectedBoard = [
+    [_, _, _, _, _, _, _, _, _, _], //
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, o, o, _, _, _, _, _],
+    [_, _, _, o, o, o, _, _, _, _],
   ]
 
   expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
