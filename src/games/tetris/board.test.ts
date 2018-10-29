@@ -528,6 +528,50 @@ test("active can't go down due to edge", () => {
   expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
 })
 
+test("active can't go down due to occupied cell", () => {
+  const color = "red"
+  const o = { color }
+  const onBoardChange = jest.fn()
+  const leftOfBoard = { x: 0, y: 0 }
+  const initialMatrix = [
+    [_, _, _, _, _, _, _, _, _, _], //
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, o, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+  ]
+  const board = createBoard({
+    matrix: initialMatrix,
+    onBoardChange,
+    active: {
+      position: leftOfBoard,
+      shape: Shape.createIShape(color),
+    },
+  })
+
+  board.down()
+
+  const expectedBoard = [
+    [_, _, o, _, _, _, _, _, _, _], //
+    [_, _, o, _, _, _, _, _, _, _],
+    [_, _, o, _, _, _, _, _, _, _],
+    [_, _, o, _, _, _, _, _, _, _],
+    [_, _, o, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+  ]
+
+  expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
+})
+
 interface CreateBoardOptions {
   getNextShape?: GetNextShape
   onBoardChange?: OnBoardChange
