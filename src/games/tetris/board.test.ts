@@ -378,6 +378,50 @@ test("active can't go right due to edge", () => {
   expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
 })
 
+test("active can't go right due to occupied cell", () => {
+  const color = "red"
+  const o = { color }
+  const onBoardChange = jest.fn()
+  const rightOfBoard = { x: 6, y: 0 }
+  const initialMatrix = [
+    [_, _, _, _, _, _, _, _, _, o], //
+    [_, _, _, _, _, _, _, _, _, o],
+    [_, _, _, _, _, _, _, _, _, o],
+    [_, _, _, _, _, _, _, _, _, o],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+  ]
+  const board = createBoard({
+    matrix: initialMatrix,
+    onBoardChange,
+    active: {
+      position: rightOfBoard,
+      shape: Shape.createIShape(color),
+    },
+  })
+
+  board.right()
+
+  const expectedBoard = [
+    [_, _, _, _, _, _, _, _, o, o], //
+    [_, _, _, _, _, _, _, _, o, o],
+    [_, _, _, _, _, _, _, _, o, o],
+    [_, _, _, _, _, _, _, _, o, o],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+  ]
+
+  expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
+})
+
 test("active can't go left due to edge", () => {
   const color = "red"
   const o = { color }
@@ -396,6 +440,50 @@ test("active can't go left due to edge", () => {
   const expectedBoard = [
     [o, o, _, _, _, _, _, _, _, _], //
     [_, o, o, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+  ]
+
+  expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
+})
+
+test("active can't go left due to occupied cell", () => {
+  const color = "red"
+  const o = { color }
+  const onBoardChange = jest.fn()
+  const leftOfBoard = { x: 1, y: 0 }
+  const initialMatrix = [
+    [_, o, _, _, _, _, _, _, _, _], //
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+  ]
+  const board = createBoard({
+    matrix: initialMatrix,
+    onBoardChange,
+    active: {
+      position: leftOfBoard,
+      shape: Shape.createTShape(color),
+    },
+  })
+
+  board.left()
+
+  const expectedBoard = [
+    [_, o, o, _, _, _, _, _, _, _], //
+    [_, o, o, o, _, _, _, _, _, _],
     [_, _, _, _, _, _, _, _, _, _],
     [_, _, _, _, _, _, _, _, _, _],
     [_, _, _, _, _, _, _, _, _, _],

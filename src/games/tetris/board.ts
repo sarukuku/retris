@@ -47,7 +47,16 @@ export class Board {
     return this.isActiveOnEdge(this.isAtLeftEdge)
   }
 
-  private isAtLeftEdge = (p: Position): boolean => p.x === 0
+  private isAtLeftEdge = (p: Position): boolean => {
+    const isAtLeftmostColumn = p.x === 0
+    if (isAtLeftmostColumn) {
+      return true
+    }
+
+    const positionToLeft = { ...p, x: p.x - 1 }
+    const isLeftCellOccupied = !!this.matrix[positionToLeft.y][positionToLeft.x]
+    return isLeftCellOccupied
+  }
 
   right(): void {
     if (this.active && this.canMoveRight()) {
@@ -60,7 +69,18 @@ export class Board {
     return this.isActiveOnEdge(this.isAtRightEdge)
   }
 
-  private isAtRightEdge = (p: Position): boolean => p.x === this.columnCount - 1
+  private isAtRightEdge = (p: Position): boolean => {
+    const isAtRightmostColumn = p.x === this.columnCount - 1
+    if (isAtRightmostColumn) {
+      return true
+    }
+
+    const positionToRight = { ...p, x: p.x + 1 }
+    const isRightCellOccupied = !!this.matrix[positionToRight.y][
+      positionToRight.x
+    ]
+    return isRightCellOccupied
+  }
 
   down(): void {
     if (this.active && this.canMoveDown()) {
@@ -111,8 +131,8 @@ export class Board {
     }
 
     const positionBelow = { ...p, y: p.y + 1 }
-    const isAboveOccupiedCell = !!this.matrix[positionBelow.y][positionBelow.x]
-    return isAboveOccupiedCell
+    const isBelowCellOccupied = !!this.matrix[positionBelow.y][positionBelow.x]
+    return isBelowCellOccupied
   }
 
   private isActiveOnEdge(isCellOnEdge: (p: Position) => boolean) {
