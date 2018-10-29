@@ -1,5 +1,5 @@
 import { transpose } from "ramda"
-import { Matrix } from "./matrix"
+import { Matrix, rotateMatrix } from "./matrix"
 
 const _ = undefined
 
@@ -12,7 +12,7 @@ export class Shape {
   constructor(public matrix: Matrix) {}
 
   rotate() {
-    this.matrix = Shape.reverseColumns(transpose(this.matrix))
+    this.matrix = rotateMatrix(this.matrix)
   }
 
   getCellPositions(): Position[] {
@@ -29,10 +29,6 @@ export class Shape {
       }),
     )
     return positions
-  }
-
-  private static reverseColumns(matrix: Matrix): Matrix {
-    return matrix.map(row => row.reverse())
   }
 
   static createIShape(color: string) {

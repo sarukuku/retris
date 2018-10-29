@@ -1,4 +1,4 @@
-import { always, times } from "ramda"
+import { always, times, transpose } from "ramda"
 
 interface Cell {
   color: string
@@ -13,4 +13,12 @@ export function createEmptyMatrix(
   rowCount: number,
 ): Matrix {
   return times(() => times(always(undefined), columnCount), rowCount)
+}
+
+export function rotateMatrix(matrix: Matrix) {
+  return reverseColumns(transpose(matrix))
+}
+
+function reverseColumns(matrix: Matrix): Matrix {
+  return matrix.map(row => row.reverse())
 }
