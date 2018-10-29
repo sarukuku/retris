@@ -33,7 +33,42 @@ export class Board {
   }
 
   private canRotate(): boolean {
-    return true
+    if (!this.active) {
+      return false
+    }
+
+    const rotatedActive = new Shape(this.active.shape.matrix)
+    rotatedActive.rotate()
+
+    const activePositions = rotatedActive
+      .getCellPositions()
+      .map(this.toBoardCellPosition)
+
+    const isACellNonRotatable = activePositions.some(p => {
+      if (this.isCellOutOfBounds(p)) {
+        return true
+      }
+
+      const isCellOverLapping = !!this.matrix[p.y][p.x]
+      return isCellOverLapping
+    })
+    return !isACellNonRotatable
+  }
+
+  private isCellOutOfBounds(p: Position): boolean {
+    const lastColumnIndex = this.columnCount - 1
+    const isXOutOfBounds = p.x < 0 || p.x > lastColumnIndex
+    if (isXOutOfBounds) {
+      return true
+    }
+
+    const lastRowIndex = this.rowCount - 1
+    const isYOutOfBounds = p.y < 0 || p.y > lastRowIndex
+    if (isYOutOfBounds) {
+      return true
+    }
+
+    return false
   }
 
   left(): void {
@@ -124,7 +159,7 @@ export class Board {
   }
 
   private isAtBottomEdge = (p: Position): boolean => {
-    const lastRowIndex = this.matrix.length - 1
+    const lastRowIndex = this.rowCount - 1
     const isAtBottomRow = p.y === lastRowIndex
     if (isAtBottomRow) {
       return true
@@ -193,6 +228,10 @@ export class Board {
       position: { x: middleX, y: 0 },
     }
     this.hasActiveAlreadyHitBottom = false
+  }
+
+  private get rowCount(): number {
+    return this.matrix.length
   }
 
   private get columnCount(): number {

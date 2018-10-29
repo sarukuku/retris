@@ -426,11 +426,11 @@ test("active can't go left due to edge", () => {
   const color = "red"
   const o = { color }
   const onBoardChange = jest.fn()
-  const leftOfboard = { x: 0, y: 0 }
+  const leftOfBoard = { x: 0, y: 0 }
   const board = createBoard({
     onBoardChange,
     active: {
-      position: leftOfboard,
+      position: leftOfBoard,
       shape: Shape.createZShape(color),
     },
   })
@@ -562,6 +562,81 @@ test("active can't go down due to occupied cell", () => {
     [_, _, o, _, _, _, _, _, _, _],
     [_, _, o, _, _, _, _, _, _, _],
     [_, _, o, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+  ]
+
+  expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
+})
+
+test("active can't rotate due to edge", () => {
+  const color = "red"
+  const o = { color }
+  const onBoardChange = jest.fn()
+  const leftOfBoard = { x: -2, y: 0 }
+  const board = createBoard({
+    onBoardChange,
+    active: {
+      position: leftOfBoard,
+      shape: Shape.createIShape(color),
+    },
+  })
+
+  board.rotate()
+
+  const expectedBoard = [
+    [o, _, _, _, _, _, _, _, _, _], //
+    [o, _, _, _, _, _, _, _, _, _],
+    [o, _, _, _, _, _, _, _, _, _],
+    [o, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+  ]
+
+  expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
+})
+
+test("active can't rotate due to occupied cell", () => {
+  const color = "red"
+  const o = { color }
+  const onBoardChange = jest.fn()
+  const initialMatrix = [
+    [_, _, _, _, _, _, _, _, _, _], //
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, o, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+  ]
+  const leftOfBoard = { x: 0, y: 0 }
+  const board = createBoard({
+    matrix: initialMatrix,
+    onBoardChange,
+    active: {
+      position: leftOfBoard,
+      shape: Shape.createIShape(color),
+    },
+  })
+
+  board.rotate()
+
+  const expectedBoard = [
+    [_, _, o, _, _, _, _, _, _, _], //
+    [_, _, o, _, _, _, _, _, _, _],
+    [_, o, o, _, _, _, _, _, _, _],
+    [_, _, o, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
     [_, _, _, _, _, _, _, _, _, _],
     [_, _, _, _, _, _, _, _, _, _],
     [_, _, _, _, _, _, _, _, _, _],
