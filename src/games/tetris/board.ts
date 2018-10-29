@@ -149,7 +149,11 @@ export class Board {
   }
 
   private toBoardCellPosition = ({ x, y }: Position): Position => {
-    const { position } = this.active!
+    if (!this.active) {
+      return { x, y }
+    }
+
+    const { position } = this.active
     return { x: x + position.x, y: y + position.y }
   }
 
@@ -165,7 +169,11 @@ export class Board {
   }
 
   private addActiveToBoard(): Matrix {
-    const { shape } = this.active!
+    if (!this.active) {
+      return this.matrix
+    }
+
+    const { shape } = this.active
 
     const board = clone(this.matrix)
     shape.getCellPositions().forEach(({ x, y }) => {
