@@ -647,6 +647,51 @@ test("active can't rotate due to occupied cell", () => {
   expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
 })
 
+test("row disappears if full", () => {
+  const color = "red"
+  const o = { color }
+  const onBoardChange = jest.fn()
+  const initialMatrix = [
+    [_, _, _, _, _, _, _, _, _, _], //
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [o, o, _, o, o, o, o, o, o, o],
+  ]
+  const leftOfBoard = { x: 0, y: 6 }
+  const board = createBoard({
+    matrix: initialMatrix,
+    onBoardChange,
+    active: {
+      position: leftOfBoard,
+      shape: Shape.createIShape(color),
+    },
+  })
+
+  board.step()
+  board.step()
+
+  const expectedBoard = [
+    [_, _, _, _, _, _, _, _, _, _], //
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, o, _, _, _, _, _, _, _],
+    [_, _, o, _, _, _, _, _, _, _],
+    [_, _, o, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+  ]
+
+  expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
+})
+
 interface CreateBoardOptions {
   getNextShape?: GetNextShape
   onBoardChange?: OnBoardChange

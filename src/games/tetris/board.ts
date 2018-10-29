@@ -1,6 +1,6 @@
 import { clone } from "ramda"
 import { GetNextShape } from "./get-next-shape"
-import { Matrix } from "./matrix"
+import { Matrix, Row } from "./matrix"
 import { Shape, Position } from "./shape"
 
 export interface Active {
@@ -140,6 +140,11 @@ export class Board {
       if (this.hasActiveAlreadyHitBottom) {
         this.matrix = this.addActiveToBoard()
         this.active = undefined
+
+        if (this.hasFullRow()) {
+          this.matrix = this.removeFullRows()
+          return
+        }
         return
       }
 
@@ -202,6 +207,24 @@ export class Board {
     this.onBoardChange(board)
     return
   }
+
+  private hasFullRow(): boolean {
+    return this.matrix.some(this.isRowFull)
+  }
+
+  private removeFullRows(): Matrix {
+    const board = clone(this.matrix)
+
+    board.forEach((row, rowIndex) => {
+      if (this.isRowFull(row)) {
+        board[rowIndex] = row.map(() => undefined)
+      }
+    })
+
+    return board
+  }
+
+  private isRowFull = (row: Row): boolean => row.every(cell => !!cell)
 
   private addActiveToBoard(): Matrix {
     if (!this.active) {
