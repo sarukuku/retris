@@ -1,7 +1,7 @@
 import { Board, OnBoardChange, OnGameOver, Active } from "./board"
 import { getNextShape as _getNextShape, GetNextShape } from "./get-next-shape"
 import { createEmptyMatrix } from "./matrix"
-import { Shape, ShapeMatrix } from "./shape"
+import { Shape, TetrisMatrix } from "./shape"
 
 const _ = undefined
 
@@ -683,10 +683,10 @@ test("row disappears if full", () => {
     [_, _, _, _, _, _, _, _, _, _],
     [_, _, _, _, _, _, _, _, _, _],
     [_, _, _, _, _, _, _, _, _, _],
-    [_, _, o, _, _, _, _, _, _, _],
-    [_, _, o, _, _, _, _, _, _, _],
-    [_, _, o, _, _, _, _, _, _, _],
     [_, _, _, _, _, _, _, _, _, _],
+    [_, _, o, _, _, _, _, _, _, _],
+    [_, _, o, _, _, _, _, _, _, _],
+    [_, _, o, _, _, _, _, _, _, _],
   ]
 
   expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
@@ -696,13 +696,13 @@ interface CreateBoardOptions {
   getNextShape?: GetNextShape
   onBoardChange?: OnBoardChange
   onGameOver?: OnGameOver
-  matrix?: ShapeMatrix
+  matrix?: TetrisMatrix
   active?: Active
 }
 
 function createBoard({
   getNextShape = _getNextShape,
-  onBoardChange = (_board: ShapeMatrix) => {
+  onBoardChange = (_board: TetrisMatrix) => {
     return
   },
   onGameOver = () => {

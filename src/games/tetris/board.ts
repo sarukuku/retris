@@ -1,13 +1,14 @@
 import { clone } from "ramda"
 import { GetNextShape } from "./get-next-shape"
-import { Shape, Position, ShapeMatrix, ShapeRow } from "./shape"
+import { rotateCounterClockwise, rotateMatrix } from "./matrix"
+import { Position, Shape, TetrisMatrix, TetrisRow } from "./shape"
 
 export interface Active {
   shape: Shape
   position: Position
 }
 
-export type OnBoardChange = (board: ShapeMatrix) => void
+export type OnBoardChange = (board: TetrisMatrix) => void
 
 export type OnGameOver = () => void
 
@@ -18,7 +19,7 @@ export class Board {
     public onBoardChange: OnBoardChange,
     public onGameOver: OnGameOver,
     private getNextShape: GetNextShape,
-    private matrix: ShapeMatrix,
+    private matrix: TetrisMatrix,
     private active?: Active,
   ) {
     this.invalidateBoard()
@@ -213,7 +214,7 @@ export class Board {
     return this.matrix.some(this.isRowFull)
   }
 
-  private removeFullRows(matrix: ShapeMatrix): ShapeMatrix {
+  private removeFullRows(matrix: TetrisMatrix): TetrisMatrix {
     matrix.forEach((row, rowIndex) => {
       if (this.isRowFull(row)) {
         matrix[rowIndex] = row.map(() => undefined)
@@ -223,13 +224,25 @@ export class Board {
     return matrix
   }
 
-  private isRowFull = (row: ShapeRow): boolean => row.every(cell => !!cell)
+  private isRowFull = (row: TetrisRow): boolean => row.every(cell => !!cell)
 
-  private applyGravity(matrix: ShapeMatrix): ShapeMatrix {
-    return matrix
+  private applyGravity(matrix: TetrisMatrix): TetrisMatrix {
+    const rotated = rotateCounterClockwise(matrix)
+
+    const gravityApplied = rotated.map(column => {
+      column.forEach((cell, cellIndex) => {
+        if (!cell) {
+          column.splice(cellIndex, 1)
+          column.unshift(cell)
+        }
+      })
+      return column
+    })
+
+    return rotateMatrix(gravityApplied)
   }
 
-  private addActiveToBoard(matrix: ShapeMatrix): ShapeMatrix {
+  private addActiveToBoard(matrix: TetrisMatrix): TetrisMatrix {
     if (!this.active) {
       return matrix
     }

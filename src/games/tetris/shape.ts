@@ -3,7 +3,7 @@ import { Matrix, rotateMatrix, Row } from "./matrix"
 
 const _ = undefined
 
-interface Cell {
+interface TetrisCell {
   color: string
 }
 
@@ -12,12 +12,12 @@ export interface Position {
   y: number
 }
 
-export type ShapeMatrix = Matrix<Cell>
+export type TetrisMatrix = Matrix<TetrisCell>
 
-export type ShapeRow = Row<Cell>
+export type TetrisRow = Row<TetrisCell>
 
 export class Shape {
-  constructor(public matrix: ShapeMatrix) {}
+  constructor(public matrix: TetrisMatrix) {}
 
   rotate() {
     this.matrix = rotateMatrix(this.matrix)
