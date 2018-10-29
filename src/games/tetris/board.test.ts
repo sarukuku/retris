@@ -1,7 +1,7 @@
 import { Board, OnBoardChange, OnGameOver, Active } from "./board"
 import { getNextShape as _getNextShape, GetNextShape } from "./get-next-shape"
-import { Matrix, createEmptyMatrix } from "./matrix"
-import { Shape } from "./shape"
+import { createEmptyMatrix } from "./matrix"
+import { Shape, ShapeMatrix } from "./shape"
 
 const _ = undefined
 
@@ -696,13 +696,13 @@ interface CreateBoardOptions {
   getNextShape?: GetNextShape
   onBoardChange?: OnBoardChange
   onGameOver?: OnGameOver
-  matrix?: Matrix
+  matrix?: ShapeMatrix
   active?: Active
 }
 
 function createBoard({
   getNextShape = _getNextShape,
-  onBoardChange = (_board: Matrix) => {
+  onBoardChange = (_board: ShapeMatrix) => {
     return
   },
   onGameOver = () => {

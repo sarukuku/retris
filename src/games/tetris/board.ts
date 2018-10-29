@@ -1,14 +1,13 @@
 import { clone } from "ramda"
 import { GetNextShape } from "./get-next-shape"
-import { Matrix, Row } from "./matrix"
-import { Shape, Position } from "./shape"
+import { Shape, Position, ShapeMatrix, ShapeRow } from "./shape"
 
 export interface Active {
   shape: Shape
   position: Position
 }
 
-export type OnBoardChange = (board: Matrix) => void
+export type OnBoardChange = (board: ShapeMatrix) => void
 
 export type OnGameOver = () => void
 
@@ -19,7 +18,7 @@ export class Board {
     public onBoardChange: OnBoardChange,
     public onGameOver: OnGameOver,
     private getNextShape: GetNextShape,
-    private matrix: Matrix,
+    private matrix: ShapeMatrix,
     private active?: Active,
   ) {
     this.invalidateBoard()
@@ -142,7 +141,9 @@ export class Board {
         this.active = undefined
 
         if (this.hasFullRow()) {
-          this.matrix = this.removeFullRows(clone(this.matrix))
+          this.matrix = this.applyGravity(
+            this.removeFullRows(clone(this.matrix)),
+          )
           return
         }
         return
@@ -212,7 +213,7 @@ export class Board {
     return this.matrix.some(this.isRowFull)
   }
 
-  private removeFullRows(matrix: Matrix): Matrix {
+  private removeFullRows(matrix: ShapeMatrix): ShapeMatrix {
     matrix.forEach((row, rowIndex) => {
       if (this.isRowFull(row)) {
         matrix[rowIndex] = row.map(() => undefined)
@@ -222,9 +223,13 @@ export class Board {
     return matrix
   }
 
-  private isRowFull = (row: Row): boolean => row.every(cell => !!cell)
+  private isRowFull = (row: ShapeRow): boolean => row.every(cell => !!cell)
 
-  private addActiveToBoard(matrix: Matrix): Matrix {
+  private applyGravity(matrix: ShapeMatrix): ShapeMatrix {
+    return matrix
+  }
+
+  private addActiveToBoard(matrix: ShapeMatrix): ShapeMatrix {
     if (!this.active) {
       return matrix
     }

@@ -1,15 +1,23 @@
 import { transpose } from "ramda"
-import { Matrix, rotateMatrix } from "./matrix"
+import { Matrix, rotateMatrix, Row } from "./matrix"
 
 const _ = undefined
+
+interface Cell {
+  color: string
+}
 
 export interface Position {
   x: number
   y: number
 }
 
+export type ShapeMatrix = Matrix<Cell>
+
+export type ShapeRow = Row<Cell>
+
 export class Shape {
-  constructor(public matrix: Matrix) {}
+  constructor(public matrix: ShapeMatrix) {}
 
   rotate() {
     this.matrix = rotateMatrix(this.matrix)
