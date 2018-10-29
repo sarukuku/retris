@@ -138,11 +138,11 @@ export class Board {
     const hasActiveHitBottom = !this.canMoveDown()
     if (hasActiveHitBottom) {
       if (this.hasActiveAlreadyHitBottom) {
-        this.matrix = this.addActiveToBoard()
+        this.matrix = this.addActiveToBoard(clone(this.matrix))
         this.active = undefined
 
         if (this.hasFullRow()) {
-          this.matrix = this.removeFullRows()
+          this.matrix = this.removeFullRows(clone(this.matrix))
           return
         }
         return
@@ -203,7 +203,7 @@ export class Board {
       return
     }
 
-    const board = this.addActiveToBoard()
+    const board = this.addActiveToBoard(clone(this.matrix))
     this.onBoardChange(board)
     return
   }
@@ -212,35 +212,31 @@ export class Board {
     return this.matrix.some(this.isRowFull)
   }
 
-  private removeFullRows(): Matrix {
-    const board = clone(this.matrix)
-
-    board.forEach((row, rowIndex) => {
+  private removeFullRows(matrix: Matrix): Matrix {
+    matrix.forEach((row, rowIndex) => {
       if (this.isRowFull(row)) {
-        board[rowIndex] = row.map(() => undefined)
+        matrix[rowIndex] = row.map(() => undefined)
       }
     })
 
-    return board
+    return matrix
   }
 
   private isRowFull = (row: Row): boolean => row.every(cell => !!cell)
 
-  private addActiveToBoard(): Matrix {
+  private addActiveToBoard(matrix: Matrix): Matrix {
     if (!this.active) {
-      return this.matrix
+      return matrix
     }
 
     const { shape } = this.active
-
-    const board = clone(this.matrix)
     shape.getCellPositions().forEach(({ x, y }) => {
       const shapeCell = shape.matrix[y][x]
       const boardCellPosition = this.toBoardCellPosition({ x, y })
-      board[boardCellPosition.y][boardCellPosition.x] = shapeCell
+      matrix[boardCellPosition.y][boardCellPosition.x] = shapeCell
     })
 
-    return board
+    return matrix
   }
 
   private spawnNewActiveShape(): void {
