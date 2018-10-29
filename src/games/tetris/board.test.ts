@@ -378,6 +378,37 @@ test("active can't go right", () => {
   expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
 })
 
+test("active can't go left", () => {
+  const color = "red"
+  const o = { color }
+  const onBoardChange = jest.fn()
+  const leftOfboard = { x: 0, y: 0 }
+  const board = createBoard({
+    onBoardChange,
+    active: {
+      position: leftOfboard,
+      shape: Shape.createZShape(color),
+    },
+  })
+
+  board.left()
+
+  const expectedBoard = [
+    [o, o, _, _, _, _, _, _, _, _], //
+    [_, o, o, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+  ]
+
+  expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
+})
+
 interface CreateBoardOptions {
   getNextShape?: GetNextShape
   onBoardChange?: OnBoardChange

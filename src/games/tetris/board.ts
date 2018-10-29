@@ -44,8 +44,10 @@ export class Board {
   }
 
   private canMoveLeft(): boolean {
-    return true
+    return this.canMoveDirection(this.isNotAtLeftEdge)
   }
+
+  private isNotAtLeftEdge = (p: Position): boolean => p.x > 0
 
   right(): void {
     if (this.active && this.canMoveRight()) {
@@ -55,19 +57,22 @@ export class Board {
   }
 
   private canMoveRight(): boolean {
+    return this.canMoveDirection(this.isNotAtRightEdge)
+  }
+
+  private isNotAtRightEdge = (p: Position): boolean =>
+    p.x < this.columnCount - 1
+
+  private canMoveDirection(checkEdgeCondition: (p: Position) => boolean) {
     if (!this.active) {
       return false
     }
 
     const activePositions = this.active.shape
       .getCellPositions()
-      .map(p => this.toBoardCellPosition(p))
+      .map(this.toBoardCellPosition)
 
-    return activePositions.every(p => this.isNotAtRightEdge(p))
-  }
-
-  private isNotAtRightEdge(p: Position) {
-    return p.x < this.columnCount - 1
+    return activePositions.every(checkEdgeCondition)
   }
 
   down(): void {
@@ -117,7 +122,7 @@ export class Board {
 
     const activeShapeCellPositions = this.active.shape
       .getCellPositions()
-      .map(p => this.toBoardCellPosition(p))
+      .map(this.toBoardCellPosition)
 
     const isAtBottom = activeShapeCellPositions.some(
       p => this.isAtBottomRow(p) || this.isAboveOccupiedCell(p),
@@ -126,7 +131,7 @@ export class Board {
     return isAtBottom
   }
 
-  private toBoardCellPosition({ x, y }: Position): Position {
+  private toBoardCellPosition = ({ x, y }: Position): Position => {
     const { position } = this.active!
     return { x: x + position.x, y: y + position.y }
   }
