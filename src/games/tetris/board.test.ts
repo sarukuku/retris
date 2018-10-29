@@ -692,6 +692,33 @@ test("row disappears if full", () => {
   expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
 })
 
+test("game over", () => {
+  const color = "red"
+  const o = { color }
+  const onGameOver = jest.fn()
+  const initialMatrix = [
+    [_, _, _, _, _, _, _, _, _, _], //
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, o, _, _, _],
+    [_, _, _, _, _, _, o, _, _, _],
+    [_, _, _, _, _, _, o, _, _, _],
+    [_, _, _, _, _, _, o, _, _, _],
+    [_, _, _, _, _, _, o, _, _, _],
+    [_, _, _, _, _, _, o, _, _, _],
+    [_, _, _, _, _, _, o, _, _, _],
+  ]
+  const board = createBoard({
+    matrix: initialMatrix,
+    onGameOver,
+    getNextShape: () => Shape.createIShape(color),
+  })
+
+  board.step()
+
+  expect(onGameOver).toHaveBeenCalled()
+})
+
 interface CreateBoardOptions {
   getNextShape?: GetNextShape
   onBoardChange?: OnBoardChange

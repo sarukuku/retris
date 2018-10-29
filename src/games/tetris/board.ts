@@ -132,6 +132,11 @@ export class Board {
   private executeStep(): void {
     if (!this.active) {
       this.spawnNewActiveShape()
+      if (this.newActiveCouldNotSpawn()) {
+        this.onGameOver()
+        return
+      }
+
       return
     }
 
@@ -265,6 +270,21 @@ export class Board {
       position: { x: middleX, y: 0 },
     }
     this.hasActiveAlreadyHitBottom = false
+  }
+
+  private newActiveCouldNotSpawn(): boolean {
+    if (!this.active) {
+      return false
+    }
+
+    const activePositions = this.active.shape
+      .getCellPositions()
+      .map(this.toBoardCellPosition)
+
+    return activePositions.some(p => {
+      const isOverlappingCell = !!this.matrix[p.y][p.x]
+      return isOverlappingCell
+    })
   }
 
   private get rowCount(): number {
