@@ -347,7 +347,7 @@ test("active reached bottom twice, new shape spawns", () => {
   expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
 })
 
-test("active can't go right", () => {
+test("active can't go right due to edge", () => {
   const color = "red"
   const o = { color }
   const onBoardChange = jest.fn()
@@ -378,7 +378,7 @@ test("active can't go right", () => {
   expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
 })
 
-test("active can't go left", () => {
+test("active can't go left due to edge", () => {
   const color = "red"
   const o = { color }
   const onBoardChange = jest.fn()
@@ -404,6 +404,37 @@ test("active can't go left", () => {
     [_, _, _, _, _, _, _, _, _, _],
     [_, _, _, _, _, _, _, _, _, _],
     [_, _, _, _, _, _, _, _, _, _],
+  ]
+
+  expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
+})
+
+test("active can't go down due to edge", () => {
+  const color = "red"
+  const o = { color }
+  const onBoardChange = jest.fn()
+  const bottomOfBoard = { x: 0, y: 8 }
+  const board = createBoard({
+    onBoardChange,
+    active: {
+      position: bottomOfBoard,
+      shape: Shape.createOShape(color),
+    },
+  })
+
+  board.down()
+
+  const expectedBoard = [
+    [_, _, _, _, _, _, _, _, _, _], //
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [o, o, _, _, _, _, _, _, _, _],
+    [o, o, _, _, _, _, _, _, _, _],
   ]
 
   expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
