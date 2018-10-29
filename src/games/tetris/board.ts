@@ -44,10 +44,10 @@ export class Board {
   }
 
   private canMoveLeft(): boolean {
-    return this.canMoveDirection(this.isNotAtLeftEdge)
+    return this.isActiveOnEdge(this.isAtLeftEdge)
   }
 
-  private isNotAtLeftEdge = (p: Position): boolean => p.x > 0
+  private isAtLeftEdge = (p: Position): boolean => p.x === 0
 
   right(): void {
     if (this.active && this.canMoveRight()) {
@@ -57,33 +57,16 @@ export class Board {
   }
 
   private canMoveRight(): boolean {
-    return this.canMoveDirection(this.isNotAtRightEdge)
+    return this.isActiveOnEdge(this.isAtRightEdge)
   }
 
-  private isNotAtRightEdge = (p: Position): boolean =>
-    p.x < this.columnCount - 1
-
-  private canMoveDirection(checkEdgeCondition: (p: Position) => boolean) {
-    if (!this.active) {
-      return false
-    }
-
-    const activePositions = this.active.shape
-      .getCellPositions()
-      .map(this.toBoardCellPosition)
-
-    return activePositions.every(checkEdgeCondition)
-  }
+  private isAtRightEdge = (p: Position): boolean => p.x === this.columnCount - 1
 
   down(): void {
     if (this.active && this.canMoveDown()) {
       this.active.position.y++
       this.invalidateBoard()
     }
-  }
-
-  private canMoveDown(): boolean {
-    return true
   }
 
   step(): void {
@@ -97,7 +80,8 @@ export class Board {
       return
     }
 
-    if (this.isActiveAtBottom()) {
+    const hasActiveHitBottom = !this.canMoveDown()
+    if (hasActiveHitBottom) {
       if (this.hasActiveAlreadyHitBottom) {
         this.matrix = this.addActiveToBoard()
         this.active = undefined
@@ -115,35 +99,38 @@ export class Board {
     this.active.position.y++
   }
 
-  private isActiveAtBottom(): boolean {
+  private canMoveDown(): boolean {
+    return this.isActiveOnEdge(this.isAtBottomEdge)
+  }
+
+  private isAtBottomEdge = (p: Position): boolean => {
+    const lastRowIndex = this.matrix.length - 1
+    const isAtBottomRow = p.y === lastRowIndex
+    if (isAtBottomRow) {
+      return true
+    }
+
+    const positionBelow = { ...p, y: p.y + 1 }
+    const isAboveOccupiedCell = !!this.matrix[positionBelow.y][positionBelow.x]
+    return isAboveOccupiedCell
+  }
+
+  private isActiveOnEdge(isCellOnEdge: (p: Position) => boolean) {
     if (!this.active) {
       return false
     }
 
-    const activeShapeCellPositions = this.active.shape
+    const activePositions = this.active.shape
       .getCellPositions()
       .map(this.toBoardCellPosition)
 
-    const isAtBottom = activeShapeCellPositions.some(
-      p => this.isAtBottomRow(p) || this.isAboveOccupiedCell(p),
-    )
-
-    return isAtBottom
+    const isACellOnEdge = activePositions.some(isCellOnEdge)
+    return !isACellOnEdge
   }
 
   private toBoardCellPosition = ({ x, y }: Position): Position => {
     const { position } = this.active!
     return { x: x + position.x, y: y + position.y }
-  }
-
-  private isAtBottomRow({ y }: Position): boolean {
-    const lastRowIndex = this.matrix.length - 1
-    return y === lastRowIndex
-  }
-
-  private isAboveOccupiedCell(p: Position): boolean {
-    const positionBelow = { ...p, y: p.y + 1 }
-    return !!this.matrix[positionBelow.y][positionBelow.x]
   }
 
   private invalidateBoard(): void {
