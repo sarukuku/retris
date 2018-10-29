@@ -41,8 +41,8 @@ export class Board {
     rotatedActive.rotate()
 
     const activePositions = rotatedActive
-      .getCellPositions()
-      .map(this.toBoardCellPosition)
+      .getPositions()
+      .map(this.toAbsolutePosition)
 
     const isACellNonRotatable = activePositions.some(p => {
       if (this.isCellOutOfBounds(p)) {
@@ -79,10 +79,10 @@ export class Board {
   }
 
   private canMoveLeft(): boolean {
-    return this.isActiveOnEdge(this.isAtLeftEdge)
+    return this.canPerformAction(this.canActiveMoveLeft)
   }
 
-  private isAtLeftEdge = (p: Position): boolean => {
+  private canActiveMoveLeft = (p: Position): boolean => {
     const isAtLeftmostColumn = p.x === 0
     if (isAtLeftmostColumn) {
       return true
@@ -101,10 +101,10 @@ export class Board {
   }
 
   private canMoveRight(): boolean {
-    return this.isActiveOnEdge(this.isAtRightEdge)
+    return this.canPerformAction(this.canActiveMoveRight)
   }
 
-  private isAtRightEdge = (p: Position): boolean => {
+  private canActiveMoveRight = (p: Position): boolean => {
     const isAtRightmostColumn = p.x === this.columnCount - 1
     if (isAtRightmostColumn) {
       return true
@@ -167,10 +167,10 @@ export class Board {
   }
 
   private canMoveDown(): boolean {
-    return this.isActiveOnEdge(this.isAtBottomEdge)
+    return this.canPerformAction(this.canActiveMoveDown)
   }
 
-  private isAtBottomEdge = (p: Position): boolean => {
+  private canActiveMoveDown = (p: Position): boolean => {
     const lastRowIndex = this.rowCount - 1
     const isAtBottomRow = p.y === lastRowIndex
     if (isAtBottomRow) {
@@ -182,20 +182,21 @@ export class Board {
     return isBelowCellOccupied
   }
 
-  private isActiveOnEdge(isCellOnEdge: (p: Position) => boolean) {
+  private canPerformAction(canActivePerformAction: (p: Position) => boolean) {
     if (!this.active) {
       return false
     }
 
     const activePositions = this.active.shape
-      .getCellPositions()
-      .map(this.toBoardCellPosition)
+      .getPositions()
+      .map(this.toAbsolutePosition)
 
-    const isACellOnEdge = activePositions.some(isCellOnEdge)
-    return !isACellOnEdge
+    const isActionDeniedByACell = activePositions.some(canActivePerformAction)
+
+    return !isActionDeniedByACell
   }
 
-  private toBoardCellPosition = ({ x, y }: Position): Position => {
+  private toAbsolutePosition = ({ x, y }: Position): Position => {
     if (!this.active) {
       return { x, y }
     }
@@ -253,9 +254,9 @@ export class Board {
     }
 
     const { shape } = this.active
-    shape.getCellPositions().forEach(({ x, y }) => {
+    shape.getPositions().forEach(({ x, y }) => {
       const shapeCell = shape.matrix[y][x]
-      const boardCellPosition = this.toBoardCellPosition({ x, y })
+      const boardCellPosition = this.toAbsolutePosition({ x, y })
       matrix[boardCellPosition.y][boardCellPosition.x] = shapeCell
     })
 
@@ -278,8 +279,8 @@ export class Board {
     }
 
     const activePositions = this.active.shape
-      .getCellPositions()
-      .map(this.toBoardCellPosition)
+      .getPositions()
+      .map(this.toAbsolutePosition)
 
     return activePositions.some(p => {
       const isOverlappingCell = !!this.matrix[p.y][p.x]

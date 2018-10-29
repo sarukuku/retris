@@ -23,7 +23,7 @@ export class Shape {
     this.matrix = rotateMatrix(this.matrix)
   }
 
-  getCellPositions(): Position[] {
+  getPositions(): Position[] {
     const positions: Position[] = []
     this.matrix.forEach((row, rowIndex) =>
       row.forEach((cell, columnIndex) => {
