@@ -20,6 +20,8 @@ class TetrisWrapper extends Component {
           tetris.right()
           break
         case "Enter":
+        case " ":
+        case "ArrowUp":
           tetris.rotate()
           break
       }

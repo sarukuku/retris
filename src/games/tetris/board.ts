@@ -1,6 +1,5 @@
 import { clone } from "ramda"
 import { GetNextShape } from "./get-next-shape"
-import { rotateCounterClockwise, rotateMatrix } from "./matrix"
 import { Position, Shape, TetrisMatrix, TetrisRow } from "./shape"
 
 export interface Active {
@@ -147,9 +146,7 @@ export class Board {
         this.active = undefined
 
         if (this.hasFullRow()) {
-          this.matrix = this.applyGravity(
-            this.removeFullRows(clone(this.matrix)),
-          )
+          this.matrix = this.removeFullRows(clone(this.matrix))
           return
         }
         return
@@ -223,7 +220,8 @@ export class Board {
   private removeFullRows(matrix: TetrisMatrix): TetrisMatrix {
     matrix.forEach((row, rowIndex) => {
       if (this.isRowFull(row)) {
-        matrix[rowIndex] = row.map(() => undefined)
+        matrix.splice(rowIndex, 1)
+        matrix.unshift(row.map(() => undefined))
       }
     })
 
@@ -231,22 +229,6 @@ export class Board {
   }
 
   private isRowFull = (row: TetrisRow): boolean => row.every(cell => !!cell)
-
-  private applyGravity(matrix: TetrisMatrix): TetrisMatrix {
-    const rotated = rotateCounterClockwise(matrix)
-
-    const gravityApplied = rotated.map(column => {
-      column.forEach((cell, cellIndex) => {
-        if (!cell) {
-          column.splice(cellIndex, 1)
-          column.unshift(cell)
-        }
-      })
-      return column
-    })
-
-    return rotateMatrix(gravityApplied)
-  }
 
   private addActiveToBoard(matrix: TetrisMatrix): TetrisMatrix {
     if (!this.active) {
