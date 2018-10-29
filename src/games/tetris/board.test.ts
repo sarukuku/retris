@@ -347,6 +347,37 @@ test("active reached bottom twice, new shape spawns", () => {
   expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
 })
 
+test("active can't go right", () => {
+  const color = "red"
+  const o = { color }
+  const onBoardChange = jest.fn()
+  const rightOfBoard = { x: 7, y: 0 }
+  const board = createBoard({
+    onBoardChange,
+    active: {
+      position: rightOfBoard,
+      shape: Shape.createIShape(color),
+    },
+  })
+
+  board.right()
+
+  const expectedBoard = [
+    [_, _, _, _, _, _, _, _, _, o], //
+    [_, _, _, _, _, _, _, _, _, o],
+    [_, _, _, _, _, _, _, _, _, o],
+    [_, _, _, _, _, _, _, _, _, o],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+  ]
+
+  expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
+})
+
 interface CreateBoardOptions {
   getNextShape?: GetNextShape
   onBoardChange?: OnBoardChange

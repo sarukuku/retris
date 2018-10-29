@@ -55,7 +55,19 @@ export class Board {
   }
 
   private canMoveRight(): boolean {
-    return true
+    if (!this.active) {
+      return false
+    }
+
+    const activePositions = this.active.shape
+      .getCellPositions()
+      .map(p => this.toBoardCellPosition(p))
+
+    return activePositions.every(p => this.isNotAtRightEdge(p))
+  }
+
+  private isNotAtRightEdge(p: Position) {
+    return p.x < this.columnCount - 1
   }
 
   down(): void {
