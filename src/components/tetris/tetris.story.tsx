@@ -30,9 +30,20 @@ class TetrisWrapper extends Component {
 
   render() {
     return (
-      <div style={{ height: "500px", width: "500px" }}>
-        <Tetris ref="tetris" />
-      </div>
+      <>
+        <div className="tetris-wrapper">
+          <Tetris ref="tetris" />
+        </div>
+        <style jsx>{`
+          html,
+          body,
+          #root,
+          #root > div {
+            width: 100%;
+            height: 100%;
+          }
+        `}</style>
+      </>
     )
   }
 }
