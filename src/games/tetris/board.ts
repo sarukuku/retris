@@ -78,7 +78,10 @@ export class Board {
   }
 
   private canMoveLeft(): boolean {
-    return this.isValidAction(this.canCellMoveLeft)
+    if (!this.active) {
+      return false
+    }
+    return this.isValidAction(this.active.shape, this.canCellMoveLeft)
   }
 
   private canCellMoveLeft = (p: Position): boolean => {
@@ -100,7 +103,10 @@ export class Board {
   }
 
   private canMoveRight(): boolean {
-    return this.isValidAction(this.canCellMoveRight)
+    if (!this.active) {
+      return false
+    }
+    return this.isValidAction(this.active.shape, this.canCellMoveRight)
   }
 
   private canCellMoveRight = (p: Position): boolean => {
@@ -129,6 +135,7 @@ export class Board {
   private executeStep(): void {
     if (!this.active) {
       this.spawnNewActiveShape()
+
       if (this.newActiveCouldNotSpawn()) {
         this.onGameOver()
         return
@@ -162,7 +169,10 @@ export class Board {
   }
 
   private canMoveDown(): boolean {
-    return this.isValidAction(this.canCellMoveDown)
+    if (!this.active) {
+      return false
+    }
+    return this.isValidAction(this.active.shape, this.canCellMoveDown)
   }
 
   private canCellMoveDown = (p: Position): boolean => {
@@ -177,12 +187,11 @@ export class Board {
     return isBelowCellEmpty
   }
 
-  private isValidAction(isValidActionForCell: (p: Position) => boolean) {
-    if (!this.active) {
-      return false
-    }
-
-    const cellPositions = this.active.shape
+  private isValidAction(
+    activeShape: Shape,
+    isValidActionForCell: (p: Position) => boolean,
+  ) {
+    const cellPositions = activeShape
       .getPositions()
       .map(this.toAbsolutePosition)
 
