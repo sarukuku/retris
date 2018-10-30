@@ -1,4 +1,5 @@
 import React, { Component } from "react"
+import { OnBoardChange } from "../../games/tetris/board"
 import { Game } from "../../games/tetris/game"
 import { TetrisMatrix } from "../../games/tetris/shape"
 
@@ -9,8 +10,9 @@ interface TetrisState {
 
 export class Tetris extends Component<{}, TetrisState> {
   private game: Game
-  private columnCount = 20
-  private rowCount = 20
+  private columnCount = 10
+  private rowCount = 10
+  private onBoardChange: OnBoardChange
 
   state: TetrisState = {
     isGameOver: false,
@@ -18,13 +20,15 @@ export class Tetris extends Component<{}, TetrisState> {
   }
 
   async componentDidMount() {
+    this.onBoardChange = (board: TetrisMatrix) => this.setState({ board })
     this.game = new Game(this.onBoardChange, this.columnCount, this.rowCount)
     await this.game.start()
+
     this.setState({ isGameOver: true })
   }
 
-  private onBoardChange = (board: TetrisMatrix) => {
-    this.setState({ board })
+  componentWillUnmount() {
+    this.onBoardChange = () => undefined
   }
 
   rotate() {
@@ -44,41 +48,34 @@ export class Tetris extends Component<{}, TetrisState> {
   }
 
   render() {
-    const { board } = this.state
+    this.renderToCanvas()
+    return <canvas width="500" height="500" ref="canvas" />
+  }
 
-    return (
-      <div
-        style={{
-          width: "100%",
-          height: "100%",
-          display: "flex",
-          flexDirection: "column",
-          border: "2px solid black",
-        }}
-      >
-        {board.map((row, rowIndex) => (
-          <div
-            key={`row-${rowIndex}`}
-            style={{
-              width: "100%",
-              height: `${(1 / this.rowCount) * 100}%`,
-              display: "flex",
-              flexDirection: "row",
-            }}
-          >
-            {row.map((cell, cellIndex) => (
-              <div
-                key={`row-${rowIndex}-cell-${cellIndex}`}
-                style={{
-                  height: "100%",
-                  width: `${(1 / this.columnCount) * 100}%`,
-                  backgroundColor: cell ? cell.color : "white",
-                }}
-              />
-            ))}
-          </div>
-        ))}
-      </div>
-    )
+  private renderToCanvas() {
+    if (!this.refs.canvas) {
+      return
+    }
+    const ctx = (this.refs.canvas as HTMLCanvasElement).getContext("2d")
+    if (!ctx) {
+      return
+    }
+    const { board } = this.state
+    const cellSize = 50
+
+    board.forEach((row, rowIndex) => {
+      row.forEach((cell, columnIndex) => {
+        ctx.fillStyle = cell ? cell.color : "white"
+        ctx.fillRect(
+          columnIndex * cellSize,
+          rowIndex * cellSize,
+          cellSize,
+          cellSize,
+        )
+      })
+    })
+
+    ctx.strokeStyle = "black"
+    ctx.strokeRect(0, 0, 500, 500)
   }
 }
