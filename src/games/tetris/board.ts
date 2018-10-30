@@ -36,38 +36,23 @@ export class Board {
       return false
     }
 
-    const rotatedActive = new Shape(this.active.shape.matrix)
-    rotatedActive.rotate()
-
-    const activePositions = rotatedActive
-      .getPositions()
-      .map(this.toAbsolutePosition)
-
-    const isACellNonRotatable = activePositions.some(p => {
-      if (this.isCellOutOfBounds(p)) {
-        return true
-      }
-
-      const isCellOverLapping = !!this.matrix[p.y][p.x]
-      return isCellOverLapping
-    })
-    return !isACellNonRotatable
+    const rotatedActiveShape = new Shape(this.active.shape.matrix)
+    rotatedActiveShape.rotate()
+    return this.isValidAction(rotatedActiveShape, this.canCellRotate)
   }
 
-  private isCellOutOfBounds(p: Position): boolean {
+  private canCellRotate = (p: Position): boolean => {
     const lastColumnIndex = this.columnCount - 1
     const isXOutOfBounds = p.x < 0 || p.x > lastColumnIndex
-    if (isXOutOfBounds) {
-      return true
-    }
-
     const lastRowIndex = this.rowCount - 1
     const isYOutOfBounds = p.y < 0 || p.y > lastRowIndex
-    if (isYOutOfBounds) {
-      return true
+    const isCellOutOfBounds = isXOutOfBounds || isYOutOfBounds
+    if (isCellOutOfBounds) {
+      return false
     }
 
-    return false
+    const isCellEmpty = !this.matrix[p.y][p.x]
+    return isCellEmpty
   }
 
   left(): void {
