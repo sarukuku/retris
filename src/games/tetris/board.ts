@@ -78,18 +78,18 @@ export class Board {
   }
 
   private canMoveLeft(): boolean {
-    return this.canPerformAction(this.canActiveMoveLeft)
+    return this.isValidAction(this.canCellMoveLeft)
   }
 
-  private canActiveMoveLeft = (p: Position): boolean => {
+  private canCellMoveLeft = (p: Position): boolean => {
     const isAtLeftmostColumn = p.x === 0
     if (isAtLeftmostColumn) {
-      return true
+      return false
     }
 
     const positionToLeft = { ...p, x: p.x - 1 }
-    const isLeftCellOccupied = !!this.matrix[positionToLeft.y][positionToLeft.x]
-    return isLeftCellOccupied
+    const isLeftCellEmpty = !this.matrix[positionToLeft.y][positionToLeft.x]
+    return isLeftCellEmpty
   }
 
   right(): void {
@@ -100,20 +100,18 @@ export class Board {
   }
 
   private canMoveRight(): boolean {
-    return this.canPerformAction(this.canActiveMoveRight)
+    return this.isValidAction(this.canCellMoveRight)
   }
 
-  private canActiveMoveRight = (p: Position): boolean => {
+  private canCellMoveRight = (p: Position): boolean => {
     const isAtRightmostColumn = p.x === this.columnCount - 1
     if (isAtRightmostColumn) {
-      return true
+      return false
     }
 
     const positionToRight = { ...p, x: p.x + 1 }
-    const isRightCellOccupied = !!this.matrix[positionToRight.y][
-      positionToRight.x
-    ]
-    return isRightCellOccupied
+    const isRightCellEmpty = !this.matrix[positionToRight.y][positionToRight.x]
+    return isRightCellEmpty
   }
 
   down(): void {
@@ -164,33 +162,32 @@ export class Board {
   }
 
   private canMoveDown(): boolean {
-    return this.canPerformAction(this.canActiveMoveDown)
+    return this.isValidAction(this.canCellMoveDown)
   }
 
-  private canActiveMoveDown = (p: Position): boolean => {
+  private canCellMoveDown = (p: Position): boolean => {
     const lastRowIndex = this.rowCount - 1
     const isAtBottomRow = p.y === lastRowIndex
     if (isAtBottomRow) {
-      return true
+      return false
     }
 
     const positionBelow = { ...p, y: p.y + 1 }
-    const isBelowCellOccupied = !!this.matrix[positionBelow.y][positionBelow.x]
-    return isBelowCellOccupied
+    const isBelowCellEmpty = !this.matrix[positionBelow.y][positionBelow.x]
+    return isBelowCellEmpty
   }
 
-  private canPerformAction(canActivePerformAction: (p: Position) => boolean) {
+  private isValidAction(isValidActionForCell: (p: Position) => boolean) {
     if (!this.active) {
       return false
     }
 
-    const activePositions = this.active.shape
+    const cellPositions = this.active.shape
       .getPositions()
       .map(this.toAbsolutePosition)
 
-    const isActionDeniedByACell = activePositions.some(canActivePerformAction)
-
-    return !isActionDeniedByACell
+    const isValid = cellPositions.every(isValidActionForCell)
+    return isValid
   }
 
   private toAbsolutePosition = ({ x, y }: Position): Position => {
