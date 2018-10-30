@@ -112,6 +112,25 @@ export class Board {
     }
   }
 
+  private canMoveDown(): boolean {
+    if (!this.active) {
+      return false
+    }
+    return this.isValidAction(this.active.shape, this.canCellMoveDown)
+  }
+
+  private canCellMoveDown = (p: Position): boolean => {
+    const lastRowIndex = this.rowCount - 1
+    const isAtBottomRow = p.y === lastRowIndex
+    if (isAtBottomRow) {
+      return false
+    }
+
+    const positionBelow = { ...p, y: p.y + 1 }
+    const isBelowCellEmpty = !this.matrix[positionBelow.y][positionBelow.x]
+    return isBelowCellEmpty
+  }
+
   step(): void {
     this.executeStep()
     this.invalidateBoard()
@@ -151,25 +170,6 @@ export class Board {
     }
 
     this.active.position.y++
-  }
-
-  private canMoveDown(): boolean {
-    if (!this.active) {
-      return false
-    }
-    return this.isValidAction(this.active.shape, this.canCellMoveDown)
-  }
-
-  private canCellMoveDown = (p: Position): boolean => {
-    const lastRowIndex = this.rowCount - 1
-    const isAtBottomRow = p.y === lastRowIndex
-    if (isAtBottomRow) {
-      return false
-    }
-
-    const positionBelow = { ...p, y: p.y + 1 }
-    const isBelowCellEmpty = !this.matrix[positionBelow.y][positionBelow.x]
-    return isBelowCellEmpty
   }
 
   private isValidAction(
