@@ -18,18 +18,19 @@ export class Game {
     columnCount: number,
     rowCount: number,
   ) {
+    const onGameOver = () => (this.isGameOver = true)
+    const onRowClear = (numberOfRowsCleared: number) => {
+      const gainedScore = this.score.linesCleared(
+        this.currentLevel,
+        numberOfRowsCleared,
+      )
+      this.onScoreChange(gainedScore, this.score.current)
+    }
+
     this.board = new Board(
       this.onBoardChange,
-      () => {
-        this.isGameOver = true
-      },
-      numberOfRowsCleared => {
-        const gainedScore = this.score.linesCleared(
-          this.currentLevel,
-          numberOfRowsCleared,
-        )
-        this.onScoreChange(gainedScore, this.score.current)
-      },
+      onGameOver,
+      onRowClear,
       getNextShape,
       createEmptyMatrix(columnCount, rowCount),
     )

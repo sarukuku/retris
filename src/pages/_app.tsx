@@ -1,13 +1,18 @@
+import FontFaceObserver from "fontfaceobserver"
 import App, { AppComponentContext, Container } from "next/app"
 import Head from "next/head"
 import "normalize.css/normalize.css"
 import React from "react"
 import { BLACK } from "../styles/colors"
-import { JOSEFIN } from "../styles/fonts"
+import { withFallback, fonts } from "../styles/fonts"
 
 class Retris extends App {
   static async getInitialProps({ Component, ctx }: AppComponentContext) {
     let pageProps = {}
+
+    await Promise.all(
+      Object.values(fonts).map(font => new FontFaceObserver(font).load()),
+    )
 
     if (Component.getInitialProps) {
       pageProps = await Component.getInitialProps(ctx)
@@ -48,7 +53,7 @@ class Retris extends App {
 
           body {
             overflow-y: hidden;
-            font-family: ${JOSEFIN};
+            font-family: ${withFallback(fonts.JOSEFIN)};
             color: ${BLACK};
             line-height: 1.1;
           }

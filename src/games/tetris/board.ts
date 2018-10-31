@@ -163,6 +163,7 @@ export class Board {
           this.matrix = this.clearFullRows(clone(this.matrix))
           return
         }
+
         return
       }
 

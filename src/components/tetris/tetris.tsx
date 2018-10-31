@@ -2,7 +2,7 @@ import React, { Component } from "react"
 import { OnBoardChange } from "../../games/tetris/board"
 import { Game, OnScoreChange } from "../../games/tetris/game"
 import { TetrisMatrix } from "../../games/tetris/shape"
-import { PRESS_START_2P } from "../../styles/fonts"
+import { fonts } from "../../styles/fonts"
 
 interface TetrisState {
   isGameOver: boolean
@@ -69,31 +69,31 @@ export class Tetris extends Component<{}, TetrisState> {
   }
 
   render() {
-    this.renderToCanvas()
+    const canvas = this.canvas
+    const ctx = this.ctx
+    if (canvas && ctx) {
+      this.renderGame(canvas, ctx)
+    }
+
     return (
       <>
-        <PreloadFonts fontFamilies={[PRESS_START_2P]} />
         <canvas ref="canvas" />
       </>
     )
   }
 
-  private renderToCanvas(): void {
-    const canvas = this.canvas
-    const ctx = this.ctx
-    if (!canvas || !ctx) {
-      return
-    }
-
-    const { board, gainedScore } = this.state
+  private renderGame(canvas: Canvas, ctx: Ctx): void {
+    const { gainedScore } = this.state
 
     this.clearCanvas(canvas, ctx)
-    this.drawBoard(canvas, ctx, board)
+    this.drawBoard(canvas, ctx)
     this.drawBorder(canvas, ctx)
 
     if (gainedScore) {
       this.drawGainedScore(canvas, ctx, gainedScore)
     }
+
+    this.drawTotalScore(ctx)
   }
 
   private clearCanvas(canvas: Canvas, ctx: Ctx): void {
@@ -101,7 +101,8 @@ export class Tetris extends Component<{}, TetrisState> {
     ctx.fillRect(0, 0, canvas.width, canvas.height)
   }
 
-  private drawBoard(canvas: Canvas, ctx: Ctx, board: TetrisMatrix): void {
+  private drawBoard(canvas: Canvas, ctx: Ctx): void {
+    const { board } = this.state
     const cellWidth = Math.ceil(canvas.width / this.columnCount)
     const cellHeight = Math.ceil(canvas.height / this.rowCount)
 
@@ -124,10 +125,19 @@ export class Tetris extends Component<{}, TetrisState> {
   }
 
   private drawGainedScore(canvas: Canvas, ctx: Ctx, gainedScore: number) {
-    ctx.font = `20px ${PRESS_START_2P}`
+    ctx.font = `40px '${fonts.PRESS_START_2P}'`
     ctx.fillStyle = "black"
     ctx.textAlign = "center"
     ctx.fillText(`+${gainedScore}`, canvas.width / 2, canvas.height / 2)
+  }
+
+  private drawTotalScore(ctx: Ctx) {
+    const { totalScore } = this.state
+
+    ctx.font = `20px '${fonts.PRESS_START_2P}'`
+    ctx.fillStyle = "black"
+    ctx.textAlign = "left"
+    ctx.fillText(`${totalScore}`, 20, 35)
   }
 
   private get ctx(): Ctx | undefined {
@@ -162,20 +172,11 @@ export class Tetris extends Component<{}, TetrisState> {
     canvas.width = parent.clientWidth
     canvas.height = parent.clientHeight
 
-    this.renderToCanvas()
+    const ctx = this.ctx
+    if (!ctx) {
+      return
+    }
+
+    this.renderGame(canvas, ctx)
   }
 }
-
-interface PreloadFontsProps {
-  fontFamilies: string[]
-}
-
-const PreloadFonts: React.SFC<PreloadFontsProps> = ({ fontFamilies }) => (
-  <>
-    {fontFamilies.map(fontFamily => (
-      <div key={fontFamily} style={{ fontFamily, height: 0 }}>
-        &nbsp;
-      </div>
-    ))}
-  </>
-)
