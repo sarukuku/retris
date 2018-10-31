@@ -42,6 +42,7 @@
     "pretty": "npx onchange 'src/**/*.{ts,tsx}' -- prettier --write {{changed}}",
     "test": "jest",
     "storybook": "start-storybook --quiet -p 3001",
+    "sb": "yarn storybook",
     "build-storybook": "build-storybook"
   },
   "engines": {

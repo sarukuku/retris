@@ -1,11 +1,14 @@
 import React, { Component } from "react"
 import { OnBoardChange } from "../../games/tetris/board"
-import { Game } from "../../games/tetris/game"
+import { Game, OnScoreChange } from "../../games/tetris/game"
 import { TetrisMatrix } from "../../games/tetris/shape"
+import { wait } from "../../helpers"
 
 interface TetrisState {
   isGameOver: boolean
   board: TetrisMatrix
+  totalScore: number
+  gainedScore?: number
 }
 
 type Ctx = CanvasRenderingContext2D
@@ -16,10 +19,13 @@ export class Tetris extends Component<{}, TetrisState> {
   private columnCount = 10
   private rowCount = 10
   private onBoardChange: OnBoardChange
+  private onScoreChange: OnScoreChange
 
   state: TetrisState = {
     isGameOver: false,
     board: [],
+    totalScore: 0,
+    gainedScore: undefined,
   }
 
   async componentDidMount() {
@@ -27,7 +33,19 @@ export class Tetris extends Component<{}, TetrisState> {
     window.onresize = () => this.resizeCanvasToParentSize()
 
     this.onBoardChange = (board: TetrisMatrix) => this.setState({ board })
-    this.game = new Game(this.onBoardChange, this.columnCount, this.rowCount)
+
+    this.onScoreChange = async (gainedScore: number, totalScore: number) => {
+      this.setState({ gainedScore, totalScore })
+      await wait(1000)
+      this.setState({ gainedScore: undefined })
+    }
+
+    this.game = new Game(
+      this.onBoardChange,
+      this.onScoreChange,
+      this.columnCount,
+      this.rowCount,
+    )
     await this.game.start()
 
     this.setState({ isGameOver: true })
@@ -35,6 +53,7 @@ export class Tetris extends Component<{}, TetrisState> {
 
   componentWillUnmount() {
     this.onBoardChange = () => undefined
+    this.onScoreChange = () => undefined
   }
 
   rotate() {
