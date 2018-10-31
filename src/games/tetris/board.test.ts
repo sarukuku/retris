@@ -1,13 +1,6 @@
-import {
-  Active,
-  Board,
-  OnBoardChange,
-  OnGameOver,
-  OnScoreChange,
-} from "./board"
+import { Active, Board, OnBoardChange, OnGameOver, OnRowClear } from "./board"
 import { GetNextShape, getNextShape as _getNextShape } from "./get-next-shape"
 import { createEmptyMatrix } from "./matrix"
-import { Score } from "./score"
 import { Shape, TetrisMatrix } from "./shape"
 
 const _ = undefined
@@ -726,10 +719,10 @@ test("game over", () => {
   expect(onGameOver).toHaveBeenCalled()
 })
 
-test("score change", () => {
+test("on row clear", () => {
   const color = "red"
   const o = { color }
-  const onScoreChange = jest.fn()
+  const onRowClear = jest.fn()
   const initialMatrix = [
     [_, _, _, _, _, _, _, _, _, _], //
     [_, _, _, _, _, _, _, _, _, _],
@@ -745,7 +738,7 @@ test("score change", () => {
   const leftOfBoard = { x: 0, y: 6 }
   const board = createBoard({
     matrix: initialMatrix,
-    onScoreChange,
+    onRowClear,
     active: {
       position: leftOfBoard,
       shape: Shape.createIShape(color),
@@ -755,18 +748,15 @@ test("score change", () => {
   board.step()
   board.step()
 
-  const score = new Score()
-  const level = 1
-  const numberOfLines = 4
-  const gainedScore = score.linesCleared(level, numberOfLines)
-  expect(onScoreChange).toHaveBeenLastCalledWith(gainedScore, score.current)
+  const numberOfRowsCleared = 4
+  expect(onRowClear).toHaveBeenLastCalledWith(numberOfRowsCleared)
 })
 
 interface CreateBoardOptions {
   getNextShape?: GetNextShape
   onBoardChange?: OnBoardChange
   onGameOver?: OnGameOver
-  onScoreChange?: OnScoreChange
+  onRowClear?: OnRowClear
   matrix?: TetrisMatrix
   active?: Active
 }
@@ -779,7 +769,7 @@ function createBoard({
   onGameOver = () => {
     return
   },
-  onScoreChange = () => {
+  onRowClear = () => {
     return
   },
   matrix = createEmptyMatrix(10, 10),
@@ -788,7 +778,7 @@ function createBoard({
   return new Board(
     onBoardChange,
     onGameOver,
-    onScoreChange,
+    onRowClear,
     getNextShape,
     matrix,
     active,

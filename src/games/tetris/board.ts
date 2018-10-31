@@ -1,6 +1,5 @@
 import { clone } from "ramda"
 import { GetNextShape } from "./get-next-shape"
-import { Score } from "./score"
 import { Position, Shape, TetrisMatrix, TetrisRow } from "./shape"
 
 export interface Active {
@@ -12,17 +11,15 @@ export type OnBoardChange = (board: TetrisMatrix) => void
 
 export type OnGameOver = () => void
 
-export type OnScoreChange = (gained: number, total: number) => void
+export type OnRowClear = (numberOfRowsCleared: number) => void
 
 export class Board {
   private hasActiveAlreadyHitBottom: boolean
-  private score = new Score()
-  private currentLevel = 1
 
   constructor(
     private onBoardChange: OnBoardChange,
     private onGameOver: OnGameOver,
-    private onScoreChange: OnScoreChange,
+    private onRowClear: OnRowClear,
     private getNextShape: GetNextShape,
     private matrix: TetrisMatrix,
     private active?: Active,
@@ -162,12 +159,8 @@ export class Board {
 
         const fullRowCount = this.getNumberOfFullRows()
         if (fullRowCount > 0) {
-          const gainedScore = this.score.linesCleared(
-            this.currentLevel,
-            fullRowCount,
-          )
-          this.onScoreChange(gainedScore, this.score.current)
-          this.matrix = this.removeFullRows(clone(this.matrix))
+          this.onRowClear(fullRowCount)
+          this.matrix = this.clearFullRows(clone(this.matrix))
           return
         }
         return
@@ -223,7 +216,7 @@ export class Board {
     )
   }
 
-  private removeFullRows(matrix: TetrisMatrix): TetrisMatrix {
+  private clearFullRows(matrix: TetrisMatrix): TetrisMatrix {
     matrix.forEach((row, rowIndex) => {
       if (this.isRowFull(row)) {
         matrix.splice(rowIndex, 1)
