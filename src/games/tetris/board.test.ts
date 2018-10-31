@@ -1,6 +1,13 @@
-import { Board, OnBoardChange, OnGameOver, Active } from "./board"
-import { getNextShape as _getNextShape, GetNextShape } from "./get-next-shape"
+import {
+  Active,
+  Board,
+  OnBoardChange,
+  OnGameOver,
+  OnScoreChange,
+} from "./board"
+import { GetNextShape, getNextShape as _getNextShape } from "./get-next-shape"
 import { createEmptyMatrix } from "./matrix"
+import { Score } from "./score"
 import { Shape, TetrisMatrix } from "./shape"
 
 const _ = undefined
@@ -719,10 +726,47 @@ test("game over", () => {
   expect(onGameOver).toHaveBeenCalled()
 })
 
+test("score change", () => {
+  const color = "red"
+  const o = { color }
+  const onScoreChange = jest.fn()
+  const initialMatrix = [
+    [_, _, _, _, _, _, _, _, _, _], //
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [_, _, _, _, _, _, _, _, _, _],
+    [o, o, _, o, o, o, o, o, o, o],
+    [o, o, _, o, o, o, o, o, o, o],
+    [o, o, _, o, o, o, o, o, o, o],
+    [o, o, _, o, o, o, o, o, o, o],
+  ]
+  const leftOfBoard = { x: 0, y: 6 }
+  const board = createBoard({
+    matrix: initialMatrix,
+    onScoreChange,
+    active: {
+      position: leftOfBoard,
+      shape: Shape.createIShape(color),
+    },
+  })
+
+  board.step()
+  board.step()
+
+  const score = new Score()
+  const level = 1
+  const numberOfLines = 4
+  const gainedScore = score.linesCleared(level, numberOfLines)
+  expect(onScoreChange).toHaveBeenLastCalledWith(gainedScore, score.current)
+})
+
 interface CreateBoardOptions {
   getNextShape?: GetNextShape
   onBoardChange?: OnBoardChange
   onGameOver?: OnGameOver
+  onScoreChange?: OnScoreChange
   matrix?: TetrisMatrix
   active?: Active
 }
@@ -735,8 +779,18 @@ function createBoard({
   onGameOver = () => {
     return
   },
+  onScoreChange = () => {
+    return
+  },
   matrix = createEmptyMatrix(10, 10),
   active,
 }: CreateBoardOptions = {}) {
-  return new Board(onBoardChange, onGameOver, getNextShape, matrix, active)
+  return new Board(
+    onBoardChange,
+    onGameOver,
+    onScoreChange,
+    getNextShape,
+    matrix,
+    active,
+  )
 }

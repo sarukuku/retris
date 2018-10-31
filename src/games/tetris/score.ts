@@ -1,10 +1,15 @@
 export class Score {
-  private current = 0
+  private _current = 0
 
   linesCleared(level: number, numberOfLines: number): number {
     const numberOfLinesMultiplier = this.getMultiplier(numberOfLines)
-    this.current += numberOfLinesMultiplier * level
-    return this.current
+    const gained = numberOfLinesMultiplier * level
+    this._current += gained
+    return gained
+  }
+
+  get current(): number {
+    return this._current
   }
 
   private getMultiplier(numberOfLines: number): number {
