@@ -126,7 +126,8 @@ export class Tetris extends Component<{}, TetrisState> {
   private drawGainedScore(canvas: Canvas, ctx: Ctx, gainedScore: number) {
     ctx.font = `20px ${PRESS_START_2P}`
     ctx.fillStyle = "black"
-    ctx.fillText(`BAM ${gainedScore}!`, canvas.width / 2, canvas.height / 2)
+    ctx.textAlign = "center"
+    ctx.fillText(`+${gainedScore}`, canvas.width / 2, canvas.height / 2)
   }
 
   private get ctx(): Ctx | undefined {
@@ -172,7 +173,7 @@ interface PreloadFontsProps {
 const PreloadFonts: React.SFC<PreloadFontsProps> = ({ fontFamilies }) => (
   <>
     {fontFamilies.map(fontFamily => (
-      <div key={fontFamily} style={{ fontFamily }}>
+      <div key={fontFamily} style={{ fontFamily, height: 0 }}>
         &nbsp;
       </div>
     ))}
