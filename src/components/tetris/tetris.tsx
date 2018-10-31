@@ -21,7 +21,7 @@ const ONE_SECOND = 1000
 export class Tetris extends Component<{}, TetrisState> {
   private game: Game
   private columnCount = 10
-  private rowCount = 20
+  private rowCount = 16
   private onBoardChange: OnBoardChange
   private onScoreChange: OnScoreChange
   private onLevelChange: OnLevelChange
@@ -105,8 +105,8 @@ export class Tetris extends Component<{}, TetrisState> {
       this.drawGainedScore(canvas, ctx, gainedScore)
     }
 
-    this.drawTotalScore(ctx)
-    this.drawCurrentLevel(ctx)
+    this.drawTotalScore(canvas, ctx)
+    this.drawCurrentLevel(canvas, ctx)
   }
 
   private clearCanvas(canvas: Canvas, ctx: Ctx): void {
@@ -144,22 +144,23 @@ export class Tetris extends Component<{}, TetrisState> {
     ctx.fillText(`+${gainedScore}`, canvas.width / 2, canvas.height / 2)
   }
 
-  private drawTotalScore(ctx: Ctx) {
+  private drawTotalScore(canvas: Canvas, ctx: Ctx) {
     const { totalScore } = this.state
 
-    ctx.font = `40px '${fonts.PRESS_START_2P}'`
+    const coeff = canvas.width / 30
+    ctx.font = `${coeff}px '${fonts.PRESS_START_2P}'`
     ctx.fillStyle = "black"
     ctx.textAlign = "left"
-    ctx.fillText(`${totalScore}`.padStart(8, "0"), 20, 60)
+    ctx.fillText(`${totalScore}`.padStart(8, "0"), 20, 2 * coeff)
   }
 
-  private drawCurrentLevel(ctx: Ctx) {
+  private drawCurrentLevel(canvas: Canvas, ctx: Ctx) {
     const { currentLevel } = this.state
-
-    ctx.font = `40px '${fonts.PRESS_START_2P}'`
+    const coeff = canvas.width / 30
+    ctx.font = `${coeff}px '${fonts.PRESS_START_2P}'`
     ctx.fillStyle = "black"
     ctx.textAlign = "left"
-    ctx.fillText(`Level ${`${currentLevel}`.padStart(2, "0")}`, 20, 120)
+    ctx.fillText(`Level ${`${currentLevel}`.padStart(2, "0")}`, 20, 4 * coeff)
   }
 
   private get ctx(): Ctx | undefined {
