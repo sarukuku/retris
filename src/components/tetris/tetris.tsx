@@ -2,7 +2,7 @@ import React, { Component } from "react"
 import { OnBoardChange } from "../../games/tetris/board"
 import { Game, OnScoreChange } from "../../games/tetris/game"
 import { TetrisMatrix } from "../../games/tetris/shape"
-import { wait } from "../../helpers"
+import { PRESS_START_2P } from "../../styles/fonts"
 
 interface TetrisState {
   isGameOver: boolean
@@ -33,12 +33,8 @@ export class Tetris extends Component<{}, TetrisState> {
     window.onresize = () => this.resizeCanvasToParentSize()
 
     this.onBoardChange = (board: TetrisMatrix) => this.setState({ board })
-
-    this.onScoreChange = async (gainedScore: number, totalScore: number) => {
+    this.onScoreChange = (gainedScore: number, totalScore: number) =>
       this.setState({ gainedScore, totalScore })
-      await wait(1000)
-      this.setState({ gainedScore: undefined })
-    }
 
     this.game = new Game(
       this.onBoardChange,
@@ -74,23 +70,30 @@ export class Tetris extends Component<{}, TetrisState> {
 
   render() {
     this.renderToCanvas()
-    return <canvas ref="canvas" />
+    return (
+      <>
+        <PreloadFonts fontFamilies={[PRESS_START_2P]} />
+        <canvas ref="canvas" />
+      </>
+    )
   }
 
   private renderToCanvas(): void {
     const canvas = this.canvas
-    if (!canvas) {
+    const ctx = this.ctx
+    if (!canvas || !ctx) {
       return
     }
 
-    const ctx = this.ctx
-    if (!ctx) {
-      return
-    }
+    const { board, gainedScore } = this.state
 
     this.clearCanvas(canvas, ctx)
-    this.drawBoard(canvas, ctx)
+    this.drawBoard(canvas, ctx, board)
     this.drawBorder(canvas, ctx)
+
+    if (gainedScore) {
+      this.drawGainedScore(canvas, ctx, gainedScore)
+    }
   }
 
   private clearCanvas(canvas: Canvas, ctx: Ctx): void {
@@ -98,9 +101,7 @@ export class Tetris extends Component<{}, TetrisState> {
     ctx.fillRect(0, 0, canvas.width, canvas.height)
   }
 
-  private drawBoard(canvas: Canvas, ctx: Ctx): void {
-    const { board } = this.state
-
+  private drawBoard(canvas: Canvas, ctx: Ctx, board: TetrisMatrix): void {
     const cellWidth = Math.ceil(canvas.width / this.columnCount)
     const cellHeight = Math.ceil(canvas.height / this.rowCount)
 
@@ -120,6 +121,12 @@ export class Tetris extends Component<{}, TetrisState> {
   private drawBorder(canvas: Canvas, ctx: Ctx): void {
     ctx.strokeStyle = "black"
     ctx.strokeRect(0, 0, canvas.width, canvas.height)
+  }
+
+  private drawGainedScore(canvas: Canvas, ctx: Ctx, gainedScore: number) {
+    ctx.font = `20px ${PRESS_START_2P}`
+    ctx.fillStyle = "black"
+    ctx.fillText(`BAM ${gainedScore}!`, canvas.width / 2, canvas.height / 2)
   }
 
   private get ctx(): Ctx | undefined {
@@ -157,3 +164,17 @@ export class Tetris extends Component<{}, TetrisState> {
     this.renderToCanvas()
   }
 }
+
+interface PreloadFontsProps {
+  fontFamilies: string[]
+}
+
+const PreloadFonts: React.SFC<PreloadFontsProps> = ({ fontFamilies }) => (
+  <>
+    {fontFamilies.map(fontFamily => (
+      <div key={fontFamily} style={{ fontFamily }}>
+        &nbsp;
+      </div>
+    ))}
+  </>
+)

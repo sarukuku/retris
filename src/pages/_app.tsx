@@ -29,6 +29,10 @@ class Retris extends App {
             href="https://fonts.googleapis.com/css?family=Josefin+Sans:400,700"
             rel="stylesheet"
           />
+          <link
+            href="https://fonts.googleapis.com/css?family=Press+Start+2P"
+            rel="stylesheet"
+          />
         </Head>
         <Component {...pageProps} />
         <style global jsx>{`
