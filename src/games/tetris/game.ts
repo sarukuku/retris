@@ -6,6 +6,10 @@ import { Score } from "./score"
 
 export type OnScoreChange = (gained: number, total: number) => void
 
+export type OnLevelChange = (currentLevel: number) => void
+
+const TEN_SECONDS = 10000
+
 export class Game {
   private isGameOver = false
   private board: Board
@@ -15,6 +19,7 @@ export class Game {
   constructor(
     private onBoardChange: OnBoardChange,
     private onScoreChange: OnScoreChange,
+    private onLevelChange: OnLevelChange,
     columnCount: number,
     rowCount: number,
   ) {
@@ -37,10 +42,25 @@ export class Game {
   }
 
   async start() {
+    this.onLevelChange(this.currentLevel)
+    const handle = setInterval(this.increaseLevel, TEN_SECONDS)
+
     while (!this.isGameOver) {
       this.board.step()
-      await wait(500)
+      await wait(this.mapLevelToTime())
     }
+
+    clearInterval(handle)
+  }
+
+  private increaseLevel = () => {
+    this.onLevelChange(this.currentLevel)
+    this.currentLevel++
+  }
+
+  private mapLevelToTime(): number {
+    const level = this.currentLevel > 10 ? 10 : this.currentLevel
+    return -100 * level + 1100
   }
 
   rotate() {

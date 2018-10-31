@@ -1,7 +1,8 @@
 import React, { Component } from "react"
 import { OnBoardChange } from "../../games/tetris/board"
-import { Game, OnScoreChange } from "../../games/tetris/game"
+import { Game, OnLevelChange, OnScoreChange } from "../../games/tetris/game"
 import { TetrisMatrix } from "../../games/tetris/shape"
+import { wait } from "../../helpers"
 import { fonts } from "../../styles/fonts"
 
 interface TetrisState {
@@ -9,10 +10,13 @@ interface TetrisState {
   board: TetrisMatrix
   totalScore: number
   gainedScore?: number
+  currentLevel: number
 }
 
 type Ctx = CanvasRenderingContext2D
 type Canvas = HTMLCanvasElement
+
+const ONE_SECOND = 1000
 
 export class Tetris extends Component<{}, TetrisState> {
   private game: Game
@@ -20,12 +24,14 @@ export class Tetris extends Component<{}, TetrisState> {
   private rowCount = 10
   private onBoardChange: OnBoardChange
   private onScoreChange: OnScoreChange
+  private onLevelChange: OnLevelChange
 
   state: TetrisState = {
     isGameOver: false,
     board: [],
     totalScore: 0,
     gainedScore: undefined,
+    currentLevel: 1,
   }
 
   async componentDidMount() {
@@ -33,12 +39,18 @@ export class Tetris extends Component<{}, TetrisState> {
     window.onresize = () => this.resizeCanvasToParentSize()
 
     this.onBoardChange = (board: TetrisMatrix) => this.setState({ board })
-    this.onScoreChange = (gainedScore: number, totalScore: number) =>
+    this.onScoreChange = async (gainedScore: number, totalScore: number) => {
       this.setState({ gainedScore, totalScore })
+      await wait(ONE_SECOND)
+      this.setState({ gainedScore: undefined })
+    }
+    this.onLevelChange = (currentLevel: number) =>
+      this.setState({ currentLevel })
 
     this.game = new Game(
       this.onBoardChange,
       this.onScoreChange,
+      this.onLevelChange,
       this.columnCount,
       this.rowCount,
     )
@@ -94,6 +106,7 @@ export class Tetris extends Component<{}, TetrisState> {
     }
 
     this.drawTotalScore(ctx)
+    this.drawCurrentLevel(ctx)
   }
 
   private clearCanvas(canvas: Canvas, ctx: Ctx): void {
@@ -125,7 +138,7 @@ export class Tetris extends Component<{}, TetrisState> {
   }
 
   private drawGainedScore(canvas: Canvas, ctx: Ctx, gainedScore: number) {
-    ctx.font = `40px '${fonts.PRESS_START_2P}'`
+    ctx.font = `60px '${fonts.PRESS_START_2P}'`
     ctx.fillStyle = "black"
     ctx.textAlign = "center"
     ctx.fillText(`+${gainedScore}`, canvas.width / 2, canvas.height / 2)
@@ -134,10 +147,19 @@ export class Tetris extends Component<{}, TetrisState> {
   private drawTotalScore(ctx: Ctx) {
     const { totalScore } = this.state
 
-    ctx.font = `20px '${fonts.PRESS_START_2P}'`
+    ctx.font = `40px '${fonts.PRESS_START_2P}'`
     ctx.fillStyle = "black"
     ctx.textAlign = "left"
-    ctx.fillText(`${totalScore}`, 20, 35)
+    ctx.fillText(`${totalScore}`.padStart(8, "0"), 20, 60)
+  }
+
+  private drawCurrentLevel(ctx: Ctx) {
+    const { currentLevel } = this.state
+
+    ctx.font = `40px '${fonts.PRESS_START_2P}'`
+    ctx.fillStyle = "black"
+    ctx.textAlign = "left"
+    ctx.fillText(`Level ${`${currentLevel}`.padStart(2, "0")}`, 20, 120)
   }
 
   private get ctx(): Ctx | undefined {
