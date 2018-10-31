@@ -21,7 +21,7 @@ const ONE_SECOND = 1000
 export class Tetris extends Component<{}, TetrisState> {
   private game: Game
   private columnCount = 10
-  private rowCount = 10
+  private rowCount = 20
   private onBoardChange: OnBoardChange
   private onScoreChange: OnScoreChange
   private onLevelChange: OnLevelChange
@@ -191,8 +191,27 @@ export class Tetris extends Component<{}, TetrisState> {
       return
     }
 
-    canvas.width = parent.clientWidth
-    canvas.height = parent.clientHeight
+    const isGamePortrait = this.rowCount >= this.columnCount
+    const isParentPortrait = parent.clientHeight >= parent.clientWidth
+
+    const aspectRatio = this.columnCount / this.rowCount
+    if (isGamePortrait) {
+      if (isParentPortrait) {
+        canvas.width = parent.clientWidth
+        canvas.height = canvas.width / aspectRatio
+      } else {
+        canvas.height = parent.clientHeight
+        canvas.width = canvas.height * aspectRatio
+      }
+    } else {
+      if (isParentPortrait) {
+        canvas.width = parent.clientWidth
+        canvas.height = canvas.width / aspectRatio
+      } else {
+        canvas.height = parent.clientHeight
+        canvas.width = canvas.height * aspectRatio
+      }
+    }
 
     const ctx = this.ctx
     if (!ctx) {
