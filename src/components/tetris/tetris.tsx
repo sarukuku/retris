@@ -1,12 +1,18 @@
-import React, { Component } from "react"
+import React, { Component, Fragment } from "react"
 import { OnBoardChange } from "../../games/tetris/board"
 import { Game, OnLevelChange, OnScoreChange } from "../../games/tetris/game"
 import { TetrisMatrix } from "../../games/tetris/shape"
 import { wait } from "../../helpers"
 import { fonts } from "../../styles/fonts"
+import { calculateCanvasSize } from "./calculate-canvas-size"
+
+export type OnGameOver = (totalScore: number) => void
+
+interface TetrisProps {
+  onGameOver: OnGameOver
+}
 
 interface TetrisState {
-  isGameOver: boolean
   board: TetrisMatrix
   totalScore: number
   gainedScore?: number
@@ -18,7 +24,7 @@ type Canvas = HTMLCanvasElement
 
 const ONE_SECOND = 1000
 
-export class Tetris extends Component<{}, TetrisState> {
+export class Tetris extends Component<TetrisProps, TetrisState> {
   private game: Game
   private columnCount = 10
   private rowCount = 16
@@ -27,7 +33,6 @@ export class Tetris extends Component<{}, TetrisState> {
   private onLevelChange: OnLevelChange
 
   state: TetrisState = {
-    isGameOver: false,
     board: [],
     totalScore: 0,
     gainedScore: undefined,
@@ -56,7 +61,7 @@ export class Tetris extends Component<{}, TetrisState> {
     )
     await this.game.start()
 
-    this.setState({ isGameOver: true })
+    this.props.onGameOver(this.state.totalScore)
   }
 
   componentWillUnmount() {
@@ -88,9 +93,9 @@ export class Tetris extends Component<{}, TetrisState> {
     }
 
     return (
-      <>
+      <Fragment>
         <canvas ref="canvas" />
-      </>
+      </Fragment>
     )
   }
 
@@ -187,32 +192,23 @@ export class Tetris extends Component<{}, TetrisState> {
       return
     }
 
-    const parent = canvas.parentElement
-    if (!parent) {
+    const parentElement = canvas.parentElement
+    if (!parentElement) {
       return
     }
 
-    const isGamePortrait = this.rowCount >= this.columnCount
-    const isParentPortrait = parent.clientHeight >= parent.clientWidth
-
-    const aspectRatio = this.columnCount / this.rowCount
-    if (isGamePortrait) {
-      if (isParentPortrait) {
-        canvas.width = parent.clientWidth
-        canvas.height = canvas.width / aspectRatio
-      } else {
-        canvas.height = parent.clientHeight
-        canvas.width = canvas.height * aspectRatio
-      }
-    } else {
-      if (isParentPortrait) {
-        canvas.width = parent.clientWidth
-        canvas.height = canvas.width / aspectRatio
-      } else {
-        canvas.height = parent.clientHeight
-        canvas.width = canvas.height * aspectRatio
-      }
+    const parent = {
+      width: parentElement.clientWidth,
+      height: parentElement.clientHeight,
     }
+    const aspectRatio = this.columnCount / this.rowCount
+    const { width, height } = calculateCanvasSize({
+      parent,
+      aspectRatio,
+    })
+
+    canvas.width = width
+    canvas.height = height
 
     const ctx = this.ctx
     if (!ctx) {

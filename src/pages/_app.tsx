@@ -3,16 +3,19 @@ import App, { AppComponentContext, Container } from "next/app"
 import Head from "next/head"
 import "normalize.css/normalize.css"
 import React from "react"
+import { isBrowser } from "../helpers"
 import { BLACK } from "../styles/colors"
-import { withFallback, fonts } from "../styles/fonts"
+import { fonts, withFallback } from "../styles/fonts"
 
 class Retris extends App {
   static async getInitialProps({ Component, ctx }: AppComponentContext) {
     let pageProps = {}
 
-    await Promise.all(
-      Object.values(fonts).map(font => new FontFaceObserver(font).load()),
-    )
+    if (isBrowser()) {
+      await Promise.all(
+        Object.values(fonts).map(font => new FontFaceObserver(font).load()),
+      )
+    }
 
     if (Component.getInitialProps) {
       pageProps = await Component.getInitialProps(ctx)

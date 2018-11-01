@@ -65,7 +65,8 @@ export default class Display extends Component<
     this.setState({ score: 0 })
   }
 
-  gameOver = () => {
+  gameOver = (totalScore: number) => {
+    this.setState({ score: totalScore })
     this.state.socket!.emit(commands.GAME_OVER)
   }
 
@@ -75,27 +76,21 @@ export default class Display extends Component<
 
     return (
       <main>
-        <p className="queue-length">{this.state.queueLength} people in queue</p>
-        {(() => {
-          switch (activeView) {
-            case views.DISPLAY_WAITING:
-              return <Waiting address={address} />
-            case views.DISPLAY_WAITING_TO_START:
-              return <WaitingToStart />
-            case views.DISPLAY_GAME:
-              return (
-                <Game
-                  socket={socket!}
-                  addToScore={this.addToScore}
-                  resetScore={this.resetScore}
-                  score={score}
-                  onGameOver={this.gameOver}
-                />
-              )
-            case views.DISPLAY_GAME_OVER:
-              return <GameOver score={score} />
-          }
-        })()}
+        <div className="info-bar">{this.state.queueLength} people in queue</div>
+        <div className="view">
+          {(() => {
+            switch (activeView) {
+              case views.DISPLAY_WAITING:
+                return <Waiting address={address} />
+              case views.DISPLAY_WAITING_TO_START:
+                return <WaitingToStart />
+              case views.DISPLAY_GAME:
+                return <Game socket={socket!} onGameOver={this.gameOver} />
+              case views.DISPLAY_GAME_OVER:
+                return <GameOver score={score} />
+            }
+          })()}
+        </div>
         <style jsx>{`
           main {
             background-color: ${PETER_RIVER};
@@ -103,12 +98,19 @@ export default class Display extends Component<
             background-size: 50px;
             background-repeat: no-repeat;
             background-position: 1vw 1vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
           }
 
-          .queue-length {
-            margin: 0;
+          .info-bar {
             text-align: right;
             padding: 10px;
+          }
+
+          .view {
+            flex-grow: 1;
+            display: flex;
           }
         `}</style>
       </main>

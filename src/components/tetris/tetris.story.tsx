@@ -1,4 +1,4 @@
-import React, { Component } from "react"
+import React, { Component, Fragment } from "react"
 
 import { storiesOf } from "@storybook/react"
 import { Tetris } from "./tetris"
@@ -30,20 +30,24 @@ class TetrisWrapper extends Component {
 
   render() {
     return (
-      <>
+      <Fragment>
         <div className="tetris-wrapper">
-          <Tetris ref="tetris" />
+          <Tetris ref="tetris" onGameOver={() => undefined} />
         </div>
-        <style jsx>{`
+        <style global={true} jsx>{`
           html,
           body,
-          #root,
-          #root > div {
+          #root {
             width: 100%;
             height: 100%;
           }
+
+          .tetris-wrapper {
+            width: 95%;
+            height: 95%;
+          }
         `}</style>
-      </>
+      </Fragment>
     )
   }
 }
