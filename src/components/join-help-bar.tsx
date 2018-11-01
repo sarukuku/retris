@@ -58,8 +58,8 @@ export class JoinHelpBar extends Component<JoinHelpBarProps, JoinHelpBarState> {
           .help-bar {
             background-color: ${EMERALD};
             color: ${WHITE};
-            font-size: 1.4vmax;
             text-align: center;
+            height: 50px;
           }
 
           .icon {

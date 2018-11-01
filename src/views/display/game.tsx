@@ -48,16 +48,20 @@ export class Game extends Component<DisplayGameProps> {
     return (
       <Fragment>
         <div className="wrap">
-          <Tetris ref="tetris" onGameOver={this.props.onGameOver} />
+          <div className="tetris-wrap">
+            <Tetris ref="tetris" onGameOver={this.props.onGameOver} />
+          </div>
           <JoinHelpBar className={className} />
         </div>
         {styles}
         <style jsx>{`
           .wrap {
             flex-grow: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+          }
+
+          .tetris-wrap {
+            text-align: center;
+            height: calc(100% - 80px);
           }
         `}</style>
       </Fragment>
