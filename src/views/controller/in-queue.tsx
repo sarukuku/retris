@@ -1,5 +1,5 @@
 import React, { Component } from "react"
-import { PETER_RIVER } from "../../styles/colors"
+import { colors } from "../../styles/colors"
 
 interface InQueueProps {
   queueLength: number
@@ -21,7 +21,7 @@ export class InQueue extends Component<InQueueProps> {
             justify-content: center;
             align-content: center;
             align-items: center;
-            background-color: ${PETER_RIVER};
+            background-color: ${colors.PETER_RIVER};
             padding: 1rem;
             flex-wrap: wrap;
             text-align: center;

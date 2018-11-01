@@ -3,7 +3,7 @@ import Head from "next/head"
 import "normalize.css/normalize.css"
 import React from "react"
 import { isBrowser, loadFonts } from "../helpers"
-import { BLACK } from "../styles/colors"
+import { colors } from "../styles/colors"
 import { fonts, withFallback } from "../styles/fonts"
 
 class Retris extends App {
@@ -56,7 +56,7 @@ class Retris extends App {
           body {
             overflow-y: hidden;
             font-family: ${withFallback(fonts.JOSEFIN)};
-            color: ${BLACK};
+            color: ${colors.BLACK};
             line-height: 1.1;
           }
         `}</style>

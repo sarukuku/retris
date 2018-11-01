@@ -3,7 +3,7 @@ import React, { Component } from "react"
 import io from "socket.io-client"
 import { commands } from "../commands"
 import { DisplayState } from "../server/state"
-import { PETER_RIVER } from "../styles/colors"
+import { colors } from "../styles/colors"
 import { views } from "../views"
 import { Game } from "../views/display/game"
 import { GameOver } from "../views/display/game-over"
@@ -93,7 +93,7 @@ export default class Display extends Component<
         </div>
         <style jsx>{`
           main {
-            background-color: ${PETER_RIVER};
+            background-color: ${colors.PETER_RIVER};
             background-image: url("/static/r-symbol.png");
             background-size: 50px;
             background-repeat: no-repeat;

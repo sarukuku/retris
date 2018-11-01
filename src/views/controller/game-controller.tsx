@@ -2,7 +2,7 @@ import React, { Component } from "react"
 import Swipeable from "react-swipeable"
 import io from "socket.io-client"
 import { commands } from "../../commands"
-import { PETER_RIVER, BELIZE_HOLE } from "../../styles/colors"
+import { colors } from "../../styles/colors"
 
 interface GameControllerProps {
   socket: typeof io.Socket
@@ -49,13 +49,13 @@ export class GameController extends Component<GameControllerProps> {
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: ${PETER_RIVER};
-            border: 6px solid ${BELIZE_HOLE};
+            background-color: ${colors.PETER_RIVER};
+            border: 6px solid ${colors.BELIZE_HOLE};
             padding: 2rem;
           }
 
           p {
-            color: ${BELIZE_HOLE};
+            color: ${colors.BELIZE_HOLE};
           }
         `}</style>
       </Swipeable>

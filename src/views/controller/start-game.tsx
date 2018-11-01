@@ -1,5 +1,5 @@
 import React, { Component } from "react"
-import { PETER_RIVER, EMERALD } from "../../styles/colors"
+import { colors } from "../../styles/colors"
 
 interface StartGameProps {
   startGame: () => void
@@ -22,7 +22,7 @@ export class StartGame extends Component<StartGameProps> {
             justify-content: center;
             align-content: center;
             align-items: center;
-            background-color: ${PETER_RIVER};
+            background-color: ${colors.PETER_RIVER};
             padding: 1rem;
             flex-wrap: wrap;
             text-align: center;
@@ -36,7 +36,7 @@ export class StartGame extends Component<StartGameProps> {
             border: 1px solid black;
             padding: 1rem;
             border-radius: 100px;
-            background: ${EMERALD};
+            background: ${colors.EMERALD};
             box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.75);
           }
         `}</style>

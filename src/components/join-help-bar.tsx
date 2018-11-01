@@ -1,6 +1,6 @@
 import React, { Component } from "react"
 import { isBrowser } from "../helpers"
-import { WHITE, EMERALD } from "../styles/colors"
+import { colors } from "../styles/colors"
 
 interface JoinHelpBarProps {
   className: string
@@ -56,8 +56,8 @@ export class JoinHelpBar extends Component<JoinHelpBarProps, JoinHelpBarState> {
         </p>
         <style jsx>{`
           .help-bar {
-            background-color: ${EMERALD};
-            color: ${WHITE};
+            background-color: ${colors.EMERALD};
+            color: ${colors.WHITE};
             text-align: center;
             height: 50px;
           }
