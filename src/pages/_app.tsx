@@ -1,9 +1,8 @@
-import FontFaceObserver from "fontfaceobserver"
 import App, { AppComponentContext, Container } from "next/app"
 import Head from "next/head"
 import "normalize.css/normalize.css"
 import React from "react"
-import { isBrowser } from "../helpers"
+import { isBrowser, loadFonts } from "../helpers"
 import { BLACK } from "../styles/colors"
 import { fonts, withFallback } from "../styles/fonts"
 
@@ -11,17 +10,17 @@ class Retris extends App {
   static async getInitialProps({ Component, ctx }: AppComponentContext) {
     let pageProps = {}
 
-    if (isBrowser()) {
-      await Promise.all(
-        Object.values(fonts).map(font => new FontFaceObserver(font).load()),
-      )
-    }
-
     if (Component.getInitialProps) {
       pageProps = await Component.getInitialProps(ctx)
     }
 
     return { pageProps }
+  }
+
+  async componentDidMount() {
+    if (isBrowser()) {
+      await loadFonts()
+    }
   }
 
   render() {

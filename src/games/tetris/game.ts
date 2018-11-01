@@ -46,7 +46,7 @@ export class Game {
     const handle = setInterval(this.increaseLevel, TEN_SECONDS)
 
     while (!this.isGameOver) {
-      // this.board.step()
+      this.board.step()
       await wait(this.mapLevelToTime())
     }
 
