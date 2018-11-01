@@ -27,12 +27,8 @@ export class GameOver extends Component<GameOverProps> {
           .wrap {
             flex-grow: 1;
             display: flex;
-            justify-content: center;
+            justify-content: space-around;
             align-items: center;
-          }
-
-          h1 {
-            width: 100%;
           }
         `}</style>
       </div>
