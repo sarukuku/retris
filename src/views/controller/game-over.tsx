@@ -1,5 +1,5 @@
 import React, { Component } from "react"
-import { PETER_RIVER } from "../../styles/colors"
+import { colors } from "../../styles/colors"
 
 export class GameOver extends Component {
   render() {
@@ -15,7 +15,7 @@ export class GameOver extends Component {
             justify-content: center;
             align-content: center;
             align-items: center;
-            background-color: ${PETER_RIVER};
+            background-color: ${colors.PETER_RIVER};
             padding: 1rem;
             flex-wrap: wrap;
             text-align: center;

@@ -12,10 +12,8 @@ export class Waiting extends Component<WaitingProps> {
         <h1>{`Go to ${address} to start playing! 🎮`}</h1>
         <style jsx>{`
           .wrap {
-            width: 100%;
-            height: 100vh;
+            flex-grow: 1;
             display: flex;
-            text-align: center;
             justify-content: center;
             align-items: center;
           }

@@ -1,6 +1,13 @@
-export const BLACK = "#2d3436"
-export const WHITE = "#fff"
-export const EMERALD = "#2ecc71"
-export const NEPHRITIS = "#27ae60"
-export const PETER_RIVER = "#3498db"
-export const BELIZE_HOLE = "#2980b9"
+export const colors = {
+  BLACK: "#2d3436",
+  WHITE: "#fff",
+  EMERALD: "#2ecc71",
+  NEPHRITIS: "#27ae60",
+  PETER_RIVER: "#3498db",
+  BELIZE_HOLE: "#2980b9",
+  ALIZARIN: "#e74c3c",
+  CARROT: "#e67e22",
+  SUNFLOWER: "#f1c40f",
+  AMETHYST: "#9b59b6",
+  WET_ASPHALT: "#34495e",
+}

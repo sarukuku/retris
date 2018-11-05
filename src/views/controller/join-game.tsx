@@ -1,5 +1,5 @@
 import React, { Component } from "react"
-import { PETER_RIVER, EMERALD } from "../../styles/colors"
+import { colors } from "../../styles/colors"
 
 interface JoinGameProps {
   joinGame: () => void
@@ -20,14 +20,14 @@ export class JoinGame extends Component<JoinGameProps> {
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: ${PETER_RIVER};
+            background-color: ${colors.PETER_RIVER};
           }
 
           button {
             border: 1px solid black;
             padding: 1rem;
             border-radius: 100px;
-            background: ${EMERALD};
+            background: ${colors.EMERALD};
             box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.75);
           }
         `}</style>

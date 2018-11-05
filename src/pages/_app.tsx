@@ -2,8 +2,9 @@ import App, { AppComponentContext, Container } from "next/app"
 import Head from "next/head"
 import "normalize.css/normalize.css"
 import React from "react"
-import { BLACK } from "../styles/colors"
-import { JOSEFIN } from "../styles/fonts"
+import { isBrowser, loadFonts } from "../helpers"
+import { colors } from "../styles/colors"
+import { fonts, withFallback } from "../styles/fonts"
 
 class Retris extends App {
   static async getInitialProps({ Component, ctx }: AppComponentContext) {
@@ -14,6 +15,12 @@ class Retris extends App {
     }
 
     return { pageProps }
+  }
+
+  async componentDidMount() {
+    if (isBrowser()) {
+      await loadFonts()
+    }
   }
 
   render() {
@@ -27,6 +34,10 @@ class Retris extends App {
           />
           <link
             href="https://fonts.googleapis.com/css?family=Josefin+Sans:400,700"
+            rel="stylesheet"
+          />
+          <link
+            href="https://fonts.googleapis.com/css?family=Press+Start+2P"
             rel="stylesheet"
           />
         </Head>
@@ -44,8 +55,8 @@ class Retris extends App {
 
           body {
             overflow-y: hidden;
-            font-family: ${JOSEFIN};
-            color: ${BLACK};
+            font-family: ${withFallback(fonts.JOSEFIN)};
+            color: ${colors.BLACK};
             line-height: 1.1;
           }
         `}</style>
