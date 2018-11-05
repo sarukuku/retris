@@ -121,18 +121,17 @@ export class Tetris extends Component<TetrisProps, TetrisState> {
 
   private drawBoard(canvas: Canvas, ctx: Ctx): void {
     const { board } = this.state
-    const cellWidth = Math.ceil(canvas.width / this.columnCount)
-    const cellHeight = Math.ceil(canvas.height / this.rowCount)
+    const cellWidth = canvas.width / this.columnCount
+    const cellHeight = canvas.height / this.rowCount
 
     board.forEach((row, rowIndex) => {
       row.forEach((cell, columnIndex) => {
         ctx.fillStyle = cell ? cell.color : "white"
-        ctx.fillRect(
-          columnIndex * cellWidth,
-          rowIndex * cellHeight,
-          cellWidth,
-          cellHeight,
-        )
+        const x = Math.floor(columnIndex * cellWidth)
+        const y = Math.floor(rowIndex * cellHeight)
+        const width = Math.ceil(cellWidth)
+        const height = Math.ceil(cellHeight)
+        ctx.fillRect(x, y, width, height)
       })
     })
   }
