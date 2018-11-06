@@ -4,6 +4,7 @@
   "jsRules": {},
   "rules": {
     "semicolon": [true, "never"],
+    "max-line-length": false,
     "member-access": false,
     "variable-name": false,
     "member-ordering": false,
