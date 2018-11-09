@@ -14,11 +14,7 @@ import {
 import { State } from "./server/state"
 
 async function main() {
-  const loadTranslations = createLoadTranslationsFromSheets({
-    apiKey: config.sheetsAPIKey,
-    spreadsheetID: config.translationSpreadsheetID,
-    sheetName: config.translationSheetName,
-  })
+  const loadTranslations = createLoadTranslationsFromSheets(config.sheets)
 
   const app = express()
   app.get(
