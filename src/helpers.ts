@@ -18,3 +18,19 @@ export async function loadFonts(): Promise<void> {
     Object.values(fonts).map(font => new FontFaceObserver(font).load()),
   )
 }
+
+export async function parseJSON(res: Response): Promise<any> {
+  const text = await res.text()
+  if (!text) {
+    return undefined
+  }
+
+  let json: any
+  try {
+    json = JSON.parse(text)
+  } catch (err) {
+    return undefined
+  }
+
+  return json
+}

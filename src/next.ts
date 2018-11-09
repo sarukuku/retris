@@ -1,18 +1,9 @@
-import http from "http"
+import { Application } from "express"
 import next from "next"
-
-type RequestHandler = (
-  req: http.IncomingMessage,
-  res: http.ServerResponse,
-) => void
-
-interface WebApp {
-  get(url: string, handler: RequestHandler): void
-}
 
 export async function createNextApp(
   env: string,
-  webApp: WebApp,
+  app: Application,
 ): Promise<void> {
   const dev = env === "development"
   const nextApp = next({ dev, dir: __dirname })
@@ -20,7 +11,7 @@ export async function createNextApp(
 
   await nextApp.prepare()
 
-  webApp.get("*", (req, res) => {
+  app.get("*", (req, res) => {
     return nextHandler(req, res)
   })
 }

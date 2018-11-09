@@ -1,4 +1,4 @@
-import { defaultTranslation, TranslationMap } from "./default"
+import { defaultTranslations, Translations } from "./default"
 import { createTranslate } from "./translate"
 
 test("default translation", () => {
@@ -7,22 +7,22 @@ test("default translation", () => {
 
   const result = translate(key)
 
-  expect(result).toEqual(defaultTranslation[key])
+  expect(result).toEqual(defaultTranslations[key])
 })
 
 test("translation", () => {
-  const translate = createTranslate(translationMap)
+  const translate = createTranslate(translations)
   const key = "display.waiting.header.line1"
 
   const result = translate(key)
 
-  expect(result).toEqual(translationMap[key])
+  expect(result).toEqual(translations[key])
 })
 
 test("interpolation", () => {
   const key = "display.waiting.header.line1"
   const translate = createTranslate({
-    ...translationMap,
+    ...translations,
     [key]: "hello {{world}}",
   })
 
@@ -31,7 +31,7 @@ test("interpolation", () => {
   expect(result).toEqual("hello foo")
 })
 
-const translationMap: TranslationMap = {
+const translations: Translations = {
   "display.waiting.header.line1": "display.waiting.header.line1",
   "display.waiting.header.line2": "display.waiting.header.line2",
 }

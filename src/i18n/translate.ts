@@ -1,14 +1,14 @@
-import { TranslationKey, TranslationMap, defaultTranslation } from "./default"
+import { TranslationKey, Translations, defaultTranslations } from "./default"
 
 export interface TranslationParams {
   [key: string]: string
 }
 
-export function createTranslate(translationMap: TranslationMap) {
+export function createTranslate(translations: Translations) {
   return (key: TranslationKey, params?: TranslationParams) => {
-    const translated = translationMap[key]
+    const translated = translations[key]
     if (!translated) {
-      return defaultTranslation[key]
+      return defaultTranslations[key]
     }
 
     if (!params) {

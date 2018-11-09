@@ -2,6 +2,7 @@ import App, { AppComponentContext, Container } from "next/app"
 import Head from "next/head"
 import "normalize.css/normalize.css"
 import React from "react"
+import { ClientAPI } from "../client-api"
 import { isBrowser, loadFonts } from "../helpers"
 import { colors } from "../styles/colors"
 import { fonts, withFallback } from "../styles/fonts"
@@ -9,6 +10,10 @@ import { fonts, withFallback } from "../styles/fonts"
 class Retris extends App {
   static async getInitialProps({ Component, ctx }: AppComponentContext) {
     let pageProps = {}
+
+    const clientAPI = new ClientAPI(ctx.req)
+    const tr = await clientAPI.getTranslations()
+    console.log({ tr })
 
     if (Component.getInitialProps) {
       pageProps = await Component.getInitialProps(ctx)

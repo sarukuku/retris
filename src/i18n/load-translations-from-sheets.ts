@@ -1,33 +1,32 @@
 import fetch from "isomorphic-unfetch"
 import { isEmpty } from "ramda"
-import { defaultTranslation, TranslationMap, TranslationKey } from "./default"
+import { parseJSON } from "../helpers"
+import { defaultTranslations, TranslationKey, Translations } from "./default"
+import { LoadTranslations } from "./load-translations"
 
 interface Args {
-  apiKey: string
-  spreadsheetID: string
-  sheetName: string
+  apiKey?: string
+  spreadsheetID?: string
+  sheetName?: string
 }
 
-type LoadTranslationMap = () => Promise<TranslationMap>
+export interface SheetsResponse {
+  values: Array<[TranslationKey, string]>
+}
 
-export function createLoadTranslationMapFromSheets({
+export function createLoadTranslationsFromSheets({
   apiKey,
   spreadsheetID,
   sheetName,
-}: Args): LoadTranslationMap {
+}: Args = {}): LoadTranslations {
   return async () => {
-    const res = await fetch(
-      `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetID}/values/${sheetName}?key=${apiKey}`,
-    )
-    const text = await res.text()
-    if (!text) {
-      throw new InvalidSheetsResponseError(["Response is falsy"])
+    if (!apiKey || !spreadsheetID || !sheetName) {
+      return defaultTranslations
     }
 
-    let json: SheetsResponse
-    try {
-      json = JSON.parse(text)
-    } catch (err) {
+    const res = await fetchSheet({ apiKey, spreadsheetID, sheetName })
+    const json = await parseJSON(res)
+    if (!json) {
       throw new InvalidSheetsResponseError(["Response is not JSON"])
     }
 
@@ -36,12 +35,18 @@ export function createLoadTranslationMapFromSheets({
       throw new InvalidSheetsResponseError(errors)
     }
 
-    return parseToTranslationMap(json)
+    return parseToTranslations(json)
   }
 }
 
-export interface SheetsResponse {
-  values: Array<[TranslationKey, string]>
+function fetchSheet({
+  apiKey,
+  spreadsheetID,
+  sheetName,
+}: Args): Promise<Response> {
+  return fetch(
+    `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetID}/values/${sheetName}?key=${apiKey}`,
+  )
 }
 
 function validateJSON(json: SheetsResponse): string[] {
@@ -54,7 +59,7 @@ function validateJSON(json: SheetsResponse): string[] {
   }
 
   const errors: string[] = []
-  const translationKeys = Object.keys(defaultTranslation)
+  const translationKeys = Object.keys(defaultTranslations)
   json.values.forEach(translationPair => {
     if (!Array.isArray(translationPair)) {
       errors.push(`'${translationPair}' is not a [key, value] pair`)
@@ -76,10 +81,10 @@ function validateJSON(json: SheetsResponse): string[] {
   return errors
 }
 
-function parseToTranslationMap(sheets: SheetsResponse): TranslationMap {
+function parseToTranslations(sheets: SheetsResponse): Translations {
   return sheets.values.reduce(
     (acc, [key, translation]) => ({ ...acc, [key]: translation }),
-    defaultTranslation,
+    defaultTranslations,
   )
 }
 
