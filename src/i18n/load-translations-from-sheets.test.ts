@@ -30,7 +30,6 @@ test("load translation", async () => {
 
   expect(translations).toEqual({
     "display.waiting.header.line1": "Line1",
-    "display.waiting.header.line2": "Line2",
   })
 })
 
@@ -110,8 +109,5 @@ function mockWithResponse(response: any): void {
 }
 
 const sheetsResponse: SheetsResponse = {
-  values: [
-    ["display.waiting.header.line1", "Line1"],
-    ["display.waiting.header.line2", "Line2"],
-  ],
+  values: [["display.waiting.header.line1", "Line1"]],
 }
