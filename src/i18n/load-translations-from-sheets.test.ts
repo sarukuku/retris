@@ -1,5 +1,5 @@
 import nock from "nock"
-import { defaultTranslations } from "./default"
+import { defaultTranslations } from "./default-translations"
 import {
   createLoadTranslationsFromSheets,
   SheetsResponse,

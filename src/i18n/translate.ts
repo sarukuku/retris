@@ -1,11 +1,20 @@
-import { TranslationKey, Translations, defaultTranslations } from "./default"
+import {
+  TranslationKey,
+  Translations,
+  defaultTranslations,
+} from "./default-translations"
 
 export interface TranslationParams {
   [key: string]: string
 }
 
-export function createTranslate(translations: Translations) {
-  return (key: TranslationKey, params?: TranslationParams) => {
+export type Translate = (
+  key: TranslationKey,
+  params?: TranslationParams,
+) => string
+
+export function createTranslate(translations: Translations): Translate {
+  return (key, params) => {
     const translated = translations[key]
     if (!translated) {
       return defaultTranslations[key]

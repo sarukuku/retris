@@ -1,7 +1,7 @@
 import { IncomingMessage } from "http"
 import fetch from "isomorphic-unfetch"
 import { parseJSON } from "./helpers"
-import { Translations } from "./i18n/default"
+import { Translations } from "./i18n/default-translations"
 
 export class ClientAPI {
   private baseURL: string

@@ -1,15 +1,19 @@
 import React, { Component } from "react"
+import {
+  withTranslate,
+  TranslateProps,
+} from "../../components/translation-context"
 
-interface WaitingProps {
+interface WaitingProps extends TranslateProps {
   address: string
 }
 
-export class Waiting extends Component<WaitingProps> {
+class _Waiting extends Component<WaitingProps> {
   render() {
-    const { address } = this.props
+    const { address, translate } = this.props
     return (
       <div className="wrap">
-        <h1>{`Go to ${address} to start playing! 🎮`}</h1>
+        <h1>{translate("display.waiting.header.line1", { address })}</h1>
         <style jsx>{`
           .wrap {
             flex-grow: 1;
@@ -22,3 +26,5 @@ export class Waiting extends Component<WaitingProps> {
     )
   }
 }
+
+export const Waiting = withTranslate(_Waiting)

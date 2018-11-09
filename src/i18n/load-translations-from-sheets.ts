@@ -1,7 +1,11 @@
 import fetch from "isomorphic-unfetch"
 import { isEmpty } from "ramda"
 import { parseJSON } from "../helpers"
-import { defaultTranslations, TranslationKey, Translations } from "./default"
+import {
+  defaultTranslations,
+  TranslationKey,
+  Translations,
+} from "./default-translations"
 import { LoadTranslations } from "./load-translations"
 
 interface Args {

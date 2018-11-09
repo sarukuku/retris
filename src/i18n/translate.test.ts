@@ -1,4 +1,4 @@
-import { defaultTranslations, Translations } from "./default"
+import { defaultTranslations, Translations } from "./default-translations"
 import { createTranslate } from "./translate"
 
 test("default translation", () => {
@@ -33,5 +33,4 @@ test("interpolation", () => {
 
 const translations: Translations = {
   "display.waiting.header.line1": "display.waiting.header.line1",
-  "display.waiting.header.line2": "display.waiting.header.line2",
 }
