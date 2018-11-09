@@ -2,17 +2,17 @@ import React, { Component } from "react"
 import { colors } from "../../styles/colors"
 
 interface StartGameProps {
-  startGame: () => void
+  onStartGame: () => void
 }
 
 export class StartGame extends Component<StartGameProps> {
   render() {
-    const { startGame } = this.props
+    const { onStartGame } = this.props
 
     return (
       <main className="wrap">
         <p>It's your turn to play! Press Start when you're ready.</p>
-        <button onClick={startGame}>Start playing</button>
+        <button onClick={onStartGame}>Start playing</button>
         <style jsx>{`
           .wrap {
             width: 100%;

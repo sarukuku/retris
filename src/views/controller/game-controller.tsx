@@ -1,44 +1,27 @@
 import React, { Component } from "react"
 import Swipeable from "react-swipeable"
-import io from "socket.io-client"
-import { commands } from "../../commands"
 import { colors } from "../../styles/colors"
 
 interface GameControllerProps {
-  socket: typeof io.Socket
+  onSwipeRight: () => void
+  onSwipeLeft: () => void
+  onSwipeDown: () => void
+  onTap: () => void
 }
 
 export class GameController extends Component<GameControllerProps> {
-  sendCommand = (value: string) => {
-    this.props.socket.emit("action", value)
-  }
-
-  onTap = () => {
-    this.sendCommand(commands.TAP)
-  }
-
-  onSwipeRight = () => {
-    this.sendCommand(commands.RIGHT)
-  }
-
-  onSwipeLeft = () => {
-    this.sendCommand(commands.LEFT)
-  }
-
-  onSwipeDown = () => {
-    this.sendCommand(commands.DOWN)
-  }
-
   render() {
+    const { onSwipeDown, onSwipeLeft, onSwipeRight, onTap } = this.props
+
     return (
       <Swipeable
-        onSwipedRight={this.onSwipeRight}
-        onSwipedDown={this.onSwipeDown}
-        onSwipedLeft={this.onSwipeLeft}
+        onSwipedRight={onSwipeRight}
+        onSwipedDown={onSwipeDown}
+        onSwipedLeft={onSwipeLeft}
         stopPropagation={true}
         delta={50}
       >
-        <main className="wrap" onClick={this.onTap}>
+        <main className="wrap" onClick={onTap}>
           <p>Tap and swipe to play!</p>
         </main>
         <style jsx>{`

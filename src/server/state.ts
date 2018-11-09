@@ -70,10 +70,6 @@ export class State {
 
     await wait(this.gameOverTimeout)
 
-    if (this.activeController) {
-      this.activeController.updateState({ activeView: views.JOIN })
-    }
-
     this.assignNewActiveController()
   }
 
@@ -115,6 +111,10 @@ export class State {
 
   onControllerAction(action: string) {
     this.displays.sendAction(action)
+  }
+
+  onControllerRestart(controller: Controller) {
+    controller.updateState({ activeView: views.CONTROLLER_JOIN })
   }
 
   onControllerDisconnect(controller: Controller) {

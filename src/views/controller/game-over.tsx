@@ -1,11 +1,18 @@
 import React, { Component } from "react"
 import { colors } from "../../styles/colors"
 
-export class GameOver extends Component {
+interface GameOverProps {
+  onRestart: () => void
+}
+
+export class GameOver extends Component<GameOverProps> {
   render() {
+    const { onRestart } = this.props
+
     return (
       <main className="wrap">
         <p>Game Over!</p>
+        <button onClick={onRestart}>Restart</button>
         <style jsx>{`
           .wrap {
             width: 100%;
@@ -19,6 +26,14 @@ export class GameOver extends Component {
             padding: 1rem;
             flex-wrap: wrap;
             text-align: center;
+          }
+
+          button {
+            border: 1px solid black;
+            padding: 1rem;
+            border-radius: 100px;
+            background: ${colors.EMERALD};
+            box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.75);
           }
 
           p {

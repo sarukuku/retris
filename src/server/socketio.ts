@@ -32,7 +32,11 @@ export function createSocketIOServer(
       state.onControllerStart(controller)
     })
 
-    controllerSocket.on("action", command => {
+    controllerSocket.on(commands.RESTART, () => {
+      state.onControllerRestart(controller)
+    })
+
+    controllerSocket.on(commands.ACTION, command => {
       state.onControllerAction(command)
     })
 

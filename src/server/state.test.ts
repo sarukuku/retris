@@ -58,20 +58,6 @@ describe("onDisplayGameOver", () => {
     })
   })
 
-  test(`set active controller's view after some time to ${
-    views.JOIN
-  }`, async () => {
-    const state = createTestState()
-    const activeController = new TestController()
-    state.setActiveContoller(activeController)
-
-    await state.onDisplayGameOver()
-
-    expect(activeController.stateUpdates[1]).toEqual({
-      activeView: views.JOIN,
-    })
-  })
-
   test(`set displays view to ${views.DISPLAY_GAME_OVER}`, async () => {
     const displays = new TestDisplays()
     const state = createTestState({ displays })

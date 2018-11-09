@@ -132,7 +132,7 @@ describe("on controller action", () => {
     createTestSocketIOServer({ state, controller })
     const socket = await connect(url)
 
-    socket.emit("action", commands.TAP)
+    socket.emit(commands.ACTION, commands.TAP)
 
     await expect(
       waitForEmission(socket, testEvent, commands.TAP),
