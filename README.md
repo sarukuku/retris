@@ -24,14 +24,16 @@ Currently Google Spreadsheet based custom translation is offered.
 ### How to add custom translations
 
 1. Open `src/i18n/default-translation.ts`
-2. Copy the keys to an empty Google Spreadsheet's first column
+2. Fill an empty Google Spreadsheet's first column with the default translation keys
 3. Add your translations to the second column
 4. Make your Sheet publicly available (readable)
 5. Go to https://console.cloud.google.com/apis/library/sheets.googleapis.com and generate an API key
-6. When starting the application provide the following environment variables (you can use `.env`):
+6. When starting the application provide the following environment variables (you can use `.env` too):
 
 - `SHEETS_API_KEY`: Your generated API key
-- `TRANSLATION_SPREADSHEET_ID`: https://docs.google.com/spreadsheets/d/`{{TRANSLATION_SPREADSHEET_ID}}`/edit#gid=0
-- `TRANSLATION_SHEET_NAME`: The name of the Sheet on can be found on the lower part of the page (by default it's `Sheet1`)
+- `TRANSLATION_SPREADSHEET_ID`: https://docs.google.com/spreadsheets/d/`TRANSLATION_SPREADSHEET_ID`/edit#gid=0
+- `TRANSLATION_SHEET_NAME`: The name of the Sheet which can be found on the lowest part of the Spreadsheet page (by default it is `Sheet1`)
 
-7. For example check out this following sheet: https://docs.google.com/spreadsheets/d/1KNi3vxCagcMp0x7dFKfo_CnIkWMaCwHadRPwuz23xm8/edit#gid=0
+7. If the environment variables are provided, the app will try to download and merge the Spreadsheet translations into the defaults on each page load.
+
+Check out the following sheet for an example structure: https://docs.google.com/spreadsheets/d/1KNi3vxCagcMp0x7dFKfo_CnIkWMaCwHadRPwuz23xm8/edit#gid=0
