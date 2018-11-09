@@ -144,6 +144,19 @@ describe("onControllerConnect", () => {
   })
 })
 
+describe("onControllerRestart", () => {
+  test(`set controller's active view to ${views.CONTROLLER_JOIN}`, () => {
+    const state = createTestState()
+    const controller = new TestController()
+
+    state.onControllerRestart(controller)
+
+    expect(controller.stateUpdates).toEqual([
+      { activeView: views.CONTROLLER_JOIN },
+    ])
+  })
+})
+
 describe("onControllerJoin", () => {
   describe("if no active controller exists", () => {
     test("set controller to active", () => {

@@ -120,6 +120,24 @@ describe(`on controller ${commands.START}`, () => {
   })
 })
 
+describe(`on controller ${commands.RESTART}`, () => {
+  test("invoke onControllerRestart", async () => {
+    const url = "/test"
+    const controller = io.of(url)
+    const testEvent = "command received"
+    const state = createTestState()
+    state.onControllerRestart = async () => {
+      controller.emit(testEvent)
+    }
+    createTestSocketIOServer({ state, controller })
+    const socket = await connect(url)
+
+    socket.emit(commands.RESTART)
+
+    await expect(waitForEmission(socket, testEvent)).resolves.toBeUndefined()
+  })
+})
+
 describe("on controller action", () => {
   test("invoke onControllerAction", async () => {
     const url = "/test"
