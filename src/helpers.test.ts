@@ -1,4 +1,4 @@
-import { pick } from "./helpers"
+import { pick, parseJSON } from "./helpers"
 
 describe("pick", () => {
   const originalRandom = Math.random
@@ -41,4 +41,31 @@ describe("pick", () => {
       expect(pick(array)).toBe(expectedElement)
     }),
   )
+})
+
+describe("parse JSON", () => {
+  test("text is undefined", async () => {
+    const res = { text: async () => undefined }
+
+    const output = await parseJSON(res)
+
+    expect(output).toEqual(undefined)
+  })
+
+  test("text is not JSON", async () => {
+    const res = { text: async () => "notAJSON" }
+
+    const output = await parseJSON(res)
+
+    expect(output).toEqual(undefined)
+  })
+
+  test("text is JSON", async () => {
+    const json = { foo: "bar" }
+    const res = { text: async () => JSON.stringify(json) }
+
+    const output = await parseJSON(res)
+
+    expect(output).toEqual(json)
+  })
 })

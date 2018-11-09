@@ -19,6 +19,10 @@ export async function loadFonts(): Promise<void> {
   )
 }
 
+interface Response {
+  text(): Promise<string | undefined>
+}
+
 export async function parseJSON(res: Response): Promise<any> {
   const text = await res.text()
   if (!text) {
