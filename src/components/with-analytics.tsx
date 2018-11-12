@@ -1,4 +1,5 @@
-import React, { ComponentType } from "react"
+import { NextComponentType } from "next"
+import React from "react"
 import { Analytics } from "../analytics"
 import { AnalyticsContext } from "./contexts"
 
@@ -12,9 +13,11 @@ type WithoutAnalyticsProps<Props> = Pick<
 >
 
 export function withAnalytics<Props>(
-  Component: ComponentType<Props & AnalyticsProps>,
+  Component: NextComponentType<Props & AnalyticsProps>,
 ): React.ComponentType<WithoutAnalyticsProps<Props>> {
-  class WithAnalytics extends React.Component<WithoutAnalyticsProps<Props>> {
+  const WithAnalytics = class extends React.Component<
+    WithoutAnalyticsProps<Props>
+  > {
     render() {
       return (
         <AnalyticsContext.Consumer>
@@ -27,6 +30,10 @@ export function withAnalytics<Props>(
         </AnalyticsContext.Consumer>
       )
     }
+  } as NextComponentType<WithoutAnalyticsProps<Props>>
+
+  if (Component.getInitialProps) {
+    WithAnalytics.getInitialProps = Component.getInitialProps
   }
 
   return WithAnalytics

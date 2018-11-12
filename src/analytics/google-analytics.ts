@@ -22,7 +22,7 @@ export class GoogleAnalytics implements Analytics {
     })
   }
 
-  private withInitializedTracker(fn: any) {
+  private withInitializedTracker(fn: () => void) {
     if (this.isInited) {
       return fn()
     }

@@ -38,8 +38,6 @@ class Retris extends App<RetrisProps> {
     const { Component, pageProps, translations } = this.props
     const analytics = new GoogleAnalytics()
 
-    console.log({ translations })
-
     return (
       <AnalyticsContext.Provider value={analytics}>
         <TranslationContext.Provider value={createTranslate(translations)}>
