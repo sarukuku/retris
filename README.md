@@ -9,6 +9,13 @@
 5. Create a PR
 6. Profit
 
+### Server side hot reloading
+
+There is a Nodemon config for server side hot loading.
+
+1. Install the Nodemon CLI tool: `npm install -g nodemon`
+2. Start the dev app using: `nodemon`
+
 ## How to deploy?
 
 When a PR is merged to master it's automatically deployed to https://reaktor-tetris-staging.herokuapp.com/. Master is deployed manually via Heroku to https://reaktor-retris-production.herokuapp.com/. To access the apps you'll need access. Joonas (@aki7) can help you with this.
