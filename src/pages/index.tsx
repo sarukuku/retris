@@ -88,34 +88,34 @@ export default class Controller extends Component<
   }
 
   render() {
+    const view = this.renderView()
+    return <div>{view}</div>
+  }
+
+  private renderView() {
     const { activeView, queueLength } = this.state
 
-    return (
-      <div>
-        {(() => {
-          switch (activeView) {
-            case views.CONTROLLER_GAME_OFFLINE:
-              return <NotRunning />
-            case views.CONTROLLER_JOIN:
-              return <JoinGame onJoinGame={this.onJoinGame} />
-            case views.CONTROLLER_IN_QUEUE:
-              return <InQueue queueLength={queueLength} />
-            case views.CONTROLLER_START:
-              return <StartGame onStartGame={this.onStartGame} />
-            case views.CONTROLLER_GAME_CONTROLS:
-              return (
-                <GameController
-                  onSwipeRight={this.onSwipeRight}
-                  onSwipeDown={this.onSwipeDown}
-                  onSwipeLeft={this.onSwipeLeft}
-                  onTap={this.onTap}
-                />
-              )
-            case views.CONTROLLER_GAME_OVER:
-              return <GameOver onRestart={this.onRestart} />
-          }
-        })()}
-      </div>
-    )
+    switch (activeView) {
+      default:
+      case views.CONTROLLER_GAME_OFFLINE:
+        return <NotRunning />
+      case views.CONTROLLER_JOIN:
+        return <JoinGame onJoinGame={this.onJoinGame} />
+      case views.CONTROLLER_IN_QUEUE:
+        return <InQueue queueLength={queueLength} />
+      case views.CONTROLLER_START:
+        return <StartGame onStartGame={this.onStartGame} />
+      case views.CONTROLLER_GAME_CONTROLS:
+        return (
+          <GameController
+            onSwipeRight={this.onSwipeRight}
+            onSwipeDown={this.onSwipeDown}
+            onSwipeLeft={this.onSwipeLeft}
+            onTap={this.onTap}
+          />
+        )
+      case views.CONTROLLER_GAME_OVER:
+        return <GameOver onRestart={this.onRestart} />
+    }
   }
 }
