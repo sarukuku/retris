@@ -1,11 +1,12 @@
 import { Namespace, Socket } from "socket.io"
+import { commands } from "../commands"
 import {
+  Controller,
+  Controllers,
+  ControllerState,
+  Display,
   Displays,
   DisplayState,
-  Controllers,
-  Display,
-  Controller,
-  ControllerState,
 } from "./state"
 
 export class SocketIODisplays implements Displays {
@@ -28,7 +29,7 @@ export class SocketIODisplays implements Displays {
   }
 
   sendAction(action: string): void {
-    this.namespace.emit("action", action)
+    this.namespace.emit(commands.ACTION, action)
   }
 
   getState(): DisplayState | undefined {

@@ -2,16 +2,16 @@ import React, { Component } from "react"
 import { colors } from "../../styles/colors"
 
 interface JoinGameProps {
-  joinGame: () => void
+  onJoinGame: () => void
 }
 
 export class JoinGame extends Component<JoinGameProps> {
   render() {
-    const { joinGame } = this.props
+    const { onJoinGame } = this.props
 
     return (
       <div className="wrap">
-        <button onClick={joinGame}>Join the game</button>
+        <button onClick={onJoinGame}>Join the game</button>
         <style jsx>{`
           .wrap {
             width: 100%;

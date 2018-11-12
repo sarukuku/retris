@@ -12,11 +12,11 @@ interface DisplayGameProps {
 
 export class Game extends Component<DisplayGameProps> {
   componentDidMount() {
-    this.props.socket.on("action", this.handleCommand)
+    this.props.socket.on(commands.ACTION, this.handleCommand)
   }
 
   componentWillUnmount() {
-    this.props.socket.removeListener("action", this.handleCommand)
+    this.props.socket.removeListener(commands.ACTION, this.handleCommand)
   }
 
   handleCommand = (command: string) => {

@@ -58,20 +58,6 @@ describe("onDisplayGameOver", () => {
     })
   })
 
-  test(`set active controller's view after some time to ${
-    views.JOIN
-  }`, async () => {
-    const state = createTestState()
-    const activeController = new TestController()
-    state.setActiveContoller(activeController)
-
-    await state.onDisplayGameOver()
-
-    expect(activeController.stateUpdates[1]).toEqual({
-      activeView: views.JOIN,
-    })
-  })
-
   test(`set displays view to ${views.DISPLAY_GAME_OVER}`, async () => {
     const displays = new TestDisplays()
     const state = createTestState({ displays })
@@ -155,6 +141,19 @@ describe("onControllerConnect", () => {
     state.onControllerConnect(controller)
 
     expect(controllers.controllers).toEqual([controller])
+  })
+})
+
+describe("onControllerRestart", () => {
+  test(`set controller's active view to ${views.CONTROLLER_JOIN}`, () => {
+    const state = createTestState()
+    const controller = new TestController()
+
+    state.onControllerRestart(controller)
+
+    expect(controller.stateUpdates).toEqual([
+      { activeView: views.CONTROLLER_JOIN },
+    ])
   })
 })
 

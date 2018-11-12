@@ -22,16 +22,50 @@ export default class Controller extends Component<
 > {
   state: ControllerComponentState = {
     socket: null,
-    activeView: views.JOIN,
+    activeView: views.CONTROLLER_JOIN,
     queueLength: 0,
   }
 
-  joinGame = () => {
-    this.state.socket!.emit(commands.JOIN)
+  onJoinGame = () => {
+    this.sendCommand(commands.JOIN)
   }
 
-  startGame = () => {
-    this.state.socket!.emit(commands.START)
+  onStartGame = () => {
+    this.sendCommand(commands.START)
+  }
+
+  onRestart = () => {
+    this.sendCommand(commands.RESTART)
+  }
+
+  sendCommand = (command: string) => {
+    const { socket } = this.state
+    if (socket) {
+      socket.emit(command)
+    }
+  }
+
+  onTap = () => {
+    this.sendAction(commands.TAP)
+  }
+
+  onSwipeRight = () => {
+    this.sendAction(commands.RIGHT)
+  }
+
+  onSwipeLeft = () => {
+    this.sendAction(commands.LEFT)
+  }
+
+  onSwipeDown = () => {
+    this.sendAction(commands.DOWN)
+  }
+
+  sendAction = (value: string) => {
+    const { socket } = this.state
+    if (socket) {
+      socket.emit(commands.ACTION, value)
+    }
   }
 
   componentDidMount() {
@@ -47,11 +81,14 @@ export default class Controller extends Component<
   }
 
   componentWillUnmount() {
-    this.state.socket!.close()
+    const { socket } = this.state
+    if (socket) {
+      socket.close()
+    }
   }
 
   render() {
-    const { activeView, queueLength, socket } = this.state
+    const { activeView, queueLength } = this.state
 
     return (
       <div>
@@ -59,16 +96,23 @@ export default class Controller extends Component<
           switch (activeView) {
             case views.CONTROLLER_GAME_OFFLINE:
               return <NotRunning />
-            case views.JOIN:
-              return <JoinGame joinGame={this.joinGame} />
+            case views.CONTROLLER_JOIN:
+              return <JoinGame onJoinGame={this.onJoinGame} />
             case views.CONTROLLER_IN_QUEUE:
               return <InQueue queueLength={queueLength} />
             case views.CONTROLLER_START:
-              return <StartGame startGame={this.startGame} />
+              return <StartGame onStartGame={this.onStartGame} />
             case views.CONTROLLER_GAME_CONTROLS:
-              return <GameController socket={socket!} />
+              return (
+                <GameController
+                  onSwipeRight={this.onSwipeRight}
+                  onSwipeDown={this.onSwipeDown}
+                  onSwipeLeft={this.onSwipeLeft}
+                  onTap={this.onTap}
+                />
+              )
             case views.CONTROLLER_GAME_OVER:
-              return <GameOver />
+              return <GameOver onRestart={this.onRestart} />
           }
         })()}
       </div>
