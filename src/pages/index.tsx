@@ -1,6 +1,7 @@
 import React, { Component } from "react"
 import io from "socket.io-client"
 import { commands } from "../commands"
+import { withAnalytics, AnalyticsProps } from "../components/with-analytics"
 import { ControllerState } from "../server/state"
 import { views } from "../views"
 import { GameController } from "../views/controller/game-controller"
@@ -12,14 +13,12 @@ import { StartGame } from "../views/controller/start-game"
 
 interface ControllerComponentState {
   socket: typeof io.Socket | null
+  previousActiveView?: string
   activeView: string
   queueLength: number
 }
 
-export default class Controller extends Component<
-  {},
-  ControllerComponentState
-> {
+class Controller extends Component<AnalyticsProps, ControllerComponentState> {
   state: ControllerComponentState = {
     socket: null,
     activeView: views.CONTROLLER_JOIN,
@@ -88,8 +87,19 @@ export default class Controller extends Component<
   }
 
   render() {
+    this.sendPageView()
     const view = this.renderView()
     return <div>{view}</div>
+  }
+
+  private sendPageView() {
+    const { activeView, previousActiveView } = this.state
+    if (activeView === previousActiveView) {
+      return
+    }
+
+    const { analytics } = this.props
+    analytics.sendPageView(activeView)
   }
 
   private renderView() {
@@ -119,3 +129,5 @@ export default class Controller extends Component<
     }
   }
 }
+
+export default withAnalytics(Controller)

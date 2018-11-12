@@ -2,6 +2,7 @@ import { NextContext } from "next"
 import React, { Component } from "react"
 import io from "socket.io-client"
 import { commands } from "../commands"
+import { AnalyticsProps, withAnalytics } from "../components/with-analytics"
 import { DisplayState } from "../server/state"
 import { colors } from "../styles/colors"
 import { views } from "../views"
@@ -10,21 +11,19 @@ import { GameOver } from "../views/display/game-over"
 import { Waiting } from "../views/display/waiting"
 import { WaitingToStart } from "../views/display/waiting-to-start"
 
-interface DisplayProps {
+interface DisplayProps extends AnalyticsProps {
   address: string
 }
 
 interface DisplayComponentState {
   socket: typeof io.Socket | null
   activeView: string
+  previousActiveView?: string
   score: number
   queueLength: number
 }
 
-export default class Display extends Component<
-  DisplayProps,
-  DisplayComponentState
-> {
+class Display extends Component<DisplayProps, DisplayComponentState> {
   state: DisplayComponentState = {
     socket: null,
     activeView: views.DISPLAY_WAITING,
@@ -69,6 +68,8 @@ export default class Display extends Component<
   render() {
     const { queueLength } = this.state
 
+    this.sendPageView()
+
     return (
       <main>
         <div className="info-bar">{queueLength} people in queue</div>
@@ -99,6 +100,16 @@ export default class Display extends Component<
     )
   }
 
+  private sendPageView() {
+    const { activeView, previousActiveView } = this.state
+    if (activeView === previousActiveView) {
+      return
+    }
+
+    const { analytics } = this.props
+    analytics.sendPageView(activeView)
+  }
+
   private renderView() {
     const { address } = this.props
     const { activeView, socket, score } = this.state
@@ -116,3 +127,5 @@ export default class Display extends Component<
     }
   }
 }
+
+export default withAnalytics(Display)
