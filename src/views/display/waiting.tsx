@@ -1,8 +1,5 @@
 import React, { Component } from "react"
-import {
-  withTranslate,
-  TranslateProps,
-} from "../../components/translation-context"
+import { withTranslate, TranslateProps } from "../../components/with-translate"
 
 interface WaitingProps extends TranslateProps {
   address: string
