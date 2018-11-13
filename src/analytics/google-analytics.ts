@@ -2,8 +2,20 @@ import ReactGA from "react-ga"
 import { isBrowser } from "../helpers"
 import { Analytics, EventArgs } from "./analytics"
 
+interface Args {
+  trackingCode: string
+  debugMode: boolean
+}
+
 export class GoogleAnalytics implements Analytics {
   private isInited = false
+  private trackingCode: string
+  private debugMode: boolean
+
+  constructor({ trackingCode, debugMode }: Args) {
+    this.trackingCode = trackingCode
+    this.debugMode = debugMode
+  }
 
   sendPageView(pageURL: string): void {
     this.withInitializedTracker(() => {
@@ -31,7 +43,7 @@ export class GoogleAnalytics implements Analytics {
       return
     }
 
-    ReactGA.initialize("UA-129134030-1")
+    ReactGA.initialize(this.trackingCode, { debug: this.debugMode })
     this.isInited = true
   }
 }

@@ -4,6 +4,7 @@ import "normalize.css/normalize.css"
 import React from "react"
 import { GoogleAnalytics } from "../analytics/google-analytics"
 import { ClientAPI } from "../client-api"
+import { clientConfig } from "../client-config"
 import { AnalyticsContext, TranslationContext } from "../components/contexts"
 import { isBrowser, loadFonts } from "../helpers"
 import { Translations } from "../i18n/default-translations"
@@ -36,7 +37,7 @@ class Retris extends App<RetrisProps> {
 
   render() {
     const { Component, pageProps, translations } = this.props
-    const analytics = new GoogleAnalytics()
+    const analytics = new GoogleAnalytics(clientConfig.googleAnalytics)
 
     return (
       <AnalyticsContext.Provider value={analytics}>

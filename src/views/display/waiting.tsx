@@ -18,6 +18,10 @@ class _Waiting extends Component<WaitingProps> {
             justify-content: center;
             align-items: center;
           }
+
+          h1 {
+            text-align: center;
+          }
         `}</style>
       </div>
     )

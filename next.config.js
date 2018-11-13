@@ -1,3 +1,6 @@
+const { parsed: localEnv } = require("dotenv").config()
+
+const webpack = require("webpack")
 const path = require("path")
 const withTypescript = require("@zeit/next-typescript")
 const withCSS = require("@zeit/next-css")
@@ -8,14 +11,17 @@ module.exports = withTypescript(
     distDir: "../dist",
     webpack(config, options) {
       // Do not run type checking twice:
-      if (options.isServer)
+      if (options.isServer) {
         config.plugins.push(
           new ForkTsCheckerWebpackPlugin({
-            tsconfig: path.join(__dirname, "./tsconfig.json")
-          })
+            tsconfig: path.join(__dirname, "./tsconfig.json"),
+          }),
         )
+      }
+
+      config.plugins.push(new webpack.EnvironmentPlugin(localEnv))
 
       return config
-    }
-  })
+    },
+  }),
 )

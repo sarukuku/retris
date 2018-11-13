@@ -1,7 +1,7 @@
-import dotenv from "dotenv"
-dotenv.config()
+import { clientConfig } from "./client-config"
 
 export const config = {
+  ...clientConfig,
   port: parseInt(process.env.PORT || "3000", 10),
   env: process.env.NODE_ENV || "development",
   sheets: {
