@@ -50,7 +50,7 @@
     "heroku-postbuild": "yarn build",
     "lint": "tslint -c tslint.json 'src/**/*.{ts,tsx}'",
     "start": "NODE_ENV=production node dist/index.js -p $PORT",
-    "dev": "ts-node src/index.ts --typeCheck --compilerOptions '{\"module\":\"commonjs\"}'",
+    "dev": "nodemon",
     "pretty": "npx onchange 'src/**/*.{ts,tsx}' -- prettier --write {{changed}}",
     "test": "jest",
     "storybook": "start-storybook --quiet -p 3001",
