@@ -3,11 +3,12 @@
 ## How to dev?
 
 1. Clone the repo
-2. Run `yarn`
-3. Run `yarn dev`
-4. ????
-5. Create a PR
-6. Profit
+2. Set the Environment variables based on `.env.example`
+3. Run `yarn`
+4. Run `yarn dev`
+5. ????
+6. Create a PR
+7. Profit
 
 ## How to deploy?
 
