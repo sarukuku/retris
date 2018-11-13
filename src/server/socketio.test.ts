@@ -10,10 +10,11 @@ import { createTestState } from "./state.mocks"
 let server: Server
 let serverAddress: string
 let io: socketio.Server
+
 beforeEach(() => {
   server = createServer().listen()
-  const { address, port } = server.address() as AddressInfo
-  serverAddress = `http://[${address}]:${port}`
+  const { port } = server.address() as AddressInfo
+  serverAddress = `http://localhost:${port}`
   io = socketio(server)
 })
 
@@ -184,7 +185,10 @@ function createTestSocketIOServer({
 
 function connect(url: string): Promise<SocketIOClient.Socket> {
   const socket = socketioClient(`${serverAddress}${url}`)
-  return new Promise(resolve => socket.on("connect", () => resolve(socket)))
+  return new Promise((resolve, reject) => {
+    socket.on("connect", () => resolve(socket))
+    socket.on("connect_error", reject)
+  })
 }
 
 function waitForEmission(
