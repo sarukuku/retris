@@ -5,10 +5,10 @@ export type Row<T> = Array<T | undefined>
 export type Matrix<T> = Array<Row<T>>
 
 export function createEmptyMatrix<T>(
-  columnCount: number,
-  rowCount: number,
+  _columnCount: number,
+  _rowCount: number,
 ): Matrix<T> {
-  return times(() => times(always(undefined), columnCount), rowCount)
+  return times(() => times(always(undefined), _columnCount), _rowCount)
 }
 
 export function rotateMatrix<T>(matrix: Matrix<T>): Matrix<T> {
@@ -21,4 +21,18 @@ export function rotateCounterClockwise<T>(matrix: Matrix<T>): Matrix<T> {
 
 function reverseColumns<T>(matrix: Matrix<T>): Matrix<T> {
   return matrix.map(row => row.reverse())
+}
+
+export function rowCount<T>(matrix: Matrix<T>): number {
+  return matrix.length
+}
+
+export function columnCount<T>(matrix: Matrix<T>): number {
+  const firstRow = matrix[0]
+
+  if (!firstRow) {
+    return 0
+  }
+
+  return firstRow.length
 }

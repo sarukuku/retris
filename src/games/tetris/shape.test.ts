@@ -4,7 +4,7 @@ const _ = undefined
 const color = "red"
 const x = { color }
 
-const tests = [
+const rotateTests = [
   {
     name: "I shape",
     createShape: Shape.createIShape,
@@ -175,7 +175,7 @@ const tests = [
   },
 ]
 
-tests.map(
+rotateTests.map(
   ({ name, createShape, initial, rotateOnce, rotateTwice, rotateThrice }) => {
     test(`${name} initial`, () => {
       const shape = createShape(color)
@@ -211,3 +211,72 @@ tests.map(
     })
   },
 )
+
+const boundingRectTests = [
+  {
+    name: "I shape",
+    createShape: Shape.createIShape,
+    expectedBoundingRect: {
+      top: 0,
+      right: 2,
+      bottom: 3,
+      left: 2,
+    },
+  },
+  {
+    name: "I shape rotated",
+    createShape: (clr: string) => {
+      const shape = Shape.createIShape(clr)
+      shape.rotate()
+      return shape
+    },
+    expectedBoundingRect: {
+      top: 2,
+      right: 3,
+      bottom: 2,
+      left: 0,
+    },
+  },
+  {
+    name: "O shape",
+    createShape: Shape.createOShape,
+    expectedBoundingRect: {
+      top: 0,
+      right: 1,
+      bottom: 1,
+      left: 0,
+    },
+  },
+  {
+    name: "Z shape",
+    createShape: Shape.createZShape,
+    expectedBoundingRect: {
+      top: 0,
+      right: 2,
+      bottom: 1,
+      left: 0,
+    },
+  },
+  {
+    name: "Z shape rotated",
+    createShape: (clr: string) => {
+      const shape = Shape.createZShape(clr)
+      shape.rotate()
+      return shape
+    },
+    expectedBoundingRect: {
+      top: 0,
+      right: 2,
+      bottom: 2,
+      left: 1,
+    },
+  },
+]
+
+describe("bounding rect", () => {
+  boundingRectTests.map(({ name, createShape, expectedBoundingRect }) => {
+    test(name, () => {
+      expect(createShape(color).getBoundingRect()).toEqual(expectedBoundingRect)
+    })
+  })
+})
