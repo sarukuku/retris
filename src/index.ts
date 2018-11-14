@@ -2,11 +2,12 @@ import dotenv from "dotenv"
 dotenv.config()
 
 import express from "express"
+import expressPino from "express-pino-logger"
 import { createServer } from "http"
+import pino from "pino"
 import socketio from "socket.io"
 import { config } from "./config"
 import { createLoadTranslationsFromSheets } from "./i18n/load-translations-from-sheets"
-import { logger } from "./logger"
 import { createNextApp } from "./next"
 import { asyncMiddleware } from "./server/express-async-middleware"
 import { createSocketIOServer } from "./server/socketio"
@@ -17,9 +18,11 @@ import {
 import { State } from "./server/state"
 
 async function main() {
+  const pinoLogger = pino()
   const loadTranslations = createLoadTranslationsFromSheets(config.sheets)
 
   const app = express()
+  app.use(expressPino({ logger: pinoLogger }))
   app.get(
     "/api/translations",
     asyncMiddleware(async (_req, res) => {
@@ -48,7 +51,7 @@ async function main() {
     if (err) {
       throw err
     }
-    logger.info(`> Ready on http://localhost:${config.port}`)
+    pinoLogger.info(`> Ready on http://localhost:${config.port}`)
   })
 }
 
