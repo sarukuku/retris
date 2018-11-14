@@ -16,6 +16,13 @@ export type TetrisMatrix = Matrix<TetrisCell>
 
 export type TetrisRow = Row<TetrisCell>
 
+export interface BoundingRect {
+  top: number
+  right: number
+  bottom: number
+  left: number
+}
+
 export class Shape {
   constructor(public matrix: TetrisMatrix) {}
 
@@ -37,6 +44,32 @@ export class Shape {
       }),
     )
     return positions
+  }
+
+  getBoundingRect(): BoundingRect {
+    const positions = this.getPositions()
+    const initialBoundingRect: BoundingRect = {
+      top: positions[0].y,
+      right: positions[0].x,
+      bottom: positions[0].y,
+      left: positions[0].x,
+    }
+    return positions.reduce((acc, { x, y }) => {
+      const { top, right, bottom, left } = acc
+      if (x < left) {
+        acc.left = x
+      }
+      if (x > right) {
+        acc.right = x
+      }
+      if (y < top) {
+        acc.top = y
+      }
+      if (y > bottom) {
+        acc.bottom = y
+      }
+      return acc
+    }, initialBoundingRect)
   }
 
   static createIShape(color: string) {
