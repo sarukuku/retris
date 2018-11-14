@@ -1,756 +1,651 @@
+import { last } from "ramda"
+import { colors } from "../../styles/colors"
 import { Active, Board, OnBoardChange, OnGameOver, OnRowClear } from "./board"
 import { GetNextShape, getNextShape as _getNextShape } from "./get-next-shape"
 import { createEmptyMatrix } from "./matrix"
 import { Shape, TetrisMatrix } from "./shape"
 
 const _ = undefined
+const p = { color: colors.PETER_RIVER }
 
-test("initialize board", () => {
-  const onBoardChange = jest.fn()
-  createBoard({ onBoardChange, matrix: createEmptyMatrix(3, 2) })
+interface Test {
+  name: string
+  initialMatrix?: TetrisMatrix
+  expectedMatrix?: TetrisMatrix
+  getNextShape?: GetNextShape
+  actions?: (board: Board) => void
+  active?: Active
+  gameOverCalled?: boolean
+  rowClearCalledWith?: number
+}
 
-  const expectedBoard = [
-    [_, _, _], //
-    [_, _, _],
-  ]
+const TOP = 0
+const BOTTOM = 8
+const MIDDLE = 4
+const RIGHT = 7
+const LEFT = 0
+const I_SHAPE_LEFT = -2
+const I_SHAPE_BOTTOM = 7
 
-  expect(onBoardChange).toHaveBeenCalledWith(expectedBoard)
-})
-
-test("add shape to board", () => {
-  const color = "red"
-  const onBoardChange = jest.fn()
-  const board = createBoard({
-    onBoardChange,
-    getNextShape: () => Shape.createIShape(color),
-  })
-
-  board.step()
-
-  const o = { color }
-  const expectedBoard = [
-    [_, _, _, _, _, _, o, _, _, _], //
-    [_, _, _, _, _, _, o, _, _, _],
-    [_, _, _, _, _, _, o, _, _, _],
-    [_, _, _, _, _, _, o, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-  ]
-
-  expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
-})
-
-test("3 steps", () => {
-  const color = "red"
-  const onBoardChange = jest.fn()
-  const board = createBoard({
-    getNextShape: () => Shape.createTShape(color),
-    onBoardChange,
-  })
-
-  board.step()
-  board.step()
-  board.step()
-
-  const o = { color }
-  const expectedBoard = [
-    [_, _, _, _, _, _, _, _, _, _], //
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, o, _, _, _, _],
-    [_, _, _, _, o, o, o, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-  ]
-
-  expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
-})
-
-test("2 steps and a rotation", () => {
-  const color = "red"
-  const onBoardChange = jest.fn()
-  const board = createBoard({
-    getNextShape: () => Shape.createZShape(color),
-    onBoardChange,
-  })
-
-  board.step()
-  board.step()
-  board.rotate()
-
-  const o = { color }
-  const expectedBoard = [
-    [_, _, _, _, _, _, _, _, _, _], //
-    [_, _, _, _, _, _, o, _, _, _],
-    [_, _, _, _, _, o, o, _, _, _],
-    [_, _, _, _, _, o, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-  ]
-
-  expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
-})
-
-test("a step and 2 lefts", () => {
-  const color = "red"
-  const onBoardChange = jest.fn()
-  const board = createBoard({
-    getNextShape: () => Shape.createSShape(color),
-    onBoardChange,
-  })
-
-  board.step()
-  board.left()
-  board.left()
-
-  const o = { color }
-  const expectedBoard = [
-    [_, _, _, o, o, _, _, _, _, _], //
-    [_, _, o, o, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-  ]
-
-  expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
-})
-
-test("a step and 2 right", () => {
-  const color = "red"
-  const onBoardChange = jest.fn()
-  const board = createBoard({
-    getNextShape: () => Shape.createOShape(color),
-    onBoardChange,
-  })
-
-  board.step()
-  board.right()
-  board.right()
-
-  const o = { color }
-  const expectedBoard = [
-    [_, _, _, _, _, _, o, o, _, _], //
-    [_, _, _, _, _, _, o, o, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-  ]
-
-  expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
-})
-
-test("a step and 2 down", () => {
-  const color = "red"
-  const onBoardChange = jest.fn()
-  const board = createBoard({
-    getNextShape: () => Shape.createOShape(color),
-    onBoardChange,
-  })
-
-  board.step()
-  board.down()
-  board.down()
-
-  const o = { color }
-  const expectedBoard = [
-    [_, _, _, _, _, _, _, _, _, _], //
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, o, o, _, _, _, _],
-    [_, _, _, _, o, o, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-  ]
-
-  expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
-})
-
-test("active reached bottom", () => {
-  const color = "red"
-  const o = { color }
-  const onBoardChange = jest.fn()
-  const bottomOfBoard = { x: 4, y: 8 }
-  const board = createBoard({
-    onBoardChange,
-    active: {
-      position: bottomOfBoard,
-      shape: Shape.createOShape(color),
+const tests: Test[] = [
+  {
+    name: "initialize board",
+    initialMatrix: [
+      [_, _, _], //
+      [_, _, _],
+    ],
+    expectedMatrix: [
+      [_, _, _], //
+      [_, _, _],
+    ],
+  },
+  {
+    name: "add shape to board",
+    getNextShape: () => Shape.createIShape(p.color),
+    actions: board => {
+      board.step()
     },
-  })
-
-  board.step()
-
-  const expectedBoard = [
-    [_, _, _, _, _, _, _, _, _, _], //
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, o, o, _, _, _, _],
-    [_, _, _, _, o, o, _, _, _, _],
-  ]
-
-  expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
-})
-
-test("active reached bottom (shape already present)", () => {
-  const o = { color: "red" }
-  const onBoardChange = jest.fn()
-  const initialMatrix = [
-    [_, _, _, _, _, _, _, _, _, _], //
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, o, _, _, _, _, _],
-  ]
-  const aboveInitialCell = {
-    x: 4,
-    y: 7,
-  }
-  const board = createBoard({
-    onBoardChange,
-    matrix: initialMatrix,
-    active: {
-      position: aboveInitialCell,
-      shape: Shape.createOShape(o.color),
+    expectedMatrix: [
+      [_, _, _, _, _, _, p, _, _, _], //
+      [_, _, _, _, _, _, p, _, _, _],
+      [_, _, _, _, _, _, p, _, _, _],
+      [_, _, _, _, _, _, p, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+    ],
+  },
+  {
+    name: "3 steps",
+    getNextShape: () => Shape.createTShape(p.color),
+    actions: board => {
+      board.step()
+      board.step()
+      board.step()
     },
-  })
-
-  board.step()
-
-  const expectedBoard = [
-    [_, _, _, _, _, _, _, _, _, _], //
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, o, o, _, _, _, _],
-    [_, _, _, _, o, o, _, _, _, _],
-    [_, _, _, _, o, _, _, _, _, _],
-  ]
-
-  expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
-})
-
-test("active reached bottom but dodges to the left", () => {
-  const o = { color: "red" }
-  const onBoardChange = jest.fn()
-  const initialMatrix = [
-    [_, _, _, _, _, _, _, _, _, _], //
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, o, _, _, _, _],
-  ]
-  const aboveInitialCell = {
-    x: 4,
-    y: 7,
-  }
-  const board = createBoard({
-    onBoardChange,
-    matrix: initialMatrix,
-    active: {
-      position: aboveInitialCell,
-      shape: Shape.createOShape(o.color),
+    expectedMatrix: [
+      [_, _, _, _, _, _, _, _, _, _], //
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, p, _, _, _, _],
+      [_, _, _, _, p, p, p, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+    ],
+  },
+  {
+    name: "2 steps and a rotation",
+    getNextShape: () => Shape.createZShape(p.color),
+    actions: board => {
+      board.step()
+      board.step()
+      board.rotate()
     },
-  })
-
-  board.step()
-  board.left()
-  board.step()
-
-  const expectedBoard = [
-    [_, _, _, _, _, _, _, _, _, _], //
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, o, o, _, _, _, _, _],
-    [_, _, _, o, o, o, _, _, _, _],
-  ]
-
-  expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
-})
-
-test("active reached bottom twice, new shape spawns", () => {
-  const o = { color: "red" }
-  const onBoardChange = jest.fn()
-  const bottomOfBoard = { x: 4, y: 8 }
-  const board = createBoard({
-    onBoardChange,
-    active: {
-      position: bottomOfBoard,
-      shape: Shape.createOShape(o.color),
+    expectedMatrix: [
+      [_, _, _, _, _, _, _, _, _, _], //
+      [_, _, _, _, _, _, p, _, _, _],
+      [_, _, _, _, _, p, p, _, _, _],
+      [_, _, _, _, _, p, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+    ],
+  },
+  {
+    name: "a step and 2 lefts",
+    getNextShape: () => Shape.createSShape(p.color),
+    actions: board => {
+      board.step()
+      board.left()
+      board.left()
     },
-    getNextShape: () => Shape.createIShape(o.color),
-  })
-
-  board.step()
-  board.step()
-  board.step()
-
-  const expectedBoard = [
-    [_, _, _, _, _, _, o, _, _, _], //
-    [_, _, _, _, _, _, o, _, _, _],
-    [_, _, _, _, _, _, o, _, _, _],
-    [_, _, _, _, _, _, o, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, o, o, _, _, _, _],
-    [_, _, _, _, o, o, _, _, _, _],
-  ]
-
-  expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
-})
-
-test("active can't go right due to edge", () => {
-  const color = "red"
-  const o = { color }
-  const onBoardChange = jest.fn()
-  const rightOfBoard = { x: 7, y: 0 }
-  const board = createBoard({
-    onBoardChange,
-    active: {
-      position: rightOfBoard,
-      shape: Shape.createIShape(color),
+    expectedMatrix: [
+      [_, _, _, p, p, _, _, _, _, _], //
+      [_, _, p, p, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+    ],
+  },
+  {
+    name: "a step and 2 rights",
+    getNextShape: () => Shape.createOShape(p.color),
+    actions: board => {
+      board.step()
+      board.right()
+      board.right()
     },
-  })
-
-  board.right()
-
-  const expectedBoard = [
-    [_, _, _, _, _, _, _, _, _, o], //
-    [_, _, _, _, _, _, _, _, _, o],
-    [_, _, _, _, _, _, _, _, _, o],
-    [_, _, _, _, _, _, _, _, _, o],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-  ]
-
-  expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
-})
-
-test("active can't go right due to occupied cell", () => {
-  const color = "red"
-  const o = { color }
-  const onBoardChange = jest.fn()
-  const rightOfBoard = { x: 6, y: 0 }
-  const initialMatrix = [
-    [_, _, _, _, _, _, _, _, _, o], //
-    [_, _, _, _, _, _, _, _, _, o],
-    [_, _, _, _, _, _, _, _, _, o],
-    [_, _, _, _, _, _, _, _, _, o],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-  ]
-  const board = createBoard({
-    matrix: initialMatrix,
-    onBoardChange,
-    active: {
-      position: rightOfBoard,
-      shape: Shape.createIShape(color),
+    expectedMatrix: [
+      [_, _, _, _, _, _, p, p, _, _], //
+      [_, _, _, _, _, _, p, p, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+    ],
+  },
+  {
+    name: "a step and 2 downs",
+    getNextShape: () => Shape.createOShape(p.color),
+    actions: board => {
+      board.step()
+      board.down()
+      board.down()
     },
-  })
-
-  board.right()
-
-  const expectedBoard = [
-    [_, _, _, _, _, _, _, _, o, o], //
-    [_, _, _, _, _, _, _, _, o, o],
-    [_, _, _, _, _, _, _, _, o, o],
-    [_, _, _, _, _, _, _, _, o, o],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-  ]
-
-  expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
-})
-
-test("active can't go left due to edge", () => {
-  const color = "red"
-  const o = { color }
-  const onBoardChange = jest.fn()
-  const leftOfBoard = { x: 0, y: 0 }
-  const board = createBoard({
-    onBoardChange,
+    expectedMatrix: [
+      [_, _, _, _, _, _, _, _, _, _], //
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, p, p, _, _, _, _],
+      [_, _, _, _, p, p, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+    ],
+  },
+  {
+    name: "active reached bottom",
     active: {
-      position: leftOfBoard,
-      shape: Shape.createZShape(color),
+      position: { x: MIDDLE, y: BOTTOM },
+      shape: Shape.createOShape(p.color),
     },
-  })
-
-  board.left()
-
-  const expectedBoard = [
-    [o, o, _, _, _, _, _, _, _, _], //
-    [_, o, o, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-  ]
-
-  expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
-})
-
-test("active can't go left due to occupied cell", () => {
-  const color = "red"
-  const o = { color }
-  const onBoardChange = jest.fn()
-  const leftOfBoard = { x: 1, y: 0 }
-  const initialMatrix = [
-    [_, o, _, _, _, _, _, _, _, _], //
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-  ]
-  const board = createBoard({
-    matrix: initialMatrix,
-    onBoardChange,
+    actions: board => {
+      board.step()
+    },
+    expectedMatrix: [
+      [_, _, _, _, _, _, _, _, _, _], //
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, p, p, _, _, _, _],
+      [_, _, _, _, p, p, _, _, _, _],
+    ],
+  },
+  {
+    name: "active reached bottom (because of occupied cell)",
     active: {
-      position: leftOfBoard,
-      shape: Shape.createTShape(color),
+      position: { x: MIDDLE, y: BOTTOM - 1 },
+      shape: Shape.createOShape(p.color),
     },
-  })
-
-  board.left()
-
-  const expectedBoard = [
-    [_, o, o, _, _, _, _, _, _, _], //
-    [_, o, o, o, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-  ]
-
-  expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
-})
-
-test("active can't go down due to edge", () => {
-  const color = "red"
-  const o = { color }
-  const onBoardChange = jest.fn()
-  const bottomOfBoard = { x: 0, y: 8 }
-  const board = createBoard({
-    onBoardChange,
+    actions: board => {
+      board.step()
+    },
+    initialMatrix: [
+      [_, _, _, _, _, _, _, _, _, _], //
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, p, _, _, _, _, _],
+    ],
+    expectedMatrix: [
+      [_, _, _, _, _, _, _, _, _, _], //
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, p, p, _, _, _, _],
+      [_, _, _, _, p, p, _, _, _, _],
+      [_, _, _, _, p, _, _, _, _, _],
+    ],
+  },
+  {
+    name: "active reached bottom but dodges to the left",
     active: {
-      position: bottomOfBoard,
-      shape: Shape.createOShape(color),
+      position: { x: MIDDLE, y: BOTTOM - 1 },
+      shape: Shape.createOShape(p.color),
     },
-  })
-
-  board.down()
-
-  const expectedBoard = [
-    [_, _, _, _, _, _, _, _, _, _], //
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [o, o, _, _, _, _, _, _, _, _],
-    [o, o, _, _, _, _, _, _, _, _],
-  ]
-
-  expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
-})
-
-test("active can't go down due to occupied cell", () => {
-  const color = "red"
-  const o = { color }
-  const onBoardChange = jest.fn()
-  const leftOfBoard = { x: 0, y: 0 }
-  const initialMatrix = [
-    [_, _, _, _, _, _, _, _, _, _], //
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, o, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-  ]
-  const board = createBoard({
-    matrix: initialMatrix,
-    onBoardChange,
+    actions: board => {
+      board.step()
+      board.left()
+      board.step()
+    },
+    initialMatrix: [
+      [_, _, _, _, _, _, _, _, _, _], //
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, p, _, _, _, _],
+    ],
+    expectedMatrix: [
+      [_, _, _, _, _, _, _, _, _, _], //
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, p, p, _, _, _, _, _],
+      [_, _, _, p, p, p, _, _, _, _],
+    ],
+  },
+  {
+    name: "active reached bottom (2 steps), new shape spawns (1 step)",
     active: {
-      position: leftOfBoard,
-      shape: Shape.createIShape(color),
+      position: { x: MIDDLE, y: BOTTOM },
+      shape: Shape.createOShape(p.color),
     },
-  })
-
-  board.down()
-
-  const expectedBoard = [
-    [_, _, o, _, _, _, _, _, _, _], //
-    [_, _, o, _, _, _, _, _, _, _],
-    [_, _, o, _, _, _, _, _, _, _],
-    [_, _, o, _, _, _, _, _, _, _],
-    [_, _, o, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-  ]
-
-  expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
-})
-
-test("active can't rotate due to edge", () => {
-  const color = "red"
-  const o = { color }
-  const onBoardChange = jest.fn()
-  const leftOfBoard = { x: -2, y: 0 }
-  const board = createBoard({
-    onBoardChange,
+    getNextShape: () => Shape.createIShape(p.color),
+    actions: board => {
+      board.step()
+      board.step()
+      board.step()
+    },
+    expectedMatrix: [
+      [_, _, _, _, _, _, p, _, _, _], //
+      [_, _, _, _, _, _, p, _, _, _],
+      [_, _, _, _, _, _, p, _, _, _],
+      [_, _, _, _, _, _, p, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, p, p, _, _, _, _],
+      [_, _, _, _, p, p, _, _, _, _],
+    ],
+  },
+  {
+    name: "active can't go right due to edge",
     active: {
-      position: leftOfBoard,
-      shape: Shape.createIShape(color),
+      position: { x: RIGHT, y: TOP },
+      shape: Shape.createIShape(p.color),
     },
-  })
-
-  board.rotate()
-
-  const expectedBoard = [
-    [o, _, _, _, _, _, _, _, _, _], //
-    [o, _, _, _, _, _, _, _, _, _],
-    [o, _, _, _, _, _, _, _, _, _],
-    [o, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-  ]
-
-  expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
-})
-
-test("active can't rotate due to occupied cell", () => {
-  const color = "red"
-  const o = { color }
-  const onBoardChange = jest.fn()
-  const initialMatrix = [
-    [_, _, _, _, _, _, _, _, _, _], //
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, o, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-  ]
-  const leftOfBoard = { x: 0, y: 0 }
-  const board = createBoard({
-    matrix: initialMatrix,
-    onBoardChange,
+    actions: board => {
+      board.right()
+    },
+    expectedMatrix: [
+      [_, _, _, _, _, _, _, _, _, p], //
+      [_, _, _, _, _, _, _, _, _, p],
+      [_, _, _, _, _, _, _, _, _, p],
+      [_, _, _, _, _, _, _, _, _, p],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+    ],
+  },
+  {
+    name: "active can't go right due to occupied cell",
     active: {
-      position: leftOfBoard,
-      shape: Shape.createIShape(color),
+      position: { x: RIGHT - 1, y: TOP },
+      shape: Shape.createIShape(p.color),
     },
-  })
-
-  board.rotate()
-
-  const expectedBoard = [
-    [_, _, o, _, _, _, _, _, _, _], //
-    [_, _, o, _, _, _, _, _, _, _],
-    [_, o, o, _, _, _, _, _, _, _],
-    [_, _, o, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-  ]
-
-  expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
-})
-
-test("row disappears if full", () => {
-  const color = "red"
-  const o = { color }
-  const onBoardChange = jest.fn()
-  const initialMatrix = [
-    [_, _, _, _, _, _, _, _, _, _], //
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, o, o, _, _, _, _],
-    [_, _, _, _, o, _, _, _, _, _],
-    [o, o, _, o, o, o, o, o, o, o],
-  ]
-  const leftOfBoard = { x: 0, y: 6 }
-  const board = createBoard({
-    matrix: initialMatrix,
-    onBoardChange,
+    actions: board => {
+      board.right()
+    },
+    initialMatrix: [
+      [_, _, _, _, _, _, _, _, _, p], //
+      [_, _, _, _, _, _, _, _, _, p],
+      [_, _, _, _, _, _, _, _, _, p],
+      [_, _, _, _, _, _, _, _, _, p],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+    ],
+    expectedMatrix: [
+      [_, _, _, _, _, _, _, _, p, p], //
+      [_, _, _, _, _, _, _, _, p, p],
+      [_, _, _, _, _, _, _, _, p, p],
+      [_, _, _, _, _, _, _, _, p, p],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+    ],
+  },
+  {
+    name: "active can't go left due to edge",
     active: {
-      position: leftOfBoard,
-      shape: Shape.createIShape(color),
+      position: { x: LEFT, y: TOP },
+      shape: Shape.createZShape(p.color),
     },
-  })
-
-  board.step()
-  board.step()
-
-  const expectedBoard = [
-    [_, _, _, _, _, _, _, _, _, _], //
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, o, _, _, _, _, _, _, _],
-    [_, _, o, _, o, o, _, _, _, _],
-    [_, _, o, _, o, _, _, _, _, _],
-  ]
-
-  expect(onBoardChange).toHaveBeenLastCalledWith(expectedBoard)
-})
-
-test("game over", () => {
-  const color = "red"
-  const o = { color }
-  const onGameOver = jest.fn()
-  const initialMatrix = [
-    [_, _, _, _, _, _, _, _, _, _], //
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, o, _, _, _],
-    [_, _, _, _, _, _, o, _, _, _],
-    [_, _, _, _, _, _, o, _, _, _],
-    [_, _, _, _, _, _, o, _, _, _],
-    [_, _, _, _, _, _, o, _, _, _],
-    [_, _, _, _, _, _, o, _, _, _],
-    [_, _, _, _, _, _, o, _, _, _],
-  ]
-  const board = createBoard({
-    matrix: initialMatrix,
-    onGameOver,
-    getNextShape: () => Shape.createIShape(color),
-  })
-
-  board.step()
-
-  expect(onGameOver).toHaveBeenCalled()
-})
-
-test("on row clear", () => {
-  const color = "red"
-  const o = { color }
-  const onRowClear = jest.fn()
-  const initialMatrix = [
-    [_, _, _, _, _, _, _, _, _, _], //
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [_, _, _, _, _, _, _, _, _, _],
-    [o, o, _, o, o, o, o, o, o, o],
-    [o, o, _, o, o, o, o, o, o, o],
-    [o, o, _, o, o, o, o, o, o, o],
-    [o, o, _, o, o, o, o, o, o, o],
-  ]
-  const leftOfBoard = { x: 0, y: 6 }
-  const board = createBoard({
-    matrix: initialMatrix,
-    onRowClear,
+    actions: board => {
+      board.left()
+    },
+    expectedMatrix: [
+      [p, p, _, _, _, _, _, _, _, _], //
+      [_, p, p, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+    ],
+  },
+  {
+    name: "active can't go left due to occupied cell",
     active: {
-      position: leftOfBoard,
-      shape: Shape.createIShape(color),
+      position: { x: LEFT + 1, y: TOP },
+      shape: Shape.createTShape(p.color),
     },
-  })
+    actions: board => {
+      board.left()
+    },
+    initialMatrix: [
+      [_, p, _, _, _, _, _, _, _, _], //
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+    ],
+    expectedMatrix: [
+      [_, p, p, _, _, _, _, _, _, _], //
+      [_, p, p, p, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+    ],
+  },
+  {
+    name: "active can't go down due to edge",
+    active: {
+      position: { x: LEFT, y: BOTTOM },
+      shape: Shape.createOShape(p.color),
+    },
+    actions: board => {
+      board.down()
+    },
+    expectedMatrix: [
+      [_, _, _, _, _, _, _, _, _, _], //
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [p, p, _, _, _, _, _, _, _, _],
+      [p, p, _, _, _, _, _, _, _, _],
+    ],
+  },
+  {
+    name: "active can't go down due to occupied cell",
+    active: {
+      position: { x: I_SHAPE_LEFT + 2, y: TOP },
+      shape: Shape.createIShape(p.color),
+    },
+    actions: board => {
+      board.down()
+    },
+    initialMatrix: [
+      [_, _, _, _, _, _, _, _, _, _], //
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, p, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+    ],
+    expectedMatrix: [
+      [_, _, p, _, _, _, _, _, _, _], //
+      [_, _, p, _, _, _, _, _, _, _],
+      [_, _, p, _, _, _, _, _, _, _],
+      [_, _, p, _, _, _, _, _, _, _],
+      [_, _, p, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+    ],
+  },
+  {
+    name: "active can't rotate due to edge",
+    active: {
+      position: { x: I_SHAPE_LEFT, y: TOP },
+      shape: Shape.createIShape(p.color),
+    },
+    actions: board => {
+      board.rotate()
+    },
+    expectedMatrix: [
+      [p, _, _, _, _, _, _, _, _, _], //
+      [p, _, _, _, _, _, _, _, _, _],
+      [p, _, _, _, _, _, _, _, _, _],
+      [p, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+    ],
+  },
+  {
+    name: "active can't rotate due to occupied cell",
+    active: {
+      position: { x: I_SHAPE_LEFT + 2, y: TOP },
+      shape: Shape.createIShape(p.color),
+    },
+    actions: board => {
+      board.rotate()
+    },
+    initialMatrix: [
+      [_, _, _, _, _, _, _, _, _, _], //
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, p, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+    ],
+    expectedMatrix: [
+      [_, _, p, _, _, _, _, _, _, _], //
+      [_, _, p, _, _, _, _, _, _, _],
+      [_, p, p, _, _, _, _, _, _, _],
+      [_, _, p, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+    ],
+  },
+  {
+    name: "row disappears if full",
+    active: {
+      position: { x: I_SHAPE_LEFT + 2, y: I_SHAPE_BOTTOM - 1 },
+      shape: Shape.createIShape(p.color),
+    },
+    actions: board => {
+      board.step()
+      board.step()
+    },
+    initialMatrix: [
+      [_, _, _, _, _, _, _, _, _, _], //
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, p, p, _, _, _, _],
+      [_, _, _, _, p, _, _, _, _, _],
+      [p, p, _, p, p, p, p, p, p, p],
+    ],
+    expectedMatrix: [
+      [_, _, _, _, _, _, _, _, _, _], //
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, p, _, _, _, _, _, _, _],
+      [_, _, p, _, p, p, _, _, _, _],
+      [_, _, p, _, p, _, _, _, _, _],
+    ],
+  },
+  {
+    name: "game over",
+    getNextShape: () => Shape.createIShape(p.color),
+    actions: board => {
+      board.step()
+    },
+    initialMatrix: [
+      [_, _, _, _, _, _, _, _, _, _], //
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, p, _, _, _],
+      [_, _, _, _, _, _, p, _, _, _],
+      [_, _, _, _, _, _, p, _, _, _],
+      [_, _, _, _, _, _, p, _, _, _],
+      [_, _, _, _, _, _, p, _, _, _],
+      [_, _, _, _, _, _, p, _, _, _],
+      [_, _, _, _, _, _, p, _, _, _],
+    ],
+    gameOverCalled: true,
+  },
+  {
+    name: "on row clear",
+    active: {
+      position: { x: I_SHAPE_LEFT + 2, y: I_SHAPE_BOTTOM - 1 },
+      shape: Shape.createIShape(p.color),
+    },
+    actions: board => {
+      board.step()
+      board.step()
+    },
+    initialMatrix: [
+      [_, _, _, _, _, _, _, _, _, _], //
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [_, _, _, _, _, _, _, _, _, _],
+      [p, p, _, p, p, p, p, p, p, p],
+      [p, p, _, p, p, p, p, p, p, p],
+      [p, p, _, p, p, p, p, p, p, p],
+      [p, p, _, p, p, p, p, p, p, p],
+    ],
+    rowClearCalledWith: 4,
+  },
+]
 
-  board.step()
-  board.step()
+tests.map(
+  ({
+    name,
+    initialMatrix,
+    getNextShape,
+    actions,
+    active,
+    expectedMatrix,
+    gameOverCalled,
+    rowClearCalledWith,
+  }) => {
+    test(name, () => {
+      const onBoardChange = jest.fn()
+      const onGameOver =
+        typeof gameOverCalled !== "undefined" ? jest.fn() : undefined
+      const onRowClear =
+        typeof rowClearCalledWith !== "undefined" ? jest.fn() : undefined
+      const board = createBoard({
+        onBoardChange,
+        getNextShape,
+        onGameOver,
+        onRowClear,
+        matrix: initialMatrix,
+        active,
+      })
 
-  const numberOfRowsCleared = 4
-  expect(onRowClear).toHaveBeenLastCalledWith(numberOfRowsCleared)
-})
+      if (actions) {
+        actions(board)
+      }
+
+      const [resultBoard] = last(onBoardChange.mock.calls)
+
+      if (expectedMatrix) {
+        try {
+          expect(resultBoard).toEqual(expectedMatrix)
+        } catch (err) {
+          throw new Error(`
+Expected:
+${printBoard(expectedMatrix)}
+
+Got:
+${printBoard(resultBoard)}
+`)
+        }
+      }
+
+      if (onGameOver) {
+        expect(onGameOver).toHaveBeenCalled()
+      }
+
+      if (onRowClear) {
+        expect(onRowClear).toHaveBeenCalledWith(rowClearCalledWith)
+      }
+    })
+  },
+)
+
+function printBoard(board: TetrisMatrix): string {
+  const mappedBoard = board.map(row => row.map(cell => (cell ? "O" : "_")))
+  return mappedBoard.join("\n")
+}
 
 interface CreateBoardOptions {
   getNextShape?: GetNextShape
