@@ -1,5 +1,6 @@
 import { clone } from "ramda"
 import { GetNextShape } from "./get-next-shape"
+import { columnCount, rowCount } from "./matrix"
 import { Position, Shape, TetrisMatrix, TetrisRow } from "./shape"
 
 export interface Active {
@@ -45,9 +46,9 @@ export class Board {
   }
 
   private canCellRotate = (p: Position): boolean => {
-    const lastColumnIndex = this.columnCount - 1
+    const lastColumnIndex = columnCount(this.matrix) - 1
     const isXOutOfBounds = p.x < 0 || p.x > lastColumnIndex
-    const lastRowIndex = this.rowCount - 1
+    const lastRowIndex = rowCount(this.matrix) - 1
     const isYOutOfBounds = p.y < 0 || p.y > lastRowIndex
     const isCellOutOfBounds = isXOutOfBounds || isYOutOfBounds
     if (isCellOutOfBounds) {
@@ -98,7 +99,7 @@ export class Board {
   }
 
   private canCellMoveRight = (p: Position): boolean => {
-    const isAtRightmostColumn = p.x === this.columnCount - 1
+    const isAtRightmostColumn = p.x === columnCount(this.matrix) - 1
     if (isAtRightmostColumn) {
       return false
     }
@@ -123,7 +124,7 @@ export class Board {
   }
 
   private canCellMoveDown = (p: Position): boolean => {
-    const lastRowIndex = this.rowCount - 1
+    const lastRowIndex = rowCount(this.matrix) - 1
     const isAtBottomRow = p.y === lastRowIndex
     if (isAtBottomRow) {
       return false
@@ -246,11 +247,14 @@ export class Board {
   }
 
   private spawnNewActiveShape(): void {
-    const middleX = Math.floor((this.columnCount - 1) / 2)
+    const shape = this.getNextShape()
 
+    const middleX = Math.floor(columnCount(this.matrix) / 2)
+    const shapeMiddleX = Math.floor((columnCount(shape.matrix) - 1) / 2)
+    const { top } = shape.getBoundingRect()
     this.active = {
-      shape: this.getNextShape(),
-      position: { x: middleX, y: 0 },
+      shape,
+      position: { x: middleX - shapeMiddleX - 1, y: -top },
     }
     this.hasActiveAlreadyHitBottom = false
   }
@@ -268,19 +272,5 @@ export class Board {
       const isOverlappingCell = !!this.matrix[p.y][p.x]
       return isOverlappingCell
     })
-  }
-
-  private get rowCount(): number {
-    return this.matrix.length
-  }
-
-  private get columnCount(): number {
-    const firstRow = this.matrix[0]
-
-    if (!firstRow) {
-      return 0
-    }
-
-    return firstRow.length
   }
 }
