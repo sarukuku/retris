@@ -30,6 +30,10 @@ export class GameOver extends Component<GameOverProps> {
             justify-content: space-around;
             align-items: center;
           }
+
+          h1 {
+            text-align: center;
+          }
         `}</style>
       </div>
     )

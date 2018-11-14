@@ -23,6 +23,10 @@ export class WaitingToStart extends Component {
             justify-content: center;
             align-items: center;
           }
+
+          h1 {
+            text-align: center;
+          }
         `}</style>
       </div>
     )

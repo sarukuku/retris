@@ -1,6 +1,7 @@
 import React, { Component } from "react"
 import io from "socket.io-client"
 import { commands } from "../commands"
+import { withAnalytics, AnalyticsProps } from "../components/with-analytics"
 import { ControllerState } from "../server/state"
 import { views } from "../views"
 import { GameController } from "../views/controller/game-controller"
@@ -12,14 +13,12 @@ import { StartGame } from "../views/controller/start-game"
 
 interface ControllerComponentState {
   socket: typeof io.Socket | null
+  previousActiveView?: string
   activeView: string
   queueLength: number
 }
 
-export default class Controller extends Component<
-  {},
-  ControllerComponentState
-> {
+class Controller extends Component<AnalyticsProps, ControllerComponentState> {
   state: ControllerComponentState = {
     socket: null,
     activeView: views.CONTROLLER_JOIN,
@@ -88,34 +87,47 @@ export default class Controller extends Component<
   }
 
   render() {
+    this.sendPageView()
+    const view = this.renderView()
+    return <div>{view}</div>
+  }
+
+  private sendPageView() {
+    const { activeView, previousActiveView } = this.state
+    if (activeView === previousActiveView) {
+      return
+    }
+
+    const { analytics } = this.props
+    analytics.sendPageView(activeView)
+  }
+
+  private renderView() {
     const { activeView, queueLength } = this.state
 
-    return (
-      <div>
-        {(() => {
-          switch (activeView) {
-            case views.CONTROLLER_GAME_OFFLINE:
-              return <NotRunning />
-            case views.CONTROLLER_JOIN:
-              return <JoinGame onJoinGame={this.onJoinGame} />
-            case views.CONTROLLER_IN_QUEUE:
-              return <InQueue queueLength={queueLength} />
-            case views.CONTROLLER_START:
-              return <StartGame onStartGame={this.onStartGame} />
-            case views.CONTROLLER_GAME_CONTROLS:
-              return (
-                <GameController
-                  onSwipeRight={this.onSwipeRight}
-                  onSwipeDown={this.onSwipeDown}
-                  onSwipeLeft={this.onSwipeLeft}
-                  onTap={this.onTap}
-                />
-              )
-            case views.CONTROLLER_GAME_OVER:
-              return <GameOver onRestart={this.onRestart} />
-          }
-        })()}
-      </div>
-    )
+    switch (activeView) {
+      default:
+      case views.CONTROLLER_GAME_OFFLINE:
+        return <NotRunning />
+      case views.CONTROLLER_JOIN:
+        return <JoinGame onJoinGame={this.onJoinGame} />
+      case views.CONTROLLER_IN_QUEUE:
+        return <InQueue queueLength={queueLength} />
+      case views.CONTROLLER_START:
+        return <StartGame onStartGame={this.onStartGame} />
+      case views.CONTROLLER_GAME_CONTROLS:
+        return (
+          <GameController
+            onSwipeRight={this.onSwipeRight}
+            onSwipeDown={this.onSwipeDown}
+            onSwipeLeft={this.onSwipeLeft}
+            onTap={this.onTap}
+          />
+        )
+      case views.CONTROLLER_GAME_OVER:
+        return <GameOver onRestart={this.onRestart} />
+    }
   }
 }
+
+export default withAnalytics(Controller)

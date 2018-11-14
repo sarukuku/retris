@@ -1,8 +1,5 @@
 import React, { Component } from "react"
-import {
-  withTranslate,
-  TranslateProps,
-} from "../../components/translation-context"
+import { withTranslate, TranslateProps } from "../../components/with-translate"
 
 interface WaitingProps extends TranslateProps {
   address: string
@@ -20,6 +17,10 @@ class _Waiting extends Component<WaitingProps> {
             display: flex;
             justify-content: center;
             align-items: center;
+          }
+
+          h1 {
+            text-align: center;
           }
         `}</style>
       </div>

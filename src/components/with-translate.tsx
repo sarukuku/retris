@@ -1,10 +1,6 @@
-import React, { createContext, ComponentType } from "react"
-import { defaultTranslations } from "../i18n/default-translations"
-import { createTranslate, Translate } from "../i18n/translate"
-
-export const TranslationContext = createContext<Translate>(
-  createTranslate(defaultTranslations),
-)
+import React, { ComponentType } from "react"
+import { Translate } from "../i18n/translate"
+import { TranslationContext } from "./contexts"
 
 export interface TranslateProps {
   translate: Translate
@@ -22,7 +18,12 @@ export function withTranslate<Props>(
     render() {
       return (
         <TranslationContext.Consumer>
-          {translate => <Component translate={translate} {...this.props} />}
+          {translate => {
+            if (!translate) {
+              throw new Error("TranslationContext has no translate provided")
+            }
+            return <Component translate={translate} {...this.props} />
+          }}
         </TranslationContext.Consumer>
       )
     }
