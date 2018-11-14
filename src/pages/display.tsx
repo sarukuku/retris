@@ -61,7 +61,13 @@ class Display extends Component<DisplayProps, DisplayComponentState> {
   }
 
   gameOver = (totalScore: number) => {
+    const { analytics } = this.props
     this.setState({ score: totalScore })
+    analytics.sendCustomEvent({
+      category: "GameOver",
+      action: "TotalScore",
+      value: totalScore,
+    })
     this.state.socket!.emit(commands.GAME_OVER)
   }
 
