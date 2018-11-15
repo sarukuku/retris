@@ -1,5 +1,6 @@
 import { Application } from "express"
 import next from "next"
+import { asyncMiddleware } from "./server/express-async-middleware"
 
 export async function createNextApp(
   env: string,
@@ -11,7 +12,10 @@ export async function createNextApp(
 
   await nextApp.prepare()
 
-  app.get("*", (req, res) => {
-    return nextHandler(req, res)
-  })
+  app.get(
+    "*",
+    asyncMiddleware((req, res) => {
+      return nextHandler(req, res)
+    }),
+  )
 }

@@ -1,12 +1,12 @@
 import dotenv from "dotenv"
 dotenv.config()
 
-import express from "express"
+import express, { ErrorRequestHandler } from "express"
 import { createServer } from "http"
+import pino from "pino"
 import socketio from "socket.io"
 import { config } from "./config"
 import { createLoadTranslationsFromSheets } from "./i18n/load-translations-from-sheets"
-import { logger } from "./logger"
 import { createNextApp } from "./next"
 import { asyncMiddleware } from "./server/express-async-middleware"
 import { createSocketIOServer } from "./server/socketio"
@@ -17,6 +17,7 @@ import {
 import { State } from "./server/state"
 
 async function main() {
+  const logger = pino()
   const loadTranslations = createLoadTranslationsFromSheets(config.sheets)
 
   const app = express()
@@ -43,6 +44,16 @@ async function main() {
     display: displayNamespace,
     controller: controllerNamespace,
   })
+
+  const errorRequestHandler: ErrorRequestHandler = (err, _req, res, _next) => {
+    logger.error(`Request Error: ${err.stack || err}`)
+    const error =
+      config.env === "production" ? "Internal Server Error" : err.stack || err
+    return res.status(500).send({
+      error,
+    })
+  }
+  app.use(errorRequestHandler)
 
   server.listen(config.port, (err: Error) => {
     if (err) {
