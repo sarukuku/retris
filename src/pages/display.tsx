@@ -18,12 +18,13 @@ interface DisplayProps extends AnalyticsProps {
 interface DisplayComponentState {
   socket: typeof io.Socket | null
   activeView: string
-  previousActiveView?: string
   score: number
   queueLength: number
 }
 
 class Display extends Component<DisplayProps, DisplayComponentState> {
+  private previousActiveView?: string
+
   state: DisplayComponentState = {
     socket: null,
     activeView: views.DISPLAY_WAITING,
@@ -114,10 +115,11 @@ class Display extends Component<DisplayProps, DisplayComponentState> {
   }
 
   private sendPageView() {
-    const { activeView, previousActiveView } = this.state
-    if (activeView === previousActiveView) {
+    const { activeView } = this.state
+    if (activeView === this.previousActiveView) {
       return
     }
+    this.previousActiveView = activeView
 
     const { analytics } = this.props
     analytics.sendPageView(activeView)

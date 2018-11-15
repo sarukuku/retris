@@ -1,7 +1,8 @@
 import React, { Component } from "react"
 import io from "socket.io-client"
 import { commands } from "../commands"
-import { withAnalytics, AnalyticsProps } from "../components/with-analytics"
+import { AnalyticsProps, withAnalytics } from "../components/with-analytics"
+import { onPageVisibilityChange } from "../helpers"
 import { ControllerState } from "../server/state"
 import { views } from "../views"
 import { GameController } from "../views/controller/game-controller"
@@ -13,12 +14,14 @@ import { StartGame } from "../views/controller/start-game"
 
 interface ControllerComponentState {
   socket: typeof io.Socket | null
-  previousActiveView?: string
   activeView: string
   queueLength: number
 }
 
 class Controller extends Component<AnalyticsProps, ControllerComponentState> {
+  private removePageVisibilityChangeListener?: () => void
+  private previousActiveView?: string
+
   state: ControllerComponentState = {
     socket: null,
     activeView: views.CONTROLLER_JOIN,
@@ -78,21 +81,23 @@ class Controller extends Component<AnalyticsProps, ControllerComponentState> {
       this.setState(state)
     })
 
-    window.addEventListener("focus", this.onFocus)
+    this.removePageVisibilityChangeListener = onPageVisibilityChange(
+      isHidden => {
+        if (!isHidden) {
+          socket.emit(commands.GET_STATE)
+        }
+      },
+    )
   }
 
   componentWillUnmount() {
-    window.removeEventListener("focus", this.onFocus)
     const { socket } = this.state
     if (socket) {
       socket.close()
     }
-  }
 
-  private onFocus = () => {
-    const { socket } = this.state
-    if (socket) {
-      socket.emit(commands.GET_STATE)
+    if (this.removePageVisibilityChangeListener) {
+      this.removePageVisibilityChangeListener()
     }
   }
 
@@ -103,10 +108,11 @@ class Controller extends Component<AnalyticsProps, ControllerComponentState> {
   }
 
   private sendPageView() {
-    const { activeView, previousActiveView } = this.state
-    if (activeView === previousActiveView) {
+    const { activeView } = this.state
+    if (activeView === this.previousActiveView) {
       return
     }
+    this.previousActiveView = activeView
 
     const { analytics } = this.props
     analytics.sendPageView(activeView)
