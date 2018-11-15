@@ -10,6 +10,7 @@ import { Game } from "../views/display/game"
 import { GameOver } from "../views/display/game-over"
 import { Waiting } from "../views/display/waiting"
 import { WaitingToStart } from "../views/display/waiting-to-start"
+import { ErrorPage } from "./_error"
 
 interface DisplayProps extends AnalyticsProps {
   address: string
@@ -137,7 +138,7 @@ class Display extends Component<DisplayProps, DisplayComponentState> {
         return <WaitingToStart />
       case views.DISPLAY_GAME:
         if (!socket) {
-          throw new Error("Socket is not available")
+          return <ErrorPage />
         }
         return <Game socket={socket} onGameOver={this.gameOver} />
       case views.DISPLAY_GAME_OVER:
