@@ -1,5 +1,4 @@
 import { views } from "../views"
-import { INITIAL_DISPLAY_STATE } from "./state"
 import {
   TestDisplays,
   TestController,
@@ -17,7 +16,10 @@ describe("onDisplayConnect", () => {
 
     state.onDisplayConnect(display)
 
-    expect(display.state).toBe(INITIAL_DISPLAY_STATE)
+    expect(display.state).toEqual({
+      activeView: views.DISPLAY_WAITING,
+      queueLength: 0,
+    })
   })
 
   test("add display to displays", () => {

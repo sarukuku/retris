@@ -1,7 +1,7 @@
 import React, { Component } from "react"
 import io from "socket.io-client"
 import { commands } from "../commands"
-import { withAnalytics, AnalyticsProps } from "../components/with-analytics"
+import { AnalyticsProps, withAnalytics } from "../components/with-analytics"
 import { ControllerState } from "../server/state"
 import { views } from "../views"
 import { GameController } from "../views/controller/game-controller"
@@ -13,12 +13,13 @@ import { StartGame } from "../views/controller/start-game"
 
 interface ControllerComponentState {
   socket: typeof io.Socket | null
-  previousActiveView?: string
   activeView: string
   queueLength: number
 }
 
 class Controller extends Component<AnalyticsProps, ControllerComponentState> {
+  private previousActiveView?: string
+
   state: ControllerComponentState = {
     socket: null,
     activeView: views.CONTROLLER_JOIN,
@@ -93,10 +94,11 @@ class Controller extends Component<AnalyticsProps, ControllerComponentState> {
   }
 
   private sendPageView() {
-    const { activeView, previousActiveView } = this.state
-    if (activeView === previousActiveView) {
+    const { activeView } = this.state
+    if (activeView === this.previousActiveView) {
       return
     }
+    this.previousActiveView = activeView
 
     const { analytics } = this.props
     analytics.sendPageView(activeView)

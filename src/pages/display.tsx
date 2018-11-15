@@ -10,6 +10,7 @@ import { Game } from "../views/display/game"
 import { GameOver } from "../views/display/game-over"
 import { Waiting } from "../views/display/waiting"
 import { WaitingToStart } from "../views/display/waiting-to-start"
+import { ErrorPage } from "./_error"
 
 interface DisplayProps extends AnalyticsProps {
   address: string
@@ -18,12 +19,13 @@ interface DisplayProps extends AnalyticsProps {
 interface DisplayComponentState {
   socket: typeof io.Socket | null
   activeView: string
-  previousActiveView?: string
   score: number
   queueLength: number
 }
 
 class Display extends Component<DisplayProps, DisplayComponentState> {
+  private previousActiveView?: string
+
   state: DisplayComponentState = {
     socket: null,
     activeView: views.DISPLAY_WAITING,
@@ -51,7 +53,10 @@ class Display extends Component<DisplayProps, DisplayComponentState> {
   }
 
   componentWillUnmount() {
-    this.state.socket!.close()
+    const { socket } = this.state
+    if (socket) {
+      socket.close()
+    }
   }
 
   addToScore = (score: number) => {
@@ -68,7 +73,11 @@ class Display extends Component<DisplayProps, DisplayComponentState> {
       action: "TotalScore",
       value: totalScore,
     })
-    this.state.socket!.emit(commands.GAME_OVER)
+
+    const { socket } = this.state
+    if (socket) {
+      socket.emit(commands.GAME_OVER)
+    }
   }
 
   render() {
@@ -107,10 +116,11 @@ class Display extends Component<DisplayProps, DisplayComponentState> {
   }
 
   private sendPageView() {
-    const { activeView, previousActiveView } = this.state
-    if (activeView === previousActiveView) {
+    const { activeView } = this.state
+    if (activeView === this.previousActiveView) {
       return
     }
+    this.previousActiveView = activeView
 
     const { analytics } = this.props
     analytics.sendPageView(activeView)
@@ -127,7 +137,10 @@ class Display extends Component<DisplayProps, DisplayComponentState> {
       case views.DISPLAY_WAITING_TO_START:
         return <WaitingToStart />
       case views.DISPLAY_GAME:
-        return <Game socket={socket!} onGameOver={this.gameOver} />
+        if (!socket) {
+          return <ErrorPage />
+        }
+        return <Game socket={socket} onGameOver={this.gameOver} />
       case views.DISPLAY_GAME_OVER:
         return <GameOver score={score} />
     }

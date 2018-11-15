@@ -4,12 +4,12 @@ import { JoinHelpBar } from "../../components/join-help-bar"
 
 export class WaitingToStart extends Component {
   render() {
-    const { className, styles } = css.resolve`
+    const { className, styles } = css.resolve`{
       position: fixed;
       bottom: 0;
       left: 0;
       width: 100%;
-    `
+    }`
 
     return (
       <div className="wrap">
