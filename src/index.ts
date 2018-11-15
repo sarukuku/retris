@@ -1,8 +1,7 @@
 import dotenv from "dotenv"
 dotenv.config()
 
-import express from "express"
-import expressPino from "express-pino-logger"
+import express, { ErrorRequestHandler } from "express"
 import { createServer } from "http"
 import pino from "pino"
 import socketio from "socket.io"
@@ -18,11 +17,10 @@ import {
 import { State } from "./server/state"
 
 async function main() {
-  const pinoLogger = pino()
+  const logger = pino()
   const loadTranslations = createLoadTranslationsFromSheets(config.sheets)
 
   const app = express()
-  app.use(expressPino({ logger: pinoLogger }))
   app.get(
     "/api/translations",
     asyncMiddleware(async (_req, res) => {
@@ -47,11 +45,21 @@ async function main() {
     controller: controllerNamespace,
   })
 
+  const errorRequestHandler: ErrorRequestHandler = (err, _req, res, _next) => {
+    logger.error(`Request Error: ${err.stack || err}`)
+    const error =
+      config.env === "production" ? "Internal Server Error" : err.stack || err
+    return res.status(500).send({
+      error,
+    })
+  }
+  app.use(errorRequestHandler)
+
   server.listen(config.port, (err: Error) => {
     if (err) {
       throw err
     }
-    pinoLogger.info(`> Ready on http://localhost:${config.port}`)
+    logger.info(`> Ready on http://localhost:${config.port}`)
   })
 }
 
