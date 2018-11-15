@@ -18,7 +18,6 @@ interface ControllerComponentState {
 }
 
 class Controller extends Component<AnalyticsProps, ControllerComponentState> {
-  private removePageVisibilityChangeListener?: () => void
   private previousActiveView?: string
 
   state: ControllerComponentState = {
@@ -85,10 +84,6 @@ class Controller extends Component<AnalyticsProps, ControllerComponentState> {
     const { socket } = this.state
     if (socket) {
       socket.close()
-    }
-
-    if (this.removePageVisibilityChangeListener) {
-      this.removePageVisibilityChangeListener()
     }
   }
 
