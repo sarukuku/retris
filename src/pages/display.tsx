@@ -51,7 +51,10 @@ class Display extends Component<DisplayProps, DisplayComponentState> {
   }
 
   componentWillUnmount() {
-    this.state.socket!.close()
+    const { socket } = this.state
+    if (socket) {
+      socket.close()
+    }
   }
 
   addToScore = (score: number) => {
@@ -68,7 +71,11 @@ class Display extends Component<DisplayProps, DisplayComponentState> {
       action: "TotalScore",
       value: totalScore,
     })
-    this.state.socket!.emit(commands.GAME_OVER)
+
+    const { socket } = this.state
+    if (socket) {
+      socket.emit(commands.GAME_OVER)
+    }
   }
 
   render() {
@@ -127,7 +134,10 @@ class Display extends Component<DisplayProps, DisplayComponentState> {
       case views.DISPLAY_WAITING_TO_START:
         return <WaitingToStart />
       case views.DISPLAY_GAME:
-        return <Game socket={socket!} onGameOver={this.gameOver} />
+        if (!socket) {
+          throw new Error("Socket is not available")
+        }
+        return <Game socket={socket} onGameOver={this.gameOver} />
       case views.DISPLAY_GAME_OVER:
         return <GameOver score={score} />
     }

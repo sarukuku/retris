@@ -62,9 +62,16 @@ export class SocketIODisplay implements Display {
 }
 
 export class SocketIOController implements Controller {
+  private state: ControllerState
+
   constructor(private socket: Socket) {}
 
   updateState(state: ControllerState): void {
+    this.state = { ...this.state, ...state }
     this.socket.emit("state", state)
+  }
+
+  getState(): ControllerState {
+    return this.state
   }
 }

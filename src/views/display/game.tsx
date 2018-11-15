@@ -38,12 +38,12 @@ export class Game extends Component<DisplayGameProps> {
   }
 
   render() {
-    const { className, styles } = css.resolve`
+    const { className, styles } = css.resolve`{
       position: fixed;
       bottom: 0;
       left: 0;
       width: 100%;
-    `
+    }`
 
     return (
       <Fragment>

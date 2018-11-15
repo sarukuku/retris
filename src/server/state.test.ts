@@ -157,6 +157,22 @@ describe("onControllerRestart", () => {
   })
 })
 
+describe("onControllerGetState", () => {
+  test("retrieve last state of controller", () => {
+    const state = createTestState()
+    const controller = new TestController()
+    const controllerState = {
+      activeView: views.CONTROLLER_GAME_CONTROLS,
+      queueLength: 10,
+    }
+    controller.state = controllerState
+
+    state.onControllerGetState(controller)
+
+    expect(controller.stateUpdates).toEqual([controllerState])
+  })
+})
+
 describe("onControllerJoin", () => {
   describe("if no active controller exists", () => {
     test("set controller to active", () => {

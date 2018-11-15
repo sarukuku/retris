@@ -21,6 +21,7 @@ export interface DisplayState {
 
 export interface Controller {
   updateState(state: ControllerState): void
+  getState(): ControllerState
 }
 
 export interface ControllerState {
@@ -115,6 +116,10 @@ export class State {
 
   onControllerRestart(controller: Controller) {
     controller.updateState({ activeView: views.CONTROLLER_JOIN })
+  }
+
+  onControllerGetState(controller: Controller) {
+    controller.updateState(controller.getState())
   }
 
   onControllerDisconnect(controller: Controller) {

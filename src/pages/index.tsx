@@ -77,12 +77,22 @@ class Controller extends Component<AnalyticsProps, ControllerComponentState> {
     socket.on("state", (state: Required<ControllerState>) => {
       this.setState(state)
     })
+
+    window.addEventListener("focus", this.onFocus)
   }
 
   componentWillUnmount() {
+    window.removeEventListener("focus", this.onFocus)
     const { socket } = this.state
     if (socket) {
       socket.close()
+    }
+  }
+
+  private onFocus = () => {
+    const { socket } = this.state
+    if (socket) {
+      socket.emit(commands.GET_STATE)
     }
   }
 
