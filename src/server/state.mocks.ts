@@ -89,7 +89,6 @@ export class TestControllers implements Controllers {
 }
 
 export class TestController implements Controller {
-  state: ControllerState
   stateUpdates: ControllerState[] = []
 
   updateState(state: ControllerState): void {
