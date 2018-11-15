@@ -1,5 +1,4 @@
 import { views } from "../views"
-import { INITIAL_DISPLAY_STATE } from "./state"
 import {
   TestDisplays,
   TestController,
@@ -17,7 +16,10 @@ describe("onDisplayConnect", () => {
 
     state.onDisplayConnect(display)
 
-    expect(display.state).toBe(INITIAL_DISPLAY_STATE)
+    expect(display.state).toEqual({
+      activeView: views.DISPLAY_WAITING,
+      queueLength: 0,
+    })
   })
 
   test("add display to displays", () => {
@@ -154,22 +156,6 @@ describe("onControllerRestart", () => {
     expect(controller.stateUpdates).toEqual([
       { activeView: views.CONTROLLER_JOIN },
     ])
-  })
-})
-
-describe("onControllerGetState", () => {
-  test("retrieve last state of controller", () => {
-    const state = createTestState()
-    const controller = new TestController()
-    const controllerState = {
-      activeView: views.CONTROLLER_GAME_CONTROLS,
-      queueLength: 10,
-    }
-    controller.state = controllerState
-
-    state.onControllerGetState(controller)
-
-    expect(controller.stateUpdates).toEqual([controllerState])
   })
 })
 

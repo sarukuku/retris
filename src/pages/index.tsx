@@ -2,7 +2,6 @@ import React, { Component } from "react"
 import io from "socket.io-client"
 import { commands } from "../commands"
 import { AnalyticsProps, withAnalytics } from "../components/with-analytics"
-import { onPageVisibilityChange } from "../helpers"
 import { ControllerState } from "../server/state"
 import { views } from "../views"
 import { GameController } from "../views/controller/game-controller"
@@ -80,14 +79,6 @@ class Controller extends Component<AnalyticsProps, ControllerComponentState> {
     socket.on("state", (state: Required<ControllerState>) => {
       this.setState(state)
     })
-
-    this.removePageVisibilityChangeListener = onPageVisibilityChange(
-      isHidden => {
-        if (!isHidden) {
-          socket.emit(commands.GET_STATE)
-        }
-      },
-    )
   }
 
   componentWillUnmount() {

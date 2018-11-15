@@ -95,8 +95,4 @@ export class TestController implements Controller {
   updateState(state: ControllerState): void {
     this.stateUpdates.push(state)
   }
-
-  getState() {
-    return this.state
-  }
 }

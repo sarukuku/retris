@@ -8,5 +8,4 @@ export const commands = {
   JOIN: "JOIN",
   RESTART: "RESTART",
   ACTION: "ACTION",
-  GET_STATE: "GET_STATE",
 }

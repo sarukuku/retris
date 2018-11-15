@@ -21,7 +21,6 @@ export interface DisplayState {
 
 export interface Controller {
   updateState(state: ControllerState): void
-  getState(): ControllerState
 }
 
 export interface ControllerState {
@@ -38,24 +37,22 @@ export interface Controllers {
 export class State {
   protected activeController?: Controller
   protected controllerQueue: Controller[] = []
-  protected initialDisplayState: DisplayState
   protected gameOverTimeout: number
 
   constructor(
     protected displays: Displays,
     protected controllers: Controllers,
-    {
-      initialDisplayState = INITIAL_DISPLAY_STATE,
-      gameOverTimeout = FIVE_SECONDS,
-    } = {},
+    { gameOverTimeout = FIVE_SECONDS } = {},
   ) {
-    this.initialDisplayState = initialDisplayState
     this.gameOverTimeout = gameOverTimeout
   }
 
   onDisplayConnect(display: Display) {
-    const currentDisplayState =
-      this.displays.getState() || this.initialDisplayState
+    const initialDisplayState = {
+      activeView: views.DISPLAY_WAITING,
+      queueLength: this.controllerQueue.length,
+    }
+    const currentDisplayState = this.displays.getState() || initialDisplayState
     display.updateState(currentDisplayState)
     this.displays.add(display)
   }
@@ -80,6 +77,10 @@ export class State {
 
   onControllerConnect(controller: Controller) {
     this.controllers.add(controller)
+    controller.updateState({
+      activeView: views.CONTROLLER_JOIN,
+      queueLength: this.controllerQueue.length,
+    })
   }
 
   onControllerJoin(controller: Controller) {
@@ -118,10 +119,6 @@ export class State {
     controller.updateState({ activeView: views.CONTROLLER_JOIN })
   }
 
-  onControllerGetState(controller: Controller) {
-    controller.updateState(controller.getState())
-  }
-
   onControllerDisconnect(controller: Controller) {
     if (controller === this.activeController) {
       this.assignNewActiveController()
@@ -147,11 +144,6 @@ export class State {
       this.activeController.updateState({ activeView: views.CONTROLLER_START })
     }
   }
-}
-
-export const INITIAL_DISPLAY_STATE = {
-  activeView: views.DISPLAY_WAITING,
-  queueLength: 0,
 }
 
 const FIVE_SECONDS = 5000

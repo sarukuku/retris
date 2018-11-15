@@ -70,8 +70,4 @@ export class SocketIOController implements Controller {
     this.state = { ...this.state, ...state }
     this.socket.emit("state", state)
   }
-
-  getState(): ControllerState {
-    return this.state
-  }
 }
