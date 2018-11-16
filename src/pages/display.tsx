@@ -2,7 +2,7 @@ import { NextContext } from "next"
 import React, { Component } from "react"
 import { commands } from "../commands"
 import { AnalyticsProps, pageWithAnalytics } from "../components/with-analytics"
-import { withSocket, SocketProps } from "../components/with-socket"
+import { SocketProps, pageWithSocket } from "../components/with-socket"
 import { DisplayState } from "../server/state"
 import { colors } from "../styles/colors"
 import { views } from "../views"
@@ -127,4 +127,4 @@ class Display extends Component<DisplayProps, DisplayComponentState> {
   }
 }
 
-export default pageWithAnalytics(withSocket(Display, "/display"))
+export default pageWithAnalytics(pageWithSocket(Display, "/display"))

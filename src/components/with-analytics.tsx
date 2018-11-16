@@ -1,7 +1,7 @@
-import { NextComponentType } from "next"
 import React, { ComponentType } from "react"
 import { Analytics } from "../analytics"
 import { AnalyticsContext } from "./contexts"
+import { retainGetInitialProps } from "./retain-get-initial-props"
 import { WithoutProps } from "./without-props"
 
 export interface AnalyticsProps {
@@ -32,16 +32,4 @@ export function withAnalytics<Props>(
   return WithAnalytics
 }
 
-type Page<P> = NextComponentType<P>
-
-export function pageWithAnalytics<Props>(
-  Component: ComponentType<Props & AnalyticsProps>,
-): NextComponentType<WithoutAnalyticsProps<Props>> {
-  const WithAnalytics = withAnalytics(Component)
-  const PageComponent = Component as Page<Props>
-  const WithAnalyticsPage = WithAnalytics as Page<WithoutAnalyticsProps<Props>>
-  if (WithAnalyticsPage.getInitialProps) {
-    WithAnalyticsPage.getInitialProps = PageComponent.getInitialProps
-  }
-  return WithAnalyticsPage
-}
+export const pageWithAnalytics = retainGetInitialProps(withAnalytics)

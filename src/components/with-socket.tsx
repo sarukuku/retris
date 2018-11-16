@@ -1,5 +1,6 @@
-import React from "react"
+import React, { ComponentType } from "react"
 import io from "socket.io-client"
+import { retainGetInitialProps } from "./retain-get-initial-props"
 import { WithoutProps } from "./without-props"
 
 type Socket = typeof io.Socket
@@ -15,9 +16,9 @@ interface SocketState {
 type WithoutSocketProps<Props> = WithoutProps<Props, SocketProps>
 
 export function withSocket<Props>(
-  Component: React.ComponentType<Props & SocketProps>,
+  Component: ComponentType<Props & SocketProps>,
   uri: string,
-): React.ComponentType<WithoutSocketProps<Props>> {
+): ComponentType<WithoutSocketProps<Props>> {
   class WithSocket extends React.Component<
     WithoutSocketProps<Props>,
     SocketState
@@ -50,3 +51,5 @@ export function withSocket<Props>(
 
   return WithSocket
 }
+
+export const pageWithSocket = retainGetInitialProps(withSocket)

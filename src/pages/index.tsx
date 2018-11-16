@@ -1,7 +1,7 @@
 import React, { Component } from "react"
 import { commands } from "../commands"
 import { AnalyticsProps, pageWithAnalytics } from "../components/with-analytics"
-import { withSocket, SocketProps } from "../components/with-socket"
+import { SocketProps, pageWithSocket } from "../components/with-socket"
 import { ControllerState } from "../server/state"
 import { views } from "../views"
 import { GameController } from "../views/controller/game-controller"
@@ -108,4 +108,4 @@ class Controller extends Component<ControllerProps, ControllerState> {
   }
 }
 
-export default pageWithAnalytics(withSocket(Controller, "/controller"))
+export default pageWithAnalytics(pageWithSocket(Controller, "/controller"))
