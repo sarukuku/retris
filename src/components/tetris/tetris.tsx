@@ -119,19 +119,50 @@ export class Tetris extends Component<TetrisProps, TetrisState> {
     ctx.fillRect(0, 0, canvas.width, canvas.height)
   }
 
+  private drawBlock(x: number, y: number, width: number, height: number, ctx: Ctx): void {
+    const radius = Math.floor(width / 10)
+
+    ctx.beginPath()
+    ctx.moveTo(x + radius, y)
+    ctx.arcTo(x + width, y,   x + width, y + height, radius)
+    ctx.arcTo(x + width, y + height, x,   y + height, radius)
+    ctx.arcTo(x,   y + height, x,   y,   radius)
+    ctx.arcTo(x,   y,   x + width, y,   radius)
+    ctx.closePath()
+    ctx.fill()
+  }
+
   private drawBoard(canvas: Canvas, ctx: Ctx): void {
     const { board } = this.state
-    const cellWidth = canvas.width / this.columnCount
-    const cellHeight = canvas.height / this.rowCount
+
+    // Calculate board size so that borders end on exact pixels
+    const boardWidth = canvas.width - (canvas.width % this.columnCount)
+    const boardHeight = canvas.height - (canvas.height % this.rowCount)
+
+    // Draw the board background
+    ctx.fillStyle = "black"
+    ctx.fillRect(0, 0 , boardWidth, boardHeight)
+
+    const cellWidth = boardWidth / this.columnCount
+    const cellHeight = boardHeight / this.rowCount
+    const innerWidth = Math.floor(cellWidth * 0.97)
+    const innerHeight = Math.floor(cellHeight * 0.97)
+    const paddingX = Math.floor((cellWidth - innerWidth) / 2)
+    const paddingY = Math.floor((cellHeight - innerHeight) / 2)
 
     board.forEach((row, rowIndex) => {
       row.forEach((cell, columnIndex) => {
-        ctx.fillStyle = cell ? cell.color : "white"
-        const x = Math.floor(columnIndex * cellWidth)
-        const y = Math.floor(rowIndex * cellHeight)
-        const width = Math.ceil(cellWidth)
-        const height = Math.ceil(cellHeight)
-        ctx.fillRect(x, y, width, height)
+
+        const x = (columnIndex * cellWidth) + paddingX
+        const y = (rowIndex * cellHeight) + paddingY
+
+        ctx.fillStyle = "#1d1f21"
+        ctx.fillRect(x, y, innerWidth, innerHeight)
+
+        if (cell) {
+          ctx.fillStyle = cell ? cell.color : "white"
+          this.drawBlock(x, y, innerWidth, innerHeight, ctx)
+        }
       })
     })
   }
