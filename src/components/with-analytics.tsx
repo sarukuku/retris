@@ -14,7 +14,7 @@ type WithoutAnalyticsProps<Props> = Pick<
 
 export function withAnalytics<Props>(
   Component: ComponentType<Props & AnalyticsProps>,
-): React.ComponentType<WithoutAnalyticsProps<Props>> {
+): ComponentType<WithoutAnalyticsProps<Props>> {
   const WithAnalytics = class extends React.Component<
     WithoutAnalyticsProps<Props>
   > {
@@ -30,12 +30,20 @@ export function withAnalytics<Props>(
         </AnalyticsContext.Consumer>
       )
     }
-  } as NextComponentType<WithoutAnalyticsProps<Props>>
-
-  const component = Component as NextComponentType<WithoutAnalyticsProps<Props>>
-  if (component.getInitialProps) {
-    WithAnalytics.getInitialProps = component.getInitialProps
   }
-
   return WithAnalytics
+}
+
+type Page<P> = NextComponentType<P>
+
+export function pageWithAnalytics<Props>(
+  Component: ComponentType<Props & AnalyticsProps>,
+): NextComponentType<WithoutAnalyticsProps<Props>> {
+  const WithAnalytics = withAnalytics(Component)
+  const PageComponent = Component as Page<Props>
+  const WithAnalyticsPage = WithAnalytics as Page<WithoutAnalyticsProps<Props>>
+  if (WithAnalyticsPage.getInitialProps) {
+    WithAnalyticsPage.getInitialProps = PageComponent.getInitialProps
+  }
+  return WithAnalyticsPage
 }

@@ -77,10 +77,7 @@ export class State {
 
   onControllerConnect(controller: Controller) {
     this.controllers.add(controller)
-    controller.updateState({
-      activeView: views.CONTROLLER_JOIN,
-      queueLength: this.controllerQueue.length,
-    })
+    this.onControllerJoin(controller)
   }
 
   onControllerJoin(controller: Controller) {
@@ -90,13 +87,10 @@ export class State {
       this.displays.updateState({ activeView: views.DISPLAY_WAITING_TO_START })
     } else {
       controller.updateState({ activeView: views.CONTROLLER_IN_QUEUE })
-      this.addToControllerQueue(controller)
+      this.controllerQueue.push(controller)
+      this.displays.updateState({ queueLength: this.controllerQueue.length })
     }
-  }
 
-  private addToControllerQueue(controller: Controller): void {
-    this.controllerQueue.push(controller)
-    this.displays.updateState({ queueLength: this.controllerQueue.length })
     this.controllers.updateState({ queueLength: this.controllerQueue.length })
   }
 
@@ -113,10 +107,6 @@ export class State {
 
   onControllerAction(action: string) {
     this.displays.sendAction(action)
-  }
-
-  onControllerRestart(controller: Controller) {
-    controller.updateState({ activeView: views.CONTROLLER_JOIN })
   }
 
   onControllerDisconnect(controller: Controller) {

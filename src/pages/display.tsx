@@ -2,7 +2,7 @@ import { NextContext } from "next"
 import React, { Component } from "react"
 import io from "socket.io-client"
 import { commands } from "../commands"
-import { AnalyticsProps, withAnalytics } from "../components/with-analytics"
+import { AnalyticsProps, pageWithAnalytics } from "../components/with-analytics"
 import { DisplayState } from "../server/state"
 import { colors } from "../styles/colors"
 import { views } from "../views"
@@ -10,14 +10,15 @@ import { Game } from "../views/display/game"
 import { GameOver } from "../views/display/game-over"
 import { Waiting } from "../views/display/waiting"
 import { WaitingToStart } from "../views/display/waiting-to-start"
-import { ErrorPage } from "./_error"
+import ErrorPage from "./_error"
+
+type Socket = typeof io.Socket
 
 interface DisplayProps extends AnalyticsProps {
   address: string
 }
 
 interface DisplayComponentState {
-  socket: typeof io.Socket | null
   activeView: string
   score: number
   queueLength: number
@@ -25,9 +26,9 @@ interface DisplayComponentState {
 
 class Display extends Component<DisplayProps, DisplayComponentState> {
   private previousActiveView?: string
+  private socket?: Socket
 
   state: DisplayComponentState = {
-    socket: null,
     activeView: views.DISPLAY_WAITING,
     score: 0,
     queueLength: 0,
@@ -44,7 +45,7 @@ class Display extends Component<DisplayProps, DisplayComponentState> {
     const socket = io("/display")
 
     socket.on("connect", () => {
-      this.setState({ socket })
+      this.socket = socket
     })
 
     socket.on("state", (data: Required<DisplayState>) => {
@@ -53,9 +54,8 @@ class Display extends Component<DisplayProps, DisplayComponentState> {
   }
 
   componentWillUnmount() {
-    const { socket } = this.state
-    if (socket) {
-      socket.close()
+    if (this.socket) {
+      this.socket.close()
     }
   }
 
@@ -74,9 +74,8 @@ class Display extends Component<DisplayProps, DisplayComponentState> {
       value: totalScore,
     })
 
-    const { socket } = this.state
-    if (socket) {
-      socket.emit(commands.GAME_OVER)
+    if (this.socket) {
+      this.socket.emit(commands.GAME_OVER)
     }
   }
 
@@ -128,7 +127,7 @@ class Display extends Component<DisplayProps, DisplayComponentState> {
 
   private renderView() {
     const { address } = this.props
-    const { activeView, socket, score } = this.state
+    const { activeView, score } = this.state
 
     switch (activeView) {
       default:
@@ -137,14 +136,14 @@ class Display extends Component<DisplayProps, DisplayComponentState> {
       case views.DISPLAY_WAITING_TO_START:
         return <WaitingToStart />
       case views.DISPLAY_GAME:
-        if (!socket) {
+        if (!this.socket) {
           return <ErrorPage />
         }
-        return <Game socket={socket} onGameOver={this.gameOver} />
+        return <Game emitter={this.socket} onGameOver={this.gameOver} />
       case views.DISPLAY_GAME_OVER:
         return <GameOver score={score} />
     }
   }
 }
 
-export default withAnalytics(Display)
+export default pageWithAnalytics(Display)

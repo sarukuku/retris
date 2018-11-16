@@ -1,30 +1,23 @@
 import React, { Component } from "react"
 import io from "socket.io-client"
 import { commands } from "../commands"
-import { AnalyticsProps, withAnalytics } from "../components/with-analytics"
+import { AnalyticsProps, pageWithAnalytics } from "../components/with-analytics"
 import { ControllerState } from "../server/state"
 import { views } from "../views"
 import { GameController } from "../views/controller/game-controller"
 import { GameOver } from "../views/controller/game-over"
 import { InQueue } from "../views/controller/in-queue"
-import { JoinGame } from "../views/controller/join-game"
 import { NotRunning } from "../views/controller/not-running"
 import { StartGame } from "../views/controller/start-game"
+import { Loading } from "../views/loading"
 
-interface ControllerComponentState {
-  socket: typeof io.Socket | null
-  activeView: string
-  queueLength: number
-}
+type Socket = typeof io.Socket
 
-class Controller extends Component<AnalyticsProps, ControllerComponentState> {
+class Controller extends Component<AnalyticsProps, ControllerState> {
   private previousActiveView?: string
+  private socket?: Socket
 
-  state: ControllerComponentState = {
-    socket: null,
-    activeView: views.CONTROLLER_JOIN,
-    queueLength: 0,
-  }
+  state: ControllerState = {}
 
   onJoinGame = () => {
     this.sendCommand(commands.JOIN)
@@ -34,37 +27,31 @@ class Controller extends Component<AnalyticsProps, ControllerComponentState> {
     this.sendCommand(commands.START)
   }
 
-  onRestart = () => {
-    this.sendCommand(commands.RESTART)
-  }
-
   sendCommand = (command: string) => {
-    const { socket } = this.state
-    if (socket) {
-      socket.emit(command)
+    if (this.socket) {
+      this.socket.emit(command)
     }
   }
 
   onTap = () => {
-    this.sendAction(commands.TAP)
+    this.sendActionCommand(commands.TAP)
   }
 
   onSwipeRight = () => {
-    this.sendAction(commands.RIGHT)
+    this.sendActionCommand(commands.RIGHT)
   }
 
   onSwipeLeft = () => {
-    this.sendAction(commands.LEFT)
+    this.sendActionCommand(commands.LEFT)
   }
 
   onSwipeDown = () => {
-    this.sendAction(commands.DOWN)
+    this.sendActionCommand(commands.DOWN)
   }
 
-  sendAction = (value: string) => {
-    const { socket } = this.state
-    if (socket) {
-      socket.emit(commands.ACTION, value)
+  sendActionCommand = (value: string) => {
+    if (this.socket) {
+      this.socket.emit(commands.ACTION, value)
     }
   }
 
@@ -72,7 +59,7 @@ class Controller extends Component<AnalyticsProps, ControllerComponentState> {
     const socket = io("/controller")
 
     socket.on("connect", () => {
-      this.setState({ socket })
+      this.socket = socket
     })
 
     socket.on("state", (state: Required<ControllerState>) => {
@@ -81,9 +68,8 @@ class Controller extends Component<AnalyticsProps, ControllerComponentState> {
   }
 
   componentWillUnmount() {
-    const { socket } = this.state
-    if (socket) {
-      socket.close()
+    if (this.socket) {
+      this.socket.close()
     }
   }
 
@@ -95,6 +81,10 @@ class Controller extends Component<AnalyticsProps, ControllerComponentState> {
 
   private sendPageView() {
     const { activeView } = this.state
+    if (!activeView) {
+      return
+    }
+
     if (activeView === this.previousActiveView) {
       return
     }
@@ -105,14 +95,11 @@ class Controller extends Component<AnalyticsProps, ControllerComponentState> {
   }
 
   private renderView() {
-    const { activeView, queueLength } = this.state
+    const { activeView, queueLength = 0 } = this.state
 
     switch (activeView) {
-      default:
       case views.CONTROLLER_GAME_OFFLINE:
         return <NotRunning />
-      case views.CONTROLLER_JOIN:
-        return <JoinGame onJoinGame={this.onJoinGame} />
       case views.CONTROLLER_IN_QUEUE:
         return <InQueue queueLength={queueLength} />
       case views.CONTROLLER_START:
@@ -127,9 +114,12 @@ class Controller extends Component<AnalyticsProps, ControllerComponentState> {
           />
         )
       case views.CONTROLLER_GAME_OVER:
-        return <GameOver onRestart={this.onRestart} />
+        return <GameOver onRestart={this.onJoinGame} />
+      case undefined:
+      default:
+        return <Loading />
     }
   }
 }
 
-export default withAnalytics(Controller)
+export default pageWithAnalytics(Controller)
