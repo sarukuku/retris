@@ -2,15 +2,13 @@ import { NextComponentType } from "next"
 import React, { ComponentType } from "react"
 import { Analytics } from "../analytics"
 import { AnalyticsContext } from "./contexts"
+import { WithoutProps } from "./without-props"
 
 export interface AnalyticsProps {
   analytics: Analytics
 }
 
-type WithoutAnalyticsProps<Props> = Pick<
-  Props,
-  Exclude<keyof Props, keyof AnalyticsProps>
->
+type WithoutAnalyticsProps<Props> = WithoutProps<Props, AnalyticsProps>
 
 export function withAnalytics<Props>(
   Component: ComponentType<Props & AnalyticsProps>,

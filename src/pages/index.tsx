@@ -1,7 +1,7 @@
 import React, { Component } from "react"
-import io from "socket.io-client"
 import { commands } from "../commands"
 import { AnalyticsProps, pageWithAnalytics } from "../components/with-analytics"
+import { withSocket, SocketProps } from "../components/with-socket"
 import { ControllerState } from "../server/state"
 import { views } from "../views"
 import { GameController } from "../views/controller/game-controller"
@@ -11,11 +11,10 @@ import { NotRunning } from "../views/controller/not-running"
 import { StartGame } from "../views/controller/start-game"
 import { Loading } from "../views/loading"
 
-type Socket = typeof io.Socket
+interface ControllerProps extends AnalyticsProps, SocketProps {}
 
-class Controller extends Component<AnalyticsProps, ControllerState> {
+class Controller extends Component<ControllerProps, ControllerState> {
   private previousActiveView?: string
-  private socket?: Socket
 
   state: ControllerState = {}
 
@@ -28,9 +27,8 @@ class Controller extends Component<AnalyticsProps, ControllerState> {
   }
 
   sendCommand = (command: string) => {
-    if (this.socket) {
-      this.socket.emit(command)
-    }
+    const { socket } = this.props
+    socket.emit(command)
   }
 
   onTap = () => {
@@ -50,27 +48,15 @@ class Controller extends Component<AnalyticsProps, ControllerState> {
   }
 
   sendActionCommand = (value: string) => {
-    if (this.socket) {
-      this.socket.emit(commands.ACTION, value)
-    }
+    const { socket } = this.props
+    socket.emit(commands.ACTION, value)
   }
 
   componentDidMount() {
-    const socket = io("/controller")
-
-    socket.on("connect", () => {
-      this.socket = socket
-    })
-
+    const { socket } = this.props
     socket.on("state", (state: Required<ControllerState>) => {
       this.setState(state)
     })
-  }
-
-  componentWillUnmount() {
-    if (this.socket) {
-      this.socket.close()
-    }
   }
 
   render() {
@@ -122,4 +108,4 @@ class Controller extends Component<AnalyticsProps, ControllerState> {
   }
 }
 
-export default pageWithAnalytics(Controller)
+export default pageWithAnalytics(withSocket(Controller, "/controller"))

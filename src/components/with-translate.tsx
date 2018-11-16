@@ -1,15 +1,13 @@
 import React, { ComponentType } from "react"
 import { Translate } from "../i18n/translate"
 import { TranslationContext } from "./contexts"
+import { WithoutProps } from "./without-props"
 
 export interface TranslateProps {
   translate: Translate
 }
 
-type WithoutTranslateProps<Props> = Pick<
-  Props,
-  Exclude<keyof Props, keyof TranslateProps>
->
+type WithoutTranslateProps<Props> = WithoutProps<Props, TranslateProps>
 
 export function withTranslate<Props>(
   Component: ComponentType<Props & TranslateProps>,
