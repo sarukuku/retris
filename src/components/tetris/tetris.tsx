@@ -146,7 +146,7 @@ export class Tetris extends Component<TetrisProps, TetrisState> {
     ctx.fillRect(0, 0, canvas.width, canvas.height)
   }
 
-  svgToImage(svg: SVGElement): HTMLImageElement {
+  static svgToImage(svg: SVGElement): HTMLImageElement {
     const img = new Image()
     const b64Prefix = "data:image/svg+xml;base64,"
     const b64Image = btoa(new XMLSerializer().serializeToString(svg))
@@ -154,8 +154,8 @@ export class Tetris extends Component<TetrisProps, TetrisState> {
     return img
   }
 
-  blockWithColors(gradientStartColor: string, gradientStopColor: string): SVGElement {
-    const SVGdup = this.blockSVG.cloneNode(true) as SVGElement
+  static blockWithColors(element: SVGElement, gradientStartColor: string, gradientStopColor: string): SVGElement {
+    const SVGdup = element.cloneNode(true) as SVGElement
     const stopElements = SVGdup.getElementsByTagName("stop")
     stopElements[0].setAttribute("stop-color", gradientStartColor)
     stopElements[1].setAttribute("stop-color", gradientStopColor)
@@ -174,7 +174,7 @@ export class Tetris extends Component<TetrisProps, TetrisState> {
     return "#" + (0x1000000 + (Math.round((t - R) * p) + R) * 0x10000 + (Math.round((t - G) * p) + G) * 0x100 + (Math.round((t - B) * p) + B)).toString(16).slice(1)
   }
 
-  memShadeColor = memoize(Tetris.shadeColor)
+  static memShadeColor = memoize(Tetris.shadeColor)
 
   private drawBlock(x: number,
                     y: number,
@@ -182,10 +182,12 @@ export class Tetris extends Component<TetrisProps, TetrisState> {
                     height: number,
                     hexColor: string,
                     ctx: Ctx): void {
-    const gradientStopColor = this.memShadeColor(hexColor, 1)
-    const blockSVG = this.blockWithColors(hexColor, gradientStopColor)
-    const blockImage = this.svgToImage(blockSVG)
-    ctx.drawImage(blockImage, x, y, width, height)
+    if (this.blockSVG) {
+      const gradientStopColor = Tetris.memShadeColor(hexColor, 1)
+      const blockSVG = Tetris.blockWithColors(this.blockSVG, hexColor, gradientStopColor)
+      const blockImage = Tetris.svgToImage(blockSVG)
+      ctx.drawImage(blockImage, x, y, width, height)
+    }
   }
 
   private drawBoard(canvas: Canvas, ctx: Ctx): void {
