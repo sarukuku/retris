@@ -170,6 +170,7 @@ export class Tetris extends Component<TetrisProps, TetrisState> {
   }
 
   static memShadeColor = memoize(Tetris.shadeColor)
+  static memBlockWithColors = memoize(Tetris.blockWithColors)
 
   private drawBlock(x: number,
                     y: number,
@@ -179,7 +180,7 @@ export class Tetris extends Component<TetrisProps, TetrisState> {
                     ctx: Ctx): void {
     if (this.blockSVG) {
       const gradientStopColor = Tetris.memShadeColor(hexColor, 1)
-      const blockSVG = Tetris.blockWithColors(this.blockSVG, hexColor, gradientStopColor)
+      const blockSVG = Tetris.memBlockWithColors(this.blockSVG, hexColor, gradientStopColor)
       const blockImage = Tetris.svgToImage(blockSVG)
       ctx.drawImage(blockImage, x, y, width, height)
     }
