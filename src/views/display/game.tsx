@@ -1,22 +1,28 @@
 import React, { Component, Fragment } from "react"
-import io from "socket.io-client"
 import css from "styled-jsx/css"
 import { commands } from "../../commands"
 import { JoinHelpBar } from "../../components/join-help-bar"
 import { OnGameOver, Tetris } from "../../components/tetris"
 
+interface Emitter {
+  on(event: string, handler: (command: string) => void): void
+  removeListener(event: string, handler: (command: string) => void): void
+}
+
 interface DisplayGameProps {
-  socket: typeof io.Socket
+  emitter: Emitter
   onGameOver: OnGameOver
 }
 
 export class Game extends Component<DisplayGameProps> {
   componentDidMount() {
-    this.props.socket.on(commands.ACTION, this.handleCommand)
+    const { emitter } = this.props
+    emitter.on(commands.ACTION, this.handleCommand)
   }
 
   componentWillUnmount() {
-    this.props.socket.removeListener(commands.ACTION, this.handleCommand)
+    const { emitter } = this.props
+    emitter.removeListener(commands.ACTION, this.handleCommand)
   }
 
   handleCommand = (command: string) => {

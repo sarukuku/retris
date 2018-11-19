@@ -1,10 +1,10 @@
 import React from "react"
 
-export default class ErrorPage extends React.Component {
+export class Loading extends React.Component {
   render() {
     return (
       <div className="wrap">
-        <h1>Something went wrong.</h1>
+        <h1>Loading...</h1>
         <style jsx>{`
           .wrap {
             flex-grow: 1;
