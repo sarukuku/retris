@@ -33,6 +33,7 @@ export class Tetris extends Component<TetrisProps, TetrisState> {
   private onLevelChange: OnLevelChange
   private board: TetrisMatrix
   private blockSVG: SVGElement
+  private readonly canvasRef = React.createRef<HTMLCanvasElement>()
 
   state: TetrisState = {
     totalScore: 0,
@@ -76,11 +77,11 @@ export class Tetris extends Component<TetrisProps, TetrisState> {
     }
     xhr.send("")
 
-    const canvas = this.canvas
+    const canvasRef = this.canvasRef
     const ctx = this.ctx
     const renderFrame = () => {
-      if (canvas && ctx ) {
-        this.renderGame(canvas, ctx)
+      if (canvasRef.current && ctx ) {
+        this.renderGame(canvasRef.current, ctx)
       }
       window.requestAnimationFrame(renderFrame)
     }
@@ -113,15 +114,9 @@ export class Tetris extends Component<TetrisProps, TetrisState> {
   }
 
   render() {
-    const canvas = this.canvas
-    const ctx = this.ctx
-    if (canvas && ctx) {
-      this.renderGame(canvas, ctx)
-    }
-
     return (
       <Fragment>
-        <canvas ref="canvas" />
+        <canvas ref={this.canvasRef} />
       </Fragment>
     )
   }
@@ -259,7 +254,7 @@ export class Tetris extends Component<TetrisProps, TetrisState> {
   }
 
   private get ctx(): Ctx | undefined {
-    const canvas = this.canvas
+    const canvas = this.canvasRef.current
     if (!canvas) {
       return
     }
@@ -272,12 +267,8 @@ export class Tetris extends Component<TetrisProps, TetrisState> {
     return ctx
   }
 
-  private get canvas(): Canvas | undefined {
-    return this.refs.canvas as Canvas | undefined
-  }
-
   private resizeCanvasToParentSize(): void {
-    const canvas = this.canvas
+    const canvas = this.canvasRef.current
     if (!canvas) {
       return
     }
