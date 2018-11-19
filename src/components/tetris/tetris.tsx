@@ -4,7 +4,6 @@ import { OnBoardChange } from "../../games/tetris/board"
 import { Game, OnLevelChange, OnScoreChange } from "../../games/tetris/game"
 import { TetrisMatrix } from "../../games/tetris/shape"
 import { wait } from "../../helpers"
-import { fonts } from "../../styles/fonts"
 import { calculateCanvasSize } from "./calculate-canvas-size"
 
 export type OnGameOver = (totalScore: number) => void
