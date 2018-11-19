@@ -5,6 +5,7 @@
   "rules": {
     "semicolon": [true, "never"],
     "class-name": false,
+    "trailing-comma": false,
     "max-line-length": false,
     "member-access": false,
     "variable-name": false,

@@ -1,8 +1,8 @@
 import { NextContext } from "next"
 import React, { Component } from "react"
-import io from "socket.io-client"
 import { commands } from "../commands"
-import { AnalyticsProps, withAnalytics } from "../components/with-analytics"
+import { AnalyticsProps, pageWithAnalytics } from "../components/with-analytics"
+import { SocketProps, pageWithSocket } from "../components/with-socket"
 import { DisplayState } from "../server/state"
 import { colors } from "../styles/colors"
 import { views } from "../views"
@@ -10,14 +10,12 @@ import { Game } from "../views/display/game"
 import { GameOver } from "../views/display/game-over"
 import { Waiting } from "../views/display/waiting"
 import { WaitingToStart } from "../views/display/waiting-to-start"
-import { ErrorPage } from "./_error"
 
-interface DisplayProps extends AnalyticsProps {
+interface DisplayProps extends AnalyticsProps, SocketProps {
   address: string
 }
 
 interface DisplayComponentState {
-  socket: typeof io.Socket | null
   activeView: string
   score: number
   queueLength: number
@@ -27,7 +25,6 @@ class Display extends Component<DisplayProps, DisplayComponentState> {
   private previousActiveView?: string
 
   state: DisplayComponentState = {
-    socket: null,
     activeView: views.DISPLAY_WAITING,
     score: 0,
     queueLength: 0,
@@ -41,22 +38,10 @@ class Display extends Component<DisplayProps, DisplayComponentState> {
   }
 
   componentDidMount() {
-    const socket = io("/display")
-
-    socket.on("connect", () => {
-      this.setState({ socket })
-    })
-
+    const { socket } = this.props
     socket.on("state", (data: Required<DisplayState>) => {
       this.setState(data)
     })
-  }
-
-  componentWillUnmount() {
-    const { socket } = this.state
-    if (socket) {
-      socket.close()
-    }
   }
 
   addToScore = (score: number) => {
@@ -66,18 +51,16 @@ class Display extends Component<DisplayProps, DisplayComponentState> {
   }
 
   gameOver = (totalScore: number) => {
-    const { analytics } = this.props
+    const { analytics, socket } = this.props
     this.setState({ score: totalScore })
+
     analytics.sendCustomEvent({
       category: "GameOver",
       action: "TotalScore",
       value: totalScore,
     })
 
-    const { socket } = this.state
-    if (socket) {
-      socket.emit(commands.GAME_OVER)
-    }
+    socket.emit(commands.GAME_OVER)
   }
 
   render() {
@@ -127,8 +110,8 @@ class Display extends Component<DisplayProps, DisplayComponentState> {
   }
 
   private renderView() {
-    const { address } = this.props
-    const { activeView, socket, score } = this.state
+    const { address, socket } = this.props
+    const { activeView, score } = this.state
 
     switch (activeView) {
       default:
@@ -137,14 +120,11 @@ class Display extends Component<DisplayProps, DisplayComponentState> {
       case views.DISPLAY_WAITING_TO_START:
         return <WaitingToStart />
       case views.DISPLAY_GAME:
-        if (!socket) {
-          return <ErrorPage />
-        }
-        return <Game socket={socket} onGameOver={this.gameOver} />
+        return <Game emitter={socket} onGameOver={this.gameOver} />
       case views.DISPLAY_GAME_OVER:
         return <GameOver score={score} />
     }
   }
 }
 
-export default withAnalytics(Display)
+export default pageWithAnalytics(pageWithSocket(Display, "/display"))
