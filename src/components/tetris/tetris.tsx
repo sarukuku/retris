@@ -1,3 +1,4 @@
+import memoize from "fast-memoize"
 import React, { Component, Fragment } from "react"
 import { OnBoardChange } from "../../games/tetris/board"
 import { Game, OnLevelChange, OnScoreChange } from "../../games/tetris/game"
@@ -13,7 +14,6 @@ interface TetrisProps {
 }
 
 interface TetrisState {
-  board: TetrisMatrix
   totalScore: number
   gainedScore?: number
   currentLevel: number
@@ -31,19 +31,25 @@ export class Tetris extends Component<TetrisProps, TetrisState> {
   private onBoardChange: OnBoardChange
   private onScoreChange: OnScoreChange
   private onLevelChange: OnLevelChange
+  private board: TetrisMatrix
+  private blockSVG: SVGElement
 
   state: TetrisState = {
-    board: [],
     totalScore: 0,
     gainedScore: undefined,
     currentLevel: 1,
+  }
+
+  componentWillUnmount() {
+    this.onBoardChange = () => undefined
+    this.onScoreChange = () => undefined
   }
 
   async componentDidMount() {
     this.resizeCanvasToParentSize()
     window.onresize = () => this.resizeCanvasToParentSize()
 
-    this.onBoardChange = (board: TetrisMatrix) => this.setState({ board })
+    this.onBoardChange = (board: TetrisMatrix) => { this.board = board }
     this.onScoreChange = async (gainedScore: number, totalScore: number) => {
       this.setState({ gainedScore, totalScore })
       await wait(ONE_SECOND)
@@ -59,14 +65,31 @@ export class Tetris extends Component<TetrisProps, TetrisState> {
       this.columnCount,
       this.rowCount,
     )
+
+    const xhr = new XMLHttpRequest()
+    xhr.open("GET", "/static/block.svg", false)
+    xhr.overrideMimeType("image/svg+xml")
+    xhr.onload = () => {
+      if (xhr.responseXML && xhr.responseXML.documentElement) {
+        this.blockSVG = xhr.responseXML.documentElement as any as SVGElement
+      }
+    }
+    xhr.send("")
+
+    const canvas = this.canvas
+    const ctx = this.ctx
+    const renderFrame = () => {
+      if (canvas && ctx ) {
+        this.renderGame(canvas, ctx)
+      }
+      window.requestAnimationFrame(renderFrame)
+    }
+
+    window.requestAnimationFrame(renderFrame)
+
     await this.game.start()
 
     this.props.onGameOver(this.state.totalScore)
-  }
-
-  componentWillUnmount() {
-    this.onBoardChange = () => undefined
-    this.onScoreChange = () => undefined
   }
 
   rotate() {
@@ -83,6 +106,10 @@ export class Tetris extends Component<TetrisProps, TetrisState> {
 
   down() {
     this.game.down()
+  }
+
+  shouldComponentUpdate() {
+    return false
   }
 
   render() {
@@ -119,52 +146,76 @@ export class Tetris extends Component<TetrisProps, TetrisState> {
     ctx.fillRect(0, 0, canvas.width, canvas.height)
   }
 
-  private drawBlock(x: number, y: number, width: number, height: number, ctx: Ctx): void {
-    const radius = Math.floor(width / 10)
+  svgToImage(svg: SVGElement): HTMLImageElement {
+    const img = new Image()
+    const b64Prefix = "data:image/svg+xml;base64,"
+    const b64Image = btoa(new XMLSerializer().serializeToString(svg))
+    img.src = b64Prefix + b64Image
+    return img
+  }
 
-    ctx.beginPath()
-    ctx.moveTo(x + radius, y)
-    ctx.arcTo(x + width, y,   x + width, y + height, radius)
-    ctx.arcTo(x + width, y + height, x,   y + height, radius)
-    ctx.arcTo(x,   y + height, x,   y,   radius)
-    ctx.arcTo(x,   y,   x + width, y,   radius)
-    ctx.closePath()
-    ctx.fill()
+  blockWithColors(gradientStartColor: string, gradientStopColor: string): SVGElement {
+    const SVGdup = this.blockSVG.cloneNode(true) as SVGElement
+    const stopElements = SVGdup.getElementsByTagName("stop")
+    stopElements[0].setAttribute("stop-color", gradientStartColor)
+    stopElements[1].setAttribute("stop-color", gradientStopColor)
+    return SVGdup
+  }
+
+  shadeColor(color: string, percent: number): string {
+    var f=parseInt(color.slice(1),16),t=percent<0?0:255,p=percent<0?percent*-1:percent,R=f>>16,G=f>>8&0x00FF,B=f&0x0000FF;
+    return "#"+(0x1000000+(Math.round((t-R)*p)+R)*0x10000+(Math.round((t-G)*p)+G)*0x100+(Math.round((t-B)*p)+B)).toString(16).slice(1);
+  }
+
+  memShadeColor = memoize(this.shadeColor)
+
+  private drawBlock(x: number,
+                    y: number,
+                    width: number,
+                    height: number,
+                    hexColor: string,
+                    ctx: Ctx): void {
+    const gradientStopColor = this.memShadeColor(hexColor, 1)
+    const blockSVG = this.blockWithColors(hexColor, gradientStopColor)
+    const blockImage = this.svgToImage(blockSVG)
+    ctx.drawImage(blockImage, x, y, width, height)
   }
 
   private drawBoard(canvas: Canvas, ctx: Ctx): void {
-    const { board } = this.state
+    const board = this.board
 
-    // Calculate board size so that borders end on exact pixels
-    const boardWidth = canvas.width - (canvas.width % this.columnCount)
-    const boardHeight = canvas.height - (canvas.height % this.rowCount)
+    if (board) {
+      // Calculate board size so that borders end on exact pixels
+      const boardWidth = canvas.width - (canvas.width % this.columnCount)
+      const boardHeight = canvas.height - (canvas.height % this.rowCount)
 
-    // Draw the board background
-    ctx.fillStyle = "black"
-    ctx.fillRect(0, 0 , boardWidth, boardHeight)
+      // Draw the board background
+      ctx.fillStyle = "black"
+      ctx.fillRect(0, 0, boardWidth, boardHeight)
 
-    const cellWidth = boardWidth / this.columnCount
-    const cellHeight = boardHeight / this.rowCount
-    const innerWidth = Math.floor(cellWidth * 0.97)
-    const innerHeight = Math.floor(cellHeight * 0.97)
-    const paddingX = Math.floor((cellWidth - innerWidth) / 2)
-    const paddingY = Math.floor((cellHeight - innerHeight) / 2)
+      const cellWidth = boardWidth / this.columnCount
+      const cellHeight = boardHeight / this.rowCount
+      const innerWidth = Math.floor(cellWidth * 0.97)
+      const innerHeight = Math.floor(cellHeight * 0.97)
+      const paddingX = Math.floor((cellWidth - innerWidth) / 2)
+      const paddingY = Math.floor((cellHeight - innerHeight) / 2)
 
-    board.forEach((row, rowIndex) => {
-      row.forEach((cell, columnIndex) => {
+      board.forEach((row, rowIndex) => {
+        row.forEach((cell, columnIndex) => {
 
-        const x = (columnIndex * cellWidth) + paddingX
-        const y = (rowIndex * cellHeight) + paddingY
+          const x = (columnIndex * cellWidth) + paddingX
+          const y = (rowIndex * cellHeight) + paddingY
 
-        ctx.fillStyle = "#1d1f21"
-        ctx.fillRect(x, y, innerWidth, innerHeight)
+          ctx.fillStyle = "#1d1f21"
+          ctx.fillRect(x, y, innerWidth, innerHeight)
 
-        if (cell) {
-          ctx.fillStyle = cell ? cell.color : "white"
-          this.drawBlock(x, y, innerWidth, innerHeight, ctx)
-        }
+          if (cell) {
+            const color = cell ? cell.color : "white"
+            this.drawBlock(x, y, innerWidth, innerHeight, color, ctx)
+          }
+        })
       })
-    })
+    }
   }
 
   private drawBorder(canvas: Canvas, ctx: Ctx): void {
