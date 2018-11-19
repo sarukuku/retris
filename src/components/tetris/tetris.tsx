@@ -162,12 +162,19 @@ export class Tetris extends Component<TetrisProps, TetrisState> {
     return SVGdup
   }
 
-  shadeColor(color: string, percent: number): string {
-    var f=parseInt(color.slice(1),16),t=percent<0?0:255,p=percent<0?percent*-1:percent,R=f>>16,G=f>>8&0x00FF,B=f&0x0000FF;
-    return "#"+(0x1000000+(Math.round((t-R)*p)+R)*0x10000+(Math.round((t-G)*p)+G)*0x100+(Math.round((t-B)*p)+B)).toString(16).slice(1);
+  static shadeColor(color: string, percent: number): string {
+    const f = parseInt(color.slice(1), 16)
+    const t = percent < 0 ? 0 : 255
+    const p = percent < 0 ? percent * -1 : percent
+    /* tslint:disable:no-bitwise */
+    const R = f >> 16
+    const G = f >> 8 & 0x00FF
+    const B = f & 0x0000FF
+    /* tslint:enable:no-bitwise */
+    return "#" + (0x1000000 + (Math.round((t - R) * p) + R) * 0x10000 + (Math.round((t - G) * p) + G) * 0x100 + (Math.round((t - B) * p) + B)).toString(16).slice(1)
   }
 
-  memShadeColor = memoize(this.shadeColor)
+  memShadeColor = memoize(Tetris.shadeColor)
 
   private drawBlock(x: number,
                     y: number,
