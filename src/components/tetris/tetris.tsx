@@ -170,7 +170,7 @@ export class Tetris extends Component<TetrisProps, TetrisState> {
                     hexColor: string,
                     ctx: Ctx): void {
     if (this.blockSVG) {
-      const gradientStopColor = Tetris.memShadeColor(hexColor, 1)
+      const gradientStopColor = Tetris.memShadeColor(hexColor, -0.5)
       const blockSVG = Tetris.memBlockWithColors(this.blockSVG, hexColor, gradientStopColor)
       const blockImage = Tetris.svgToImage(blockSVG)
       ctx.drawImage(blockImage, x, y, width, height)
