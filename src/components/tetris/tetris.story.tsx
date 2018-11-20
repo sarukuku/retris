@@ -32,7 +32,7 @@ class TetrisWrapper extends Component {
     return (
       <Fragment>
         <div className="tetris-wrapper">
-          <Tetris ref="tetris" onGameOver={() => undefined} />
+          <Tetris ref="tetris" onGameOver={() => undefined} staticPath={""} />
         </div>
         <style global={true} jsx>{`
           html,
