@@ -9,8 +9,8 @@ afterAll(() => {
 test("generate random shape with color", () => {
   Math.random = () => 0
   const createFirstShape = Shape.createIShape
-  const redGradient = ["#ff4396", "#ff292c"]
-  const expectedShape = createFirstShape(redGradient)
+  const greenGradient = ["#0aff00", "#00edff"]
+  const expectedShape = createFirstShape(greenGradient)
 
   const shape = getNextShape()
 

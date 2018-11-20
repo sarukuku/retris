@@ -1,7 +1,7 @@
 import { Shape } from "./shape"
 
 const _ = undefined
-const color = ["#ff4396", "#ff292c"]
+const color = ["#0aff00", "#00edff"]
 const x = { color }
 
 const rotateTests = [
