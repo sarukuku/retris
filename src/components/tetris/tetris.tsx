@@ -69,7 +69,7 @@ export class Tetris extends Component<TetrisProps, TetrisState> {
 
     const xhr = new XMLHttpRequest()
     const url = clientConfig.staticPath + "/block.svg"
-    xhr.open("GET", url, false)
+    xhr.open("GET", url, true)
     xhr.overrideMimeType("image/svg+xml")
     xhr.onload = () => {
       if (xhr.responseXML && xhr.responseXML.documentElement) {
