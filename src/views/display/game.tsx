@@ -55,7 +55,7 @@ export class Game extends Component<DisplayGameProps> {
       <Fragment>
         <div className="wrap">
           <div className="tetris-wrap">
-            <Tetris ref="tetris" onGameOver={this.props.onGameOver} />
+            <Tetris ref="tetris" onGameOver={this.props.onGameOver} staticPath={"/static"}/>
           </div>
           <JoinHelpBar className={className} />
         </div>

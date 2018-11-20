@@ -9,6 +9,7 @@ import { calculateCanvasSize } from "./calculate-canvas-size"
 export type OnGameOver = (totalScore: number) => void
 
 interface TetrisProps {
+  staticPath: string
   onGameOver: OnGameOver
 }
 
@@ -67,7 +68,8 @@ export class Tetris extends Component<TetrisProps, TetrisState> {
     )
 
     const xhr = new XMLHttpRequest()
-    xhr.open("GET", "/static/block.svg", false)
+    const url = this.props.staticPath + "/block.svg"
+    xhr.open("GET", url, true)
     xhr.overrideMimeType("image/svg+xml")
     xhr.onload = () => {
       if (xhr.responseXML && xhr.responseXML.documentElement) {
