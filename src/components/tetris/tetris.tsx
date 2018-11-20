@@ -1,5 +1,6 @@
 import memoize from "fast-memoize"
 import React, { Component, Fragment } from "react"
+import {clientConfig} from "../../client-config"
 import { OnBoardChange } from "../../games/tetris/board"
 import { Game, OnLevelChange, OnScoreChange } from "../../games/tetris/game"
 import { TetrisMatrix } from "../../games/tetris/shape"
@@ -67,7 +68,8 @@ export class Tetris extends Component<TetrisProps, TetrisState> {
     )
 
     const xhr = new XMLHttpRequest()
-    xhr.open("GET", "/static/block.svg", false)
+    const url = clientConfig.staticPath + "/block.svg"
+    xhr.open("GET", url, false)
     xhr.overrideMimeType("image/svg+xml")
     xhr.onload = () => {
       if (xhr.responseXML && xhr.responseXML.documentElement) {

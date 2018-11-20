@@ -1,3 +1,5 @@
+const { parsed: localEnv } = require("dotenv").config()
+const webpack = require("webpack")
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin")
 
 module.exports = (baseConfig, env, config) => {
@@ -13,5 +15,8 @@ module.exports = (baseConfig, env, config) => {
       formatter: "codeframe",
     }),
   )
+
+  config.plugins.push(new webpack.EnvironmentPlugin(localEnv))
+
   return config
 }
