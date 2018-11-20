@@ -4,7 +4,7 @@ import { Matrix, rotateMatrix, Row } from "./matrix"
 const _ = undefined
 
 interface TetrisCell {
-  color: string
+  color: string[]
 }
 
 export interface Position {
@@ -72,7 +72,7 @@ export class Shape {
     }, initialBoundingRect)
   }
 
-  static createIShape(color: string) {
+  static createIShape(color: string[]) {
     const x = { color }
     return new IShape([
       [_, _, x, _], //
@@ -82,7 +82,7 @@ export class Shape {
     ])
   }
 
-  static createJShape(color: string) {
+  static createJShape(color: string[]) {
     const x = { color }
     return new Shape([
       [_, x, _], //
@@ -91,7 +91,7 @@ export class Shape {
     ])
   }
 
-  static createLShape(color: string) {
+  static createLShape(color: string[]) {
     const x = { color }
     return new Shape([
       [_, x, _], //
@@ -100,7 +100,7 @@ export class Shape {
     ])
   }
 
-  static createOShape(color: string) {
+  static createOShape(color: string[]) {
     const x = { color }
     return new Shape([
       [x, x], //
@@ -108,7 +108,7 @@ export class Shape {
     ])
   }
 
-  static createSShape(color: string) {
+  static createSShape(color: string[]) {
     const x = { color }
     return new Shape([
       [_, x, x], //
@@ -117,7 +117,7 @@ export class Shape {
     ])
   }
 
-  static createTShape(color: string) {
+  static createTShape(color: string[]) {
     const x = { color }
     return new Shape([
       [_, x, _], //
@@ -126,7 +126,7 @@ export class Shape {
     ])
   }
 
-  static createZShape(color: string) {
+  static createZShape(color: string[]) {
     const x = { color }
     return new Shape([
       [x, x, _], //

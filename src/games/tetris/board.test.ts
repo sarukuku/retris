@@ -1,12 +1,12 @@
 import { last } from "ramda"
-import { colors } from "../../styles/colors"
 import { Active, Board, OnBoardChange, OnGameOver, OnRowClear } from "./board"
 import { GetNextShape, getNextShape as _getNextShape } from "./get-next-shape"
 import { createEmptyMatrix } from "./matrix"
 import { Shape, TetrisMatrix } from "./shape"
 
 const _ = undefined
-const p = { color: colors.PETER_RIVER }
+const redGradient = ["#ff4396", "#ff292c"]
+const p = { color: redGradient }
 
 interface Test {
   only?: boolean

@@ -1,7 +1,7 @@
 import { Shape } from "./shape"
 
 const _ = undefined
-const color = "red"
+const color = ["#ff4396", "#ff292c"]
 const x = { color }
 
 const rotateTests = [
@@ -225,7 +225,7 @@ const boundingRectTests = [
   },
   {
     name: "I shape rotated",
-    createShape: (clr: string) => {
+    createShape: (clr: string[]) => {
       const shape = Shape.createIShape(clr)
       shape.rotate()
       return shape
@@ -259,7 +259,7 @@ const boundingRectTests = [
   },
   {
     name: "Z shape rotated",
-    createShape: (clr: string) => {
+    createShape: (clr: string[]) => {
       const shape = Shape.createZShape(clr)
       shape.rotate()
       return shape

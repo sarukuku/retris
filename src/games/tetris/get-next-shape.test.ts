@@ -1,4 +1,3 @@
-import { colors } from "../../styles/colors"
 import { getNextShape } from "./get-next-shape"
 import { Shape } from "./shape"
 
@@ -10,7 +9,8 @@ afterAll(() => {
 test("generate random shape with color", () => {
   Math.random = () => 0
   const createFirstShape = Shape.createIShape
-  const expectedShape = createFirstShape(colors.PETER_RIVER)
+  const redGradient = ["#ff4396", "#ff292c"]
+  const expectedShape = createFirstShape(redGradient)
 
   const shape = getNextShape()
 
