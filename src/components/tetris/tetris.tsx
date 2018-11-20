@@ -125,7 +125,6 @@ export class Tetris extends Component<TetrisProps, TetrisState> {
   private renderGame(canvas: Canvas, ctx: Ctx): void {
     this.clearCanvas(canvas, ctx)
     this.drawBoard(canvas, ctx)
-    this.drawBorder(canvas, ctx)
   }
 
   private clearCanvas(canvas: Canvas, ctx: Ctx): void {
@@ -168,6 +167,8 @@ export class Tetris extends Component<TetrisProps, TetrisState> {
     const board = this.board
 
     if (board) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+
       // Calculate board size so that borders end on exact pixels
       const boardWidth = canvas.width - (canvas.width % this.columnCount)
       const boardHeight = canvas.height - (canvas.height % this.rowCount)
@@ -198,11 +199,6 @@ export class Tetris extends Component<TetrisProps, TetrisState> {
         })
       })
     }
-  }
-
-  private drawBorder(canvas: Canvas, ctx: Ctx): void {
-    ctx.strokeStyle = "black"
-    ctx.strokeRect(0, 0, canvas.width, canvas.height)
   }
 
   private get ctx(): Ctx | undefined {
