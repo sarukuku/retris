@@ -125,7 +125,6 @@ export class Tetris extends Component<TetrisProps, TetrisState> {
   private renderGame(canvas: Canvas, ctx: Ctx): void {
     this.clearCanvas(canvas, ctx)
     this.drawBoard(canvas, ctx)
-    this.drawBorder(canvas, ctx)
   }
 
   private clearCanvas(canvas: Canvas, ctx: Ctx): void {
@@ -149,30 +148,16 @@ export class Tetris extends Component<TetrisProps, TetrisState> {
     return SVGdup
   }
 
-  static shadeColor(color: string, percent: number): string {
-    const f = parseInt(color.slice(1), 16)
-    const t = percent < 0 ? 0 : 255
-    const p = percent < 0 ? percent * -1 : percent
-    /* tslint:disable:no-bitwise */
-    const R = f >> 16
-    const G = f >> 8 & 0x00FF
-    const B = f & 0x0000FF
-    /* tslint:enable:no-bitwise */
-    return "#" + (0x1000000 + (Math.round((t - R) * p) + R) * 0x10000 + (Math.round((t - G) * p) + G) * 0x100 + (Math.round((t - B) * p) + B)).toString(16).slice(1)
-  }
-
-  static memShadeColor = memoize(Tetris.shadeColor)
   static memBlockWithColors = memoize(Tetris.blockWithColors)
 
   private drawBlock(x: number,
                     y: number,
                     width: number,
                     height: number,
-                    hexColor: string,
+                    gradient: string[],
                     ctx: Ctx): void {
     if (this.blockSVG) {
-      const gradientStopColor = Tetris.memShadeColor(hexColor, -0.5)
-      const blockSVG = Tetris.memBlockWithColors(this.blockSVG, hexColor, gradientStopColor)
+      const blockSVG = Tetris.memBlockWithColors(this.blockSVG, gradient[0], gradient[1])
       const blockImage = Tetris.svgToImage(blockSVG)
       ctx.drawImage(blockImage, x, y, width, height)
     }
@@ -182,6 +167,8 @@ export class Tetris extends Component<TetrisProps, TetrisState> {
     const board = this.board
 
     if (board) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+
       // Calculate board size so that borders end on exact pixels
       const boardWidth = canvas.width - (canvas.width % this.columnCount)
       const boardHeight = canvas.height - (canvas.height % this.rowCount)
@@ -207,17 +194,11 @@ export class Tetris extends Component<TetrisProps, TetrisState> {
           ctx.fillRect(x, y, innerWidth, innerHeight)
 
           if (cell) {
-            const color = cell ? cell.color : "white"
-            this.drawBlock(x, y, innerWidth, innerHeight, color, ctx)
+            this.drawBlock(x, y, innerWidth, innerHeight, cell.color, ctx)
           }
         })
       })
     }
-  }
-
-  private drawBorder(canvas: Canvas, ctx: Ctx): void {
-    ctx.strokeStyle = "black"
-    ctx.strokeRect(0, 0, canvas.width, canvas.height)
   }
 
   private get ctx(): Ctx | undefined {

@@ -1,6 +1,5 @@
 import { times } from "ramda"
 import { pick } from "../../helpers"
-import { colors } from "../../styles/colors"
 import { Shape } from "./shape"
 
 export type GetNextShape = () => Shape
@@ -15,14 +14,24 @@ export function getNextShape(): Shape {
   return shape
 }
 
+const gradients = {
+  GREEN: ["#0aff00", "#00edff"],
+  WHITE: ["#ffffff", "#92baff"],
+  BLUE: ["#4dffff", "#0a34af"],
+  ORANGE: ["#fad961", "#f76b1c"],
+  LIGHT_BLUE: ["#1fddff", "#21a0ff"],
+  RED: ["#ff4396", "#ff292c"],
+  PURPLE: ["#3023ae", "#c86dd7"]
+}
+
 const shapes = [
-  { createShape: Shape.createIShape, color: colors.PETER_RIVER },
-  { createShape: Shape.createJShape, color: colors.SUNFLOWER },
-  { createShape: Shape.createLShape, color: colors.AMETHYST },
-  { createShape: Shape.createOShape, color: colors.ALIZARIN },
-  { createShape: Shape.createSShape, color: colors.EMERALD },
-  { createShape: Shape.createTShape, color: colors.WET_ASPHALT },
-  { createShape: Shape.createZShape, color: colors.CARROT },
+  { createShape: Shape.createIShape, color: gradients.GREEN },
+  { createShape: Shape.createJShape, color: gradients.WHITE },
+  { createShape: Shape.createLShape, color: gradients.BLUE },
+  { createShape: Shape.createOShape, color: gradients.ORANGE},
+  { createShape: Shape.createSShape, color: gradients.LIGHT_BLUE },
+  { createShape: Shape.createTShape, color: gradients.RED },
+  { createShape: Shape.createZShape, color: gradients.PURPLE },
 ]
 
 const rotationAmounts = [0, 1, 2, 3]
