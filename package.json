@@ -27,6 +27,7 @@
     "concurrently": "4.0.1",
     "dotenv": "6.1.0",
     "express": "4.16.4",
+    "fast-memoize": "2.5.1",
     "fontfaceobserver": "2.0.13",
     "fork-ts-checker-webpack-plugin": "0.4.10",
     "isomorphic-unfetch": "3.0.0",
@@ -58,7 +59,7 @@
     "dev": "nodemon",
     "pretty": "npx onchange 'src/**/*.{ts,tsx}' -- prettier --write {{changed}}",
     "test": "jest",
-    "storybook": "start-storybook --quiet -p 3001",
+    "storybook": "start-storybook --quiet -p 3001 -s ./src/static",
     "sb": "yarn storybook",
     "build-storybook": "build-storybook"
   },

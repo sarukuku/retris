@@ -13,5 +13,6 @@ module.exports = (baseConfig, env, config) => {
       formatter: "codeframe",
     }),
   )
+
   return config
 }

@@ -1,19 +1,19 @@
+import memoize from "fast-memoize"
 import React, { Component, Fragment } from "react"
 import { OnBoardChange } from "../../games/tetris/board"
 import { Game, OnLevelChange, OnScoreChange } from "../../games/tetris/game"
 import { TetrisMatrix } from "../../games/tetris/shape"
 import { wait } from "../../helpers"
-import { fonts } from "../../styles/fonts"
 import { calculateCanvasSize } from "./calculate-canvas-size"
 
 export type OnGameOver = (totalScore: number) => void
 
 interface TetrisProps {
+  staticPath: string
   onGameOver: OnGameOver
 }
 
 interface TetrisState {
-  board: TetrisMatrix
   totalScore: number
   gainedScore?: number
   currentLevel: number
@@ -31,19 +31,26 @@ export class Tetris extends Component<TetrisProps, TetrisState> {
   private onBoardChange: OnBoardChange
   private onScoreChange: OnScoreChange
   private onLevelChange: OnLevelChange
+  private board: TetrisMatrix
+  private blockSVG: SVGElement
+  private readonly canvasRef = React.createRef<HTMLCanvasElement>()
 
   state: TetrisState = {
-    board: [],
     totalScore: 0,
     gainedScore: undefined,
     currentLevel: 1,
+  }
+
+  componentWillUnmount() {
+    this.onBoardChange = () => undefined
+    this.onScoreChange = () => undefined
   }
 
   async componentDidMount() {
     this.resizeCanvasToParentSize()
     window.onresize = () => this.resizeCanvasToParentSize()
 
-    this.onBoardChange = (board: TetrisMatrix) => this.setState({ board })
+    this.onBoardChange = (board: TetrisMatrix) => { this.board = board }
     this.onScoreChange = async (gainedScore: number, totalScore: number) => {
       this.setState({ gainedScore, totalScore })
       await wait(ONE_SECOND)
@@ -59,14 +66,32 @@ export class Tetris extends Component<TetrisProps, TetrisState> {
       this.columnCount,
       this.rowCount,
     )
+
+    const xhr = new XMLHttpRequest()
+    const url = this.props.staticPath + "/block.svg"
+    xhr.open("GET", url, true)
+    xhr.overrideMimeType("image/svg+xml")
+    xhr.onload = () => {
+      if (xhr.responseXML && xhr.responseXML.documentElement) {
+        this.blockSVG = xhr.responseXML.documentElement as any as SVGElement
+      }
+    }
+    xhr.send("")
+
+    const canvasRef = this.canvasRef
+    const ctx = this.ctx
+    const renderFrame = () => {
+      if (canvasRef.current && ctx ) {
+        this.renderGame(canvasRef.current, ctx)
+      }
+      window.requestAnimationFrame(renderFrame)
+    }
+
+    window.requestAnimationFrame(renderFrame)
+
     await this.game.start()
 
     this.props.onGameOver(this.state.totalScore)
-  }
-
-  componentWillUnmount() {
-    this.onBoardChange = () => undefined
-    this.onScoreChange = () => undefined
   }
 
   rotate() {
@@ -85,33 +110,21 @@ export class Tetris extends Component<TetrisProps, TetrisState> {
     this.game.down()
   }
 
-  render() {
-    const canvas = this.canvas
-    const ctx = this.ctx
-    if (canvas && ctx) {
-      this.renderGame(canvas, ctx)
-    }
+  shouldComponentUpdate() {
+    return false
+  }
 
+  render() {
     return (
       <Fragment>
-        <canvas ref="canvas" />
+        <canvas ref={this.canvasRef} />
       </Fragment>
     )
   }
 
   private renderGame(canvas: Canvas, ctx: Ctx): void {
-    const { gainedScore } = this.state
-
     this.clearCanvas(canvas, ctx)
     this.drawBoard(canvas, ctx)
-    this.drawBorder(canvas, ctx)
-
-    if (gainedScore) {
-      this.drawGainedScore(canvas, ctx, gainedScore)
-    }
-
-    this.drawTotalScore(canvas, ctx)
-    this.drawCurrentLevel(canvas, ctx)
   }
 
   private clearCanvas(canvas: Canvas, ctx: Ctx): void {
@@ -119,56 +132,77 @@ export class Tetris extends Component<TetrisProps, TetrisState> {
     ctx.fillRect(0, 0, canvas.width, canvas.height)
   }
 
+  static svgToImage(svg: SVGElement): HTMLImageElement {
+    const img = new Image()
+    const b64Prefix = "data:image/svg+xml;base64,"
+    const b64Image = btoa(new XMLSerializer().serializeToString(svg))
+    img.src = b64Prefix + b64Image
+    return img
+  }
+
+  static blockWithColors(element: SVGElement, gradientStartColor: string, gradientStopColor: string): SVGElement {
+    const SVGdup = element.cloneNode(true) as SVGElement
+    const stopElements = SVGdup.getElementsByTagName("stop")
+    stopElements[0].setAttribute("stop-color", gradientStartColor)
+    stopElements[1].setAttribute("stop-color", gradientStopColor)
+    return SVGdup
+  }
+
+  static memBlockWithColors = memoize(Tetris.blockWithColors)
+
+  private drawBlock(x: number,
+                    y: number,
+                    width: number,
+                    height: number,
+                    gradient: string[],
+                    ctx: Ctx): void {
+    if (this.blockSVG) {
+      const blockSVG = Tetris.memBlockWithColors(this.blockSVG, gradient[0], gradient[1])
+      const blockImage = Tetris.svgToImage(blockSVG)
+      ctx.drawImage(blockImage, x, y, width, height)
+    }
+  }
+
   private drawBoard(canvas: Canvas, ctx: Ctx): void {
-    const { board } = this.state
-    const cellWidth = canvas.width / this.columnCount
-    const cellHeight = canvas.height / this.rowCount
+    const board = this.board
 
-    board.forEach((row, rowIndex) => {
-      row.forEach((cell, columnIndex) => {
-        ctx.fillStyle = cell ? cell.color : "white"
-        const x = Math.floor(columnIndex * cellWidth)
-        const y = Math.floor(rowIndex * cellHeight)
-        const width = Math.ceil(cellWidth)
-        const height = Math.ceil(cellHeight)
-        ctx.fillRect(x, y, width, height)
+    if (board) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+      // Calculate board size so that borders end on exact pixels
+      const boardWidth = canvas.width - (canvas.width % this.columnCount)
+      const boardHeight = canvas.height - (canvas.height % this.rowCount)
+
+      // Draw the board background
+      ctx.fillStyle = "black"
+      ctx.fillRect(0, 0, boardWidth, boardHeight)
+
+      const cellWidth = boardWidth / this.columnCount
+      const cellHeight = boardHeight / this.rowCount
+      const innerWidth = Math.floor(cellWidth * 0.97)
+      const innerHeight = Math.floor(cellHeight * 0.97)
+      const paddingX = Math.floor((cellWidth - innerWidth) / 2)
+      const paddingY = Math.floor((cellHeight - innerHeight) / 2)
+
+      board.forEach((row, rowIndex) => {
+        row.forEach((cell, columnIndex) => {
+
+          const x = (columnIndex * cellWidth) + paddingX
+          const y = (rowIndex * cellHeight) + paddingY
+
+          ctx.fillStyle = "#1d1f21"
+          ctx.fillRect(x, y, innerWidth, innerHeight)
+
+          if (cell) {
+            this.drawBlock(x, y, innerWidth, innerHeight, cell.color, ctx)
+          }
+        })
       })
-    })
-  }
-
-  private drawBorder(canvas: Canvas, ctx: Ctx): void {
-    ctx.strokeStyle = "black"
-    ctx.strokeRect(0, 0, canvas.width, canvas.height)
-  }
-
-  private drawGainedScore(canvas: Canvas, ctx: Ctx, gainedScore: number) {
-    ctx.font = `60px '${fonts.PRESS_START_2P}'`
-    ctx.fillStyle = "black"
-    ctx.textAlign = "center"
-    ctx.fillText(`+${gainedScore}`, canvas.width / 2, canvas.height / 2)
-  }
-
-  private drawTotalScore(canvas: Canvas, ctx: Ctx) {
-    const { totalScore } = this.state
-
-    const coeff = canvas.width / 30
-    ctx.font = `${coeff}px '${fonts.PRESS_START_2P}'`
-    ctx.fillStyle = "black"
-    ctx.textAlign = "left"
-    ctx.fillText(`${totalScore}`.padStart(8, "0"), 20, 2 * coeff)
-  }
-
-  private drawCurrentLevel(canvas: Canvas, ctx: Ctx) {
-    const { currentLevel } = this.state
-    const coeff = canvas.width / 30
-    ctx.font = `${coeff}px '${fonts.PRESS_START_2P}'`
-    ctx.fillStyle = "black"
-    ctx.textAlign = "left"
-    ctx.fillText(`Level ${`${currentLevel}`.padStart(2, "0")}`, 20, 4 * coeff)
+    }
   }
 
   private get ctx(): Ctx | undefined {
-    const canvas = this.canvas
+    const canvas = this.canvasRef.current
     if (!canvas) {
       return
     }
@@ -181,12 +215,8 @@ export class Tetris extends Component<TetrisProps, TetrisState> {
     return ctx
   }
 
-  private get canvas(): Canvas | undefined {
-    return this.refs.canvas as Canvas | undefined
-  }
-
   private resizeCanvasToParentSize(): void {
-    const canvas = this.canvas
+    const canvas = this.canvasRef.current
     if (!canvas) {
       return
     }
