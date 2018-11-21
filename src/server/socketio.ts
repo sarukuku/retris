@@ -8,6 +8,11 @@ export function createSocketIOServer(
   namespaces: { display: Namespace; controller: Namespace },
 ): void {
   namespaces.display.on("connect", displaySocket => {
+    if (Object.keys(namespaces.display.sockets).length > 1) {
+      displaySocket.disconnect(true)
+      return
+    }
+
     const display = new SocketIODisplay(displaySocket)
     state.onDisplayConnect(display)
 
