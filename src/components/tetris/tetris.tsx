@@ -90,7 +90,9 @@ export class Tetris extends Component<TetrisProps, TetrisState> {
     window.requestAnimationFrame(renderFrame)
 
     await this.game.start()
-
+    /* tslint:disable */
+    console.log(this.board)
+    /* tslint:enable */
     this.props.onGameOver(this.state.totalScore)
   }
 
