@@ -28,6 +28,10 @@ export class Board {
     this.invalidateBoard()
   }
 
+  setOnBoardChange(cb: OnBoardChange) {
+    this.onBoardChange = cb
+  }
+
   rotate(): void {
     if (this.active && this.canRotate()) {
       this.active.shape.rotate()

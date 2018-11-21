@@ -15,14 +15,21 @@ export class Game {
   private board: Board
   private score = new Score()
   private currentLevel = 1
+  private onScoreChange: OnScoreChange = () => undefined
+  private onBoardChange: OnBoardChange = () => undefined
+  private columnCount: number
+  private rowCount: number
 
-  constructor(
-    private onBoardChange: OnBoardChange,
-    private onScoreChange: OnScoreChange,
-    private onLevelChange: OnLevelChange,
-    columnCount: number,
-    rowCount: number,
-  ) {
+  constructor({
+    columnCount,
+    rowCount,
+  }: {
+    columnCount: number
+    rowCount: number
+  }) {
+    this.rowCount = rowCount
+    this.columnCount = columnCount
+
     const onGameOver = () => (this.isGameOver = true)
     const onRowClear = (numberOfRowsCleared: number) => {
       const gainedScore = this.score.linesCleared(
@@ -41,8 +48,24 @@ export class Game {
     )
   }
 
+  setOnScoreChange(cb: OnScoreChange) {
+    this.onScoreChange = cb
+  }
+
+  setOnBoardChange(cb: OnBoardChange) {
+    this.onBoardChange = cb
+    this.board.setOnBoardChange(cb)
+  }
+
+  getRowCount(): number {
+    return this.rowCount
+  }
+
+  getColumnCount(): number {
+    return this.columnCount
+  }
+
   async start() {
-    this.onLevelChange(this.currentLevel)
     const handle = setInterval(this.increaseLevel, TEN_SECONDS)
 
     while (!this.isGameOver) {
@@ -54,7 +77,6 @@ export class Game {
   }
 
   private increaseLevel = () => {
-    this.onLevelChange(this.currentLevel)
     this.currentLevel++
   }
 

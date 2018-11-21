@@ -1,28 +1,29 @@
-import React, { Component, Fragment } from "react"
-
 import { storiesOf } from "@storybook/react"
+import React, { Component, Fragment } from "react"
+import { Game } from "../../games/tetris/game"
 import { Tetris } from "./tetris"
 
 storiesOf("Tetris", module).add("Tetris", () => <TetrisWrapper />)
 
 class TetrisWrapper extends Component {
+  private game = new Game({ columnCount: 10, rowCount: 16 })
+
   componentDidMount() {
-    const tetris = this.refs.tetris as Tetris
     document.addEventListener("keydown", e => {
       switch (e.key) {
         case "ArrowDown":
-          tetris.down()
+          this.game.down()
           break
         case "ArrowLeft":
-          tetris.left()
+          this.game.left()
           break
         case "ArrowRight":
-          tetris.right()
+          this.game.right()
           break
         case "Enter":
         case " ":
         case "ArrowUp":
-          tetris.rotate()
+          this.game.rotate()
           break
       }
     })
@@ -32,7 +33,11 @@ class TetrisWrapper extends Component {
     return (
       <Fragment>
         <div className="tetris-wrapper">
-          <Tetris ref="tetris" onGameOver={() => undefined} staticPath={""} />
+          <Tetris
+            game={this.game}
+            onGameOver={() => undefined}
+            staticPath={""}
+          />
         </div>
         <style global={true} jsx>{`
           html,
