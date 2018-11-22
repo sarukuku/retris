@@ -1,18 +1,16 @@
+import { ReplaySubject } from "rxjs"
 import { wait } from "../../helpers"
-import { colors } from "../../styles/colors"
-import { Board, OnBoardChange } from "./board"
+import { Board } from "./board"
 import { createEmptyMatrix } from "./matrix"
-import { Shape } from "./shape"
+import { Shape, TetrisMatrix } from "./shape"
 
-const noop = () => undefined
-
-const I = () => Shape.createIShape(colors.PETER_RIVER)
-const J = () => Shape.createJShape(colors.SUNFLOWER)
-const L = () => Shape.createLShape(colors.AMETHYST)
-const O = () => Shape.createOShape(colors.ALIZARIN)
-const S = () => Shape.createSShape(colors.EMERALD)
-const T = () => Shape.createTShape(colors.WET_ASPHALT)
-const Z = () => Shape.createZShape(colors.CARROT)
+const I = () => Shape.createIShape()
+const J = () => Shape.createJShape()
+const L = () => Shape.createLShape()
+const O = () => Shape.createOShape()
+const S = () => Shape.createSShape()
+const T = () => Shape.createTShape()
+const Z = () => Shape.createZShape()
 
 const shapes = [
   {
@@ -136,15 +134,23 @@ export class ReaktorGame {
   private currentPosition = 0
   private currentRotation = 0
 
-  constructor(onBoardChange: OnBoardChange) {
-    const onGameOver = () => (this.isGameOver = true)
+  readonly boardChange: ReplaySubject<TetrisMatrix>
+
+  getColumnCount() {
+    return 13
+  }
+
+  getRowCount() {
+    return 16
+  }
+
+  constructor() {
     this.board = new Board(
-      onBoardChange,
-      onGameOver,
-      noop,
       this.getNextShape,
-      createEmptyMatrix(13, 16),
+      createEmptyMatrix(this.getColumnCount(), this.getRowCount()),
     )
+    this.board.gameOver.subscribe(() => (this.isGameOver = true))
+    this.boardChange = this.board.boardChange
   }
 
   private getNextShape = () => {

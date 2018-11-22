@@ -1,12 +1,13 @@
 import { NextContext } from "next"
 import React, { Component } from "react"
+import { Subject } from "rxjs"
 import { commands } from "../commands"
 import { AnalyticsProps, pageWithAnalytics } from "../components/with-analytics"
-import { SocketProps, pageWithSocket } from "../components/with-socket"
+import { pageWithSocket, SocketProps } from "../components/with-socket"
 import { DisplayState } from "../server/state"
 import { colors } from "../styles/colors"
 import { views } from "../views"
-import { Game } from "../views/display/game"
+import { DisplayGame } from "../views/display/display-game"
 import { GameOver } from "../views/display/game-over"
 import { Waiting } from "../views/display/waiting"
 import { WaitingToStart } from "../views/display/waiting-to-start"
@@ -30,6 +31,9 @@ class Display extends Component<DisplayProps, DisplayComponentState> {
     queueLength: 0,
   }
 
+  private actionCommand = new Subject<string>()
+  private gameOver = new Subject<number>()
+
   static async getInitialProps(ctx: NextContext) {
     if (ctx.req) {
       return { address: ctx.req.headers.host }
@@ -42,25 +46,21 @@ class Display extends Component<DisplayProps, DisplayComponentState> {
     socket.on("state", (data: Required<DisplayState>) => {
       this.setState(data)
     })
-  }
+    socket.on(commands.ACTION, (action: string) =>
+      this.actionCommand.next(action),
+    )
+    this.gameOver.subscribe((totalScore: number) => {
+      const { analytics } = this.props
+      this.setState({ score: totalScore })
 
-  addToScore = (score: number) => {
-    this.setState(prevState => {
-      return { score: prevState.score + score }
+      analytics.sendCustomEvent({
+        category: "GameOver",
+        action: "TotalScore",
+        value: totalScore,
+      })
+
+      socket.emit(commands.GAME_OVER)
     })
-  }
-
-  gameOver = (totalScore: number) => {
-    const { analytics, socket } = this.props
-    this.setState({ score: totalScore })
-
-    analytics.sendCustomEvent({
-      category: "GameOver",
-      action: "TotalScore",
-      value: totalScore,
-    })
-
-    socket.emit(commands.GAME_OVER)
   }
 
   render() {
@@ -110,7 +110,7 @@ class Display extends Component<DisplayProps, DisplayComponentState> {
   }
 
   private renderView() {
-    const { address, socket } = this.props
+    const { address } = this.props
     const { activeView, score } = this.state
 
     switch (activeView) {
@@ -120,7 +120,13 @@ class Display extends Component<DisplayProps, DisplayComponentState> {
       case views.DISPLAY_WAITING_TO_START:
         return <WaitingToStart />
       case views.DISPLAY_GAME:
-        return <Game emitter={socket} onGameOver={this.gameOver} />
+        return (
+          <DisplayGame
+            actionCommand={this.actionCommand}
+            gameOver={this.gameOver}
+            staticPath="/static"
+          />
+        )
       case views.DISPLAY_GAME_OVER:
         return <GameOver score={score} />
     }

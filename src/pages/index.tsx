@@ -61,8 +61,7 @@ class Controller extends Component<ControllerProps, ControllerState> {
 
   render() {
     this.sendPageView()
-    const view = this.renderView()
-    return <div>{view}</div>
+    return this.renderView()
   }
 
   private sendPageView() {

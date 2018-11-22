@@ -1,29 +1,30 @@
 import { storiesOf } from "@storybook/react"
 import React, { Component, Fragment } from "react"
-import { Game } from "../../games/tetris/game"
-import { Tetris } from "./tetris"
+import { Subject } from "rxjs"
+import { commands } from "../../commands"
+import { DisplayGame } from "./display-game"
 
 storiesOf("Tetris", module).add("Tetris", () => <TetrisWrapper />)
 
 class TetrisWrapper extends Component {
-  private game = new Game({ columnCount: 10, rowCount: 16 })
+  private actionCommand = new Subject<string>()
 
   componentDidMount() {
     document.addEventListener("keydown", e => {
       switch (e.key) {
         case "ArrowDown":
-          this.game.down()
+          this.actionCommand.next(commands.DOWN)
           break
         case "ArrowLeft":
-          this.game.left()
+          this.actionCommand.next(commands.LEFT)
           break
         case "ArrowRight":
-          this.game.right()
+          this.actionCommand.next(commands.RIGHT)
           break
         case "Enter":
         case " ":
         case "ArrowUp":
-          this.game.rotate()
+          this.actionCommand.next(commands.TAP)
           break
       }
     })
@@ -33,10 +34,10 @@ class TetrisWrapper extends Component {
     return (
       <Fragment>
         <div className="tetris-wrapper">
-          <Tetris
-            game={this.game}
-            onGameOver={() => undefined}
-            staticPath={""}
+          <DisplayGame
+            actionCommand={this.actionCommand}
+            gameOver={new Subject<number>()}
+            staticPath=""
           />
         </div>
         <style global={true} jsx>{`
@@ -50,6 +51,11 @@ class TetrisWrapper extends Component {
           .tetris-wrapper {
             width: 95%;
             height: 95%;
+          }
+
+          .tetris-wrapper .wrap {
+            width: 100%;
+            height: 100%;
           }
         `}</style>
       </Fragment>

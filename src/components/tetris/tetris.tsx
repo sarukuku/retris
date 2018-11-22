@@ -1,17 +1,12 @@
 import memoize from "fast-memoize"
 import React, { Component } from "react"
-import { OnBoardChange } from "../../games/tetris/board"
-import { OnScoreChange } from "../../games/tetris/game"
+import { ReplaySubject } from "rxjs"
 import { TetrisMatrix } from "../../games/tetris/shape"
 import { svgToImage } from "../../helpers"
 import { calculateCanvasSize } from "./calculate-canvas-size"
 
-export type OnGameOver = (totalScore: number) => void
-
 interface Game {
-  start(): Promise<void>
-  setOnBoardChange(cb: OnBoardChange): void
-  setOnScoreChange(cb: OnScoreChange): void
+  boardChange: ReplaySubject<TetrisMatrix>
   getColumnCount(): number
   getRowCount(): number
 }
@@ -19,7 +14,6 @@ interface Game {
 interface TetrisProps {
   game: Game
   staticPath: string
-  onGameOver: OnGameOver
 }
 
 interface TetrisState {
@@ -31,7 +25,6 @@ type Canvas = HTMLCanvasElement
 
 export class Tetris extends Component<TetrisProps, TetrisState> {
   private board: TetrisMatrix
-  private score: number
   private blockSVG: SVGElement
   private readonly canvasRef = React.createRef<HTMLCanvasElement>()
 
@@ -51,13 +44,8 @@ export class Tetris extends Component<TetrisProps, TetrisState> {
     }
     window.requestAnimationFrame(renderFrame)
 
-    const { game, onGameOver } = this.props
-    game.setOnBoardChange(board => {
-      this.board = board
-    })
-    game.setOnScoreChange(score => (this.score = score))
-    await game.start()
-    onGameOver(this.score)
+    const { game } = this.props
+    game.boardChange.subscribe(board => (this.board = board))
   }
 
   private loadShapeBlock(): Promise<void> {
