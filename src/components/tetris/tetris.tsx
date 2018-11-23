@@ -1,8 +1,12 @@
 import memoize from "fast-memoize"
 import React, { Component } from "react"
-import { ReplaySubject, Subscription } from "rxjs"
+import { ReplaySubject } from "rxjs"
 import { TetrisMatrix } from "../../games/tetris/shape"
 import { svgToImage } from "../../helpers"
+import {
+  withAutoUnsubscribe,
+  AutoUnsubscribeProps,
+} from "../with-auto-unsubscribe"
 import { calculateCanvasSize } from "./calculate-canvas-size"
 
 interface Game {
@@ -11,7 +15,7 @@ interface Game {
   getRowCount(): number
 }
 
-interface TetrisProps {
+interface TetrisProps extends AutoUnsubscribeProps {
   game: Game
   staticPath: string
 }
@@ -23,11 +27,10 @@ interface TetrisState {
 type Ctx = CanvasRenderingContext2D
 type Canvas = HTMLCanvasElement
 
-export class Tetris extends Component<TetrisProps, TetrisState> {
+class _Tetris extends Component<TetrisProps, TetrisState> {
   private board: TetrisMatrix
   private blockSVG: SVGElement
   private readonly canvasRef = React.createRef<HTMLCanvasElement>()
-  private subscriptions: Subscription[] = []
 
   async componentDidMount() {
     this.resizeCanvasToParentSize()
@@ -45,14 +48,10 @@ export class Tetris extends Component<TetrisProps, TetrisState> {
     }
     window.requestAnimationFrame(renderFrame)
 
-    const { game } = this.props
-    this.subscriptions.push(
+    const { game, unsubscribeOnUnmount } = this.props
+    unsubscribeOnUnmount(
       game.boardChange.subscribe(board => (this.board = board)),
     )
-  }
-
-  componentWillUnmount() {
-    this.subscriptions.map(s => s.unsubscribe())
   }
 
   private loadShapeBlock(): Promise<void> {
@@ -203,3 +202,5 @@ export class Tetris extends Component<TetrisProps, TetrisState> {
     this.renderGame(canvas, ctx)
   }
 }
+
+export const Tetris = withAutoUnsubscribe(_Tetris)

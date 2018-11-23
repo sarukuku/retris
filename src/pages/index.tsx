@@ -1,7 +1,11 @@
 import React, { Component } from "react"
-import { Subject, Subscription } from "rxjs"
+import { Subject } from "rxjs"
 import { commands } from "../commands"
 import { AnalyticsProps, pageWithAnalytics } from "../components/with-analytics"
+import {
+  pageWithAutoUnsubscribe,
+  AutoUnsubscribeProps,
+} from "../components/with-auto-unsubscribe"
 import { pageWithSocket, SocketProps } from "../components/with-socket"
 import { ControllerState } from "../server/state"
 import { views } from "../views"
@@ -12,11 +16,13 @@ import { NotRunning } from "../views/controller/not-running"
 import { StartGame } from "../views/controller/start-game"
 import { Loading } from "../views/loading"
 
-interface ControllerProps extends AnalyticsProps, SocketProps {}
+interface ControllerProps
+  extends AnalyticsProps,
+    SocketProps,
+    AutoUnsubscribeProps {}
 
 class Controller extends Component<ControllerProps, ControllerState> {
   private previousActiveView?: string
-  private subscriptions: Subscription[] = []
   private actionCommand = new Subject<string>()
 
   state: ControllerState = {}
@@ -35,20 +41,16 @@ class Controller extends Component<ControllerProps, ControllerState> {
   }
 
   componentDidMount() {
-    const { socket } = this.props
+    const { socket, unsubscribeOnUnmount } = this.props
     socket.on("state", (state: Required<ControllerState>) => {
       this.setState(state)
     })
 
-    this.subscriptions.push(
+    unsubscribeOnUnmount(
       this.actionCommand.subscribe((action: string) => {
         socket.emit(commands.ACTION, action)
       }),
     )
-  }
-
-  componentWillUnmount() {
-    this.subscriptions.map(s => s.unsubscribe())
   }
 
   render() {
@@ -92,4 +94,6 @@ class Controller extends Component<ControllerProps, ControllerState> {
   }
 }
 
-export default pageWithAnalytics(pageWithSocket(Controller, "/controller"))
+export default pageWithAutoUnsubscribe(
+  pageWithAnalytics(pageWithSocket(Controller, "/controller")),
+)

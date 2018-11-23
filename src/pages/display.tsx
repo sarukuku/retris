@@ -1,8 +1,12 @@
 import { NextContext } from "next"
 import React, { Component } from "react"
-import { Subject, Subscription } from "rxjs"
+import { Subject } from "rxjs"
 import { commands } from "../commands"
 import { AnalyticsProps, pageWithAnalytics } from "../components/with-analytics"
+import {
+  pageWithAutoUnsubscribe,
+  AutoUnsubscribeProps,
+} from "../components/with-auto-unsubscribe"
 import { pageWithSocket, SocketProps } from "../components/with-socket"
 import { DisplayState } from "../server/state"
 import { colors } from "../styles/colors"
@@ -12,7 +16,10 @@ import { GameOver } from "../views/display/game-over"
 import { Waiting } from "../views/display/waiting"
 import { WaitingToStart } from "../views/display/waiting-to-start"
 
-interface DisplayProps extends AnalyticsProps, SocketProps {
+interface DisplayProps
+  extends AnalyticsProps,
+    SocketProps,
+    AutoUnsubscribeProps {
   address: string
 }
 
@@ -24,7 +31,6 @@ interface DisplayComponentState {
 
 class Display extends Component<DisplayProps, DisplayComponentState> {
   private previousActiveView?: string
-  private subscriptions: Subscription[] = []
 
   state: DisplayComponentState = {
     activeView: views.DISPLAY_WAITING,
@@ -43,31 +49,27 @@ class Display extends Component<DisplayProps, DisplayComponentState> {
   }
 
   componentDidMount() {
-    const { socket } = this.props
+    const { socket, unsubscribeOnUnmount } = this.props
     socket.on("state", (data: Required<DisplayState>) => {
       this.setState(data)
     })
     socket.on(commands.ACTION, (action: string) =>
       this.actionCommand.next(action),
     )
-    this.subscriptions.push(
-      this.gameOver.subscribe((totalScore: number) => {
-        const { analytics } = this.props
-        this.setState({ score: totalScore })
-
-        analytics.sendCustomEvent({
-          category: "GameOver",
-          action: "TotalScore",
-          value: totalScore,
-        })
-
-        socket.emit(commands.GAME_OVER)
-      }),
-    )
+    unsubscribeOnUnmount(this.gameOver.subscribe(this.onGameOver))
   }
 
-  componentWillUnmount() {
-    this.subscriptions.map(s => s.unsubscribe())
+  private onGameOver = (totalScore: number) => {
+    const { analytics, socket } = this.props
+    this.setState({ score: totalScore })
+
+    analytics.sendCustomEvent({
+      category: "GameOver",
+      action: "TotalScore",
+      value: totalScore,
+    })
+
+    socket.emit(commands.GAME_OVER)
   }
 
   render() {
@@ -140,4 +142,6 @@ class Display extends Component<DisplayProps, DisplayComponentState> {
   }
 }
 
-export default pageWithAnalytics(pageWithSocket(Display, "/display"))
+export default pageWithAutoUnsubscribe(
+  pageWithAnalytics(pageWithSocket(Display, "/display")),
+)

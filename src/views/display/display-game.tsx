@@ -1,12 +1,16 @@
 import React, { Component, Fragment } from "react"
-import { Subject, Subscription } from "rxjs"
+import { Subject } from "rxjs"
 import css from "styled-jsx/css"
 import { commands } from "../../commands"
 import { JoinHelpBar } from "../../components/join-help-bar"
 import { Tetris } from "../../components/tetris"
+import {
+  AutoUnsubscribeProps,
+  withAutoUnsubscribe,
+} from "../../components/with-auto-unsubscribe"
 import { Game } from "../../games/tetris/game"
 
-interface DisplayGameProps {
+interface DisplayGameProps extends AutoUnsubscribeProps {
   actionCommand: Subject<string>
   gameOver: Subject<number>
   staticPath: string
@@ -16,17 +20,16 @@ interface DisplayGameState {
   score: number
 }
 
-export class DisplayGame extends Component<DisplayGameProps, DisplayGameState> {
+class _DisplayGame extends Component<DisplayGameProps, DisplayGameState> {
   private game = new Game({ columnCount: 10, rowCount: 16 })
-  private subscriptions: Subscription[] = []
   state: DisplayGameState = {
     score: 0,
   }
 
   async componentDidMount() {
-    const { actionCommand, gameOver } = this.props
+    const { actionCommand, gameOver, unsubscribeOnUnmount } = this.props
 
-    this.subscriptions.push(
+    unsubscribeOnUnmount(
       actionCommand.subscribe(this.handleCommand),
       this.game.scoreChange.subscribe(({ current }) =>
         this.setState({ score: current }),
@@ -35,10 +38,6 @@ export class DisplayGame extends Component<DisplayGameProps, DisplayGameState> {
 
     await this.game.start()
     gameOver.next(this.state.score)
-  }
-
-  componentWillUnmount() {
-    this.subscriptions.map(s => s.unsubscribe())
   }
 
   private handleCommand = (command: string) => {
@@ -93,3 +92,5 @@ export class DisplayGame extends Component<DisplayGameProps, DisplayGameState> {
     )
   }
 }
+
+export const DisplayGame = withAutoUnsubscribe(_DisplayGame)
