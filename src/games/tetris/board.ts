@@ -1,4 +1,5 @@
 import { clone } from "ramda"
+import { ReplaySubject, Subject } from "rxjs"
 import { GetNextShape } from "./get-next-shape"
 import { columnCount, rowCount } from "./matrix"
 import { Position, Shape, TetrisMatrix, TetrisRow } from "./shape"
@@ -8,19 +9,14 @@ export interface Active {
   position: Position
 }
 
-export type OnBoardChange = (board: TetrisMatrix) => void
-
-export type OnGameOver = () => void
-
-export type OnRowClear = (numberOfRowsCleared: number) => void
-
 export class Board {
   private hasActiveAlreadyHitBottom: boolean
 
+  readonly boardChange = new ReplaySubject<TetrisMatrix>()
+  readonly gameOver = new Subject<void>()
+  readonly rowClear = new Subject<number>()
+
   constructor(
-    private onBoardChange: OnBoardChange,
-    private onGameOver: OnGameOver,
-    private onRowClear: OnRowClear,
     private getNextShape: GetNextShape,
     private matrix: TetrisMatrix,
     private active?: Active,
@@ -145,7 +141,7 @@ export class Board {
       this.spawnNewActiveShape()
 
       if (this.newActiveCouldNotSpawn()) {
-        this.onGameOver()
+        this.gameOver.next()
         return
       }
 
@@ -160,7 +156,7 @@ export class Board {
 
         const fullRowCount = this.getNumberOfFullRows()
         if (fullRowCount > 0) {
-          this.onRowClear(fullRowCount)
+          this.rowClear.next(fullRowCount)
           this.matrix = this.clearFullRows(clone(this.matrix))
           return
         }
@@ -202,12 +198,12 @@ export class Board {
 
   private invalidateBoard(): void {
     if (!this.active) {
-      this.onBoardChange(this.matrix)
+      this.boardChange.next(this.matrix)
       return
     }
 
     const board = this.addActiveToBoard(clone(this.matrix))
-    this.onBoardChange(board)
+    this.boardChange.next(board)
     return
   }
 

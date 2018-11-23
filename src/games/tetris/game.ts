@@ -1,48 +1,66 @@
+import { Subject, ReplaySubject } from "rxjs"
 import { wait } from "../../helpers"
-import { Board, OnBoardChange } from "./board"
+import { Board } from "./board"
 import { getNextShape } from "./get-next-shape"
 import { createEmptyMatrix } from "./matrix"
 import { Score } from "./score"
-
-export type OnScoreChange = (gained: number, total: number) => void
-
-export type OnLevelChange = (currentLevel: number) => void
+import { TetrisMatrix } from "./shape"
 
 const TEN_SECONDS = 10000
+
+export interface ScoreChange {
+  gained: number
+  current: number
+}
 
 export class Game {
   private isGameOver = false
   private board: Board
   private score = new Score()
   private currentLevel = 1
+  private columnCount: number
+  private rowCount: number
 
-  constructor(
-    private onBoardChange: OnBoardChange,
-    private onScoreChange: OnScoreChange,
-    private onLevelChange: OnLevelChange,
-    columnCount: number,
-    rowCount: number,
-  ) {
-    const onGameOver = () => (this.isGameOver = true)
-    const onRowClear = (numberOfRowsCleared: number) => {
-      const gainedScore = this.score.linesCleared(
-        this.currentLevel,
-        numberOfRowsCleared,
-      )
-      this.onScoreChange(gainedScore, this.score.current)
-    }
+  readonly boardChange: ReplaySubject<TetrisMatrix>
+  readonly scoreChange = new Subject<ScoreChange>()
+  readonly levelChange = new Subject<number>()
+
+  constructor({
+    columnCount,
+    rowCount,
+  }: {
+    columnCount: number
+    rowCount: number
+  }) {
+    this.rowCount = rowCount
+    this.columnCount = columnCount
 
     this.board = new Board(
-      this.onBoardChange,
-      onGameOver,
-      onRowClear,
       getNextShape,
       createEmptyMatrix(columnCount, rowCount),
     )
+    this.boardChange = this.board.boardChange
+
+    this.board.gameOver.subscribe(() => (this.isGameOver = true))
+    this.board.rowClear.subscribe((numberOfRowsCleared: number) => {
+      const gained = this.score.linesCleared(
+        this.currentLevel,
+        numberOfRowsCleared,
+      )
+      const current = this.score.current
+      this.scoreChange.next({ gained, current })
+    })
+  }
+
+  getRowCount(): number {
+    return this.rowCount
+  }
+
+  getColumnCount(): number {
+    return this.columnCount
   }
 
   async start() {
-    this.onLevelChange(this.currentLevel)
     const handle = setInterval(this.increaseLevel, TEN_SECONDS)
 
     while (!this.isGameOver) {
@@ -54,7 +72,6 @@ export class Game {
   }
 
   private increaseLevel = () => {
-    this.onLevelChange(this.currentLevel)
     this.currentLevel++
   }
 

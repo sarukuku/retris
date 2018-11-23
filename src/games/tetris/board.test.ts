@@ -1,5 +1,5 @@
 import { last } from "ramda"
-import { Active, Board, OnBoardChange, OnGameOver, OnRowClear } from "./board"
+import { Active, Board } from "./board"
 import { GetNextShape, getNextShape as _getNextShape } from "./get-next-shape"
 import { createEmptyMatrix } from "./matrix"
 import { Shape, TetrisMatrix } from "./shape"
@@ -624,19 +624,18 @@ tests.map(
     const t =
       typeof only !== "undefined" ? (only ? test.only : test.skip) : test
     t(name, () => {
-      const onBoardChange = jest.fn()
-      const onGameOver =
-        typeof gameOverCalled !== "undefined" ? jest.fn() : undefined
-      const onRowClear =
-        typeof rowClearCalledWith !== "undefined" ? jest.fn() : undefined
       const board = createBoard({
-        onBoardChange,
         getNextShape,
-        onGameOver,
-        onRowClear,
         matrix: initialMatrix,
         active,
       })
+
+      const onBoardChange = jest.fn()
+      board.boardChange.subscribe(onBoardChange)
+      const onGameOver = jest.fn()
+      board.gameOver.subscribe(onGameOver)
+      const onRowClear = jest.fn()
+      board.rowClear.subscribe(onRowClear)
 
       if (actions) {
         actions(board)
@@ -658,11 +657,11 @@ ${printBoard(resultBoard)}
         }
       }
 
-      if (onGameOver) {
+      if (typeof gameOverCalled !== "undefined") {
         expect(onGameOver).toHaveBeenCalled()
       }
 
-      if (onRowClear) {
+      if (typeof rowClearCalledWith !== "undefined") {
         expect(onRowClear).toHaveBeenCalledWith(rowClearCalledWith)
       }
     })
@@ -676,33 +675,14 @@ function printBoard(board: TetrisMatrix): string {
 
 interface CreateBoardOptions {
   getNextShape?: GetNextShape
-  onBoardChange?: OnBoardChange
-  onGameOver?: OnGameOver
-  onRowClear?: OnRowClear
   matrix?: TetrisMatrix
   active?: Active
 }
 
 function createBoard({
   getNextShape = _getNextShape,
-  onBoardChange = (_board: TetrisMatrix) => {
-    return
-  },
-  onGameOver = () => {
-    return
-  },
-  onRowClear = () => {
-    return
-  },
   matrix = createEmptyMatrix(10, 10),
   active,
 }: CreateBoardOptions = {}) {
-  return new Board(
-    onBoardChange,
-    onGameOver,
-    onRowClear,
-    getNextShape,
-    matrix,
-    active,
-  )
+  return new Board(getNextShape, matrix, active)
 }

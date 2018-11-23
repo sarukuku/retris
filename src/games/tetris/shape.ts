@@ -1,4 +1,5 @@
 import { transpose } from "ramda"
+import { colorGradients } from "../../styles/colors"
 import { Matrix, rotateMatrix, Row } from "./matrix"
 
 const _ = undefined
@@ -72,7 +73,7 @@ export class Shape {
     }, initialBoundingRect)
   }
 
-  static createIShape(color: string[]) {
+  static createIShape(color: string[] = colorGradients.GREEN) {
     const x = { color }
     return new IShape([
       [_, _, x, _], //
@@ -82,7 +83,7 @@ export class Shape {
     ])
   }
 
-  static createJShape(color: string[]) {
+  static createJShape(color: string[] = colorGradients.WHITE) {
     const x = { color }
     return new Shape([
       [_, x, _], //
@@ -91,7 +92,7 @@ export class Shape {
     ])
   }
 
-  static createLShape(color: string[]) {
+  static createLShape(color: string[] = colorGradients.BLUE) {
     const x = { color }
     return new Shape([
       [_, x, _], //
@@ -100,7 +101,7 @@ export class Shape {
     ])
   }
 
-  static createOShape(color: string[]) {
+  static createOShape(color: string[] = colorGradients.ORANGE) {
     const x = { color }
     return new Shape([
       [x, x], //
@@ -108,7 +109,7 @@ export class Shape {
     ])
   }
 
-  static createSShape(color: string[]) {
+  static createSShape(color: string[] = colorGradients.LIGHT_BLUE) {
     const x = { color }
     return new Shape([
       [_, x, x], //
@@ -117,7 +118,7 @@ export class Shape {
     ])
   }
 
-  static createTShape(color: string[]) {
+  static createTShape(color: string[] = colorGradients.RED) {
     const x = { color }
     return new Shape([
       [_, x, _], //
@@ -126,7 +127,7 @@ export class Shape {
     ])
   }
 
-  static createZShape(color: string[]) {
+  static createZShape(color: string[] = colorGradients.PURPLE) {
     const x = { color }
     return new Shape([
       [x, x, _], //

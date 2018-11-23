@@ -1,7 +1,12 @@
 import React, { Component } from "react"
+import { Subject } from "rxjs"
 import { commands } from "../commands"
 import { AnalyticsProps, pageWithAnalytics } from "../components/with-analytics"
-import { SocketProps, pageWithSocket } from "../components/with-socket"
+import {
+  pageWithAutoUnsubscribe,
+  AutoUnsubscribeProps,
+} from "../components/with-auto-unsubscribe"
+import { pageWithSocket, SocketProps } from "../components/with-socket"
 import { ControllerState } from "../server/state"
 import { views } from "../views"
 import { GameController } from "../views/controller/game-controller"
@@ -11,10 +16,14 @@ import { NotRunning } from "../views/controller/not-running"
 import { StartGame } from "../views/controller/start-game"
 import { Loading } from "../views/loading"
 
-interface ControllerProps extends AnalyticsProps, SocketProps {}
+interface ControllerProps
+  extends AnalyticsProps,
+    SocketProps,
+    AutoUnsubscribeProps {}
 
 class Controller extends Component<ControllerProps, ControllerState> {
   private previousActiveView?: string
+  private actionCommand = new Subject<string>()
 
   state: ControllerState = {}
 
@@ -31,38 +40,22 @@ class Controller extends Component<ControllerProps, ControllerState> {
     socket.emit(command)
   }
 
-  onTap = () => {
-    this.sendActionCommand(commands.TAP)
-  }
-
-  onSwipeRight = () => {
-    this.sendActionCommand(commands.RIGHT)
-  }
-
-  onSwipeLeft = () => {
-    this.sendActionCommand(commands.LEFT)
-  }
-
-  onSwipeDown = () => {
-    this.sendActionCommand(commands.DOWN)
-  }
-
-  sendActionCommand = (value: string) => {
-    const { socket } = this.props
-    socket.emit(commands.ACTION, value)
-  }
-
   componentDidMount() {
-    const { socket } = this.props
+    const { socket, unsubscribeOnUnmount } = this.props
     socket.on("state", (state: Required<ControllerState>) => {
       this.setState(state)
     })
+
+    unsubscribeOnUnmount(
+      this.actionCommand.subscribe((action: string) => {
+        socket.emit(commands.ACTION, action)
+      }),
+    )
   }
 
   render() {
     this.sendPageView()
-    const view = this.renderView()
-    return <div>{view}</div>
+    return this.renderView()
   }
 
   private sendPageView() {
@@ -91,14 +84,7 @@ class Controller extends Component<ControllerProps, ControllerState> {
       case views.CONTROLLER_START:
         return <StartGame onStartGame={this.onStartGame} />
       case views.CONTROLLER_GAME_CONTROLS:
-        return (
-          <GameController
-            onSwipeRight={this.onSwipeRight}
-            onSwipeDown={this.onSwipeDown}
-            onSwipeLeft={this.onSwipeLeft}
-            onTap={this.onTap}
-          />
-        )
+        return <GameController actionCommand={this.actionCommand} />
       case views.CONTROLLER_GAME_OVER:
         return <GameOver onRestart={this.onJoinGame} />
       case undefined:
@@ -108,4 +94,6 @@ class Controller extends Component<ControllerProps, ControllerState> {
   }
 }
 
-export default pageWithAnalytics(pageWithSocket(Controller, "/controller"))
+export default pageWithAutoUnsubscribe(
+  pageWithAnalytics(pageWithSocket(Controller, "/controller")),
+)

@@ -1,27 +1,26 @@
 import React, { Component } from "react"
 import Swipeable from "react-swipeable"
+import { Subject } from "rxjs"
+import { commands } from "../../commands"
 import { colors } from "../../styles/colors"
 
 interface GameControllerProps {
-  onSwipeRight: () => void
-  onSwipeLeft: () => void
-  onSwipeDown: () => void
-  onTap: () => void
+  actionCommand: Subject<string>
 }
 
 export class GameController extends Component<GameControllerProps> {
   render() {
-    const { onSwipeDown, onSwipeLeft, onSwipeRight, onTap } = this.props
+    const { actionCommand } = this.props
 
     return (
       <Swipeable
-        onSwipedRight={onSwipeRight}
-        onSwipedDown={onSwipeDown}
-        onSwipedLeft={onSwipeLeft}
+        onSwipedRight={() => actionCommand.next(commands.RIGHT)}
+        onSwipedDown={() => actionCommand.next(commands.DOWN)}
+        onSwipedLeft={() => actionCommand.next(commands.LEFT)}
         stopPropagation={true}
         delta={50}
       >
-        <main className="wrap" onClick={onTap}>
+        <main className="wrap" onClick={() => actionCommand.next(commands.TAP)}>
           <p>Tap and swipe to play!</p>
         </main>
         <style jsx>{`
