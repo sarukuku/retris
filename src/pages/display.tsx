@@ -1,6 +1,6 @@
 import { NextContext } from "next"
 import React, { Component } from "react"
-import { Subject } from "rxjs"
+import { Subject, Subscription } from "rxjs"
 import { commands } from "../commands"
 import { AnalyticsProps, pageWithAnalytics } from "../components/with-analytics"
 import { pageWithSocket, SocketProps } from "../components/with-socket"
@@ -24,6 +24,7 @@ interface DisplayComponentState {
 
 class Display extends Component<DisplayProps, DisplayComponentState> {
   private previousActiveView?: string
+  private subscriptions: Subscription[] = []
 
   state: DisplayComponentState = {
     activeView: views.DISPLAY_WAITING,
@@ -49,18 +50,24 @@ class Display extends Component<DisplayProps, DisplayComponentState> {
     socket.on(commands.ACTION, (action: string) =>
       this.actionCommand.next(action),
     )
-    this.gameOver.subscribe((totalScore: number) => {
-      const { analytics } = this.props
-      this.setState({ score: totalScore })
+    this.subscriptions.push(
+      this.gameOver.subscribe((totalScore: number) => {
+        const { analytics } = this.props
+        this.setState({ score: totalScore })
 
-      analytics.sendCustomEvent({
-        category: "GameOver",
-        action: "TotalScore",
-        value: totalScore,
-      })
+        analytics.sendCustomEvent({
+          category: "GameOver",
+          action: "TotalScore",
+          value: totalScore,
+        })
 
-      socket.emit(commands.GAME_OVER)
-    })
+        socket.emit(commands.GAME_OVER)
+      }),
+    )
+  }
+
+  componentWillUnmount() {
+    this.subscriptions.map(s => s.unsubscribe())
   }
 
   render() {

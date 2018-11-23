@@ -1,6 +1,6 @@
 import memoize from "fast-memoize"
 import React, { Component } from "react"
-import { ReplaySubject } from "rxjs"
+import { ReplaySubject, Subscription } from "rxjs"
 import { TetrisMatrix } from "../../games/tetris/shape"
 import { svgToImage } from "../../helpers"
 import { calculateCanvasSize } from "./calculate-canvas-size"
@@ -27,6 +27,7 @@ export class Tetris extends Component<TetrisProps, TetrisState> {
   private board: TetrisMatrix
   private blockSVG: SVGElement
   private readonly canvasRef = React.createRef<HTMLCanvasElement>()
+  private subscriptions: Subscription[] = []
 
   async componentDidMount() {
     this.resizeCanvasToParentSize()
@@ -45,7 +46,13 @@ export class Tetris extends Component<TetrisProps, TetrisState> {
     window.requestAnimationFrame(renderFrame)
 
     const { game } = this.props
-    game.boardChange.subscribe(board => (this.board = board))
+    this.subscriptions.push(
+      game.boardChange.subscribe(board => (this.board = board)),
+    )
+  }
+
+  componentWillUnmount() {
+    this.subscriptions.map(s => s.unsubscribe())
   }
 
   private loadShapeBlock(): Promise<void> {

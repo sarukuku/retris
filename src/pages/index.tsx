@@ -1,7 +1,8 @@
 import React, { Component } from "react"
+import { Subject, Subscription } from "rxjs"
 import { commands } from "../commands"
 import { AnalyticsProps, pageWithAnalytics } from "../components/with-analytics"
-import { SocketProps, pageWithSocket } from "../components/with-socket"
+import { pageWithSocket, SocketProps } from "../components/with-socket"
 import { ControllerState } from "../server/state"
 import { views } from "../views"
 import { GameController } from "../views/controller/game-controller"
@@ -15,6 +16,8 @@ interface ControllerProps extends AnalyticsProps, SocketProps {}
 
 class Controller extends Component<ControllerProps, ControllerState> {
   private previousActiveView?: string
+  private subscriptions: Subscription[] = []
+  private actionCommand = new Subject<string>()
 
   state: ControllerState = {}
 
@@ -31,32 +34,21 @@ class Controller extends Component<ControllerProps, ControllerState> {
     socket.emit(command)
   }
 
-  onTap = () => {
-    this.sendActionCommand(commands.TAP)
-  }
-
-  onSwipeRight = () => {
-    this.sendActionCommand(commands.RIGHT)
-  }
-
-  onSwipeLeft = () => {
-    this.sendActionCommand(commands.LEFT)
-  }
-
-  onSwipeDown = () => {
-    this.sendActionCommand(commands.DOWN)
-  }
-
-  sendActionCommand = (value: string) => {
-    const { socket } = this.props
-    socket.emit(commands.ACTION, value)
-  }
-
   componentDidMount() {
     const { socket } = this.props
     socket.on("state", (state: Required<ControllerState>) => {
       this.setState(state)
     })
+
+    this.subscriptions.push(
+      this.actionCommand.subscribe((action: string) => {
+        socket.emit(commands.ACTION, action)
+      }),
+    )
+  }
+
+  componentWillUnmount() {
+    this.subscriptions.map(s => s.unsubscribe())
   }
 
   render() {
@@ -90,14 +82,7 @@ class Controller extends Component<ControllerProps, ControllerState> {
       case views.CONTROLLER_START:
         return <StartGame onStartGame={this.onStartGame} />
       case views.CONTROLLER_GAME_CONTROLS:
-        return (
-          <GameController
-            onSwipeRight={this.onSwipeRight}
-            onSwipeDown={this.onSwipeDown}
-            onSwipeLeft={this.onSwipeLeft}
-            onTap={this.onTap}
-          />
-        )
+        return <GameController actionCommand={this.actionCommand} />
       case views.CONTROLLER_GAME_OVER:
         return <GameOver onRestart={this.onJoinGame} />
       case undefined:

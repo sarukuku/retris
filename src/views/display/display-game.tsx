@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from "react"
-import { Subject } from "rxjs"
+import { Subject, Subscription } from "rxjs"
 import css from "styled-jsx/css"
 import { commands } from "../../commands"
 import { JoinHelpBar } from "../../components/join-help-bar"
@@ -18,18 +18,27 @@ interface DisplayGameState {
 
 export class DisplayGame extends Component<DisplayGameProps, DisplayGameState> {
   private game = new Game({ columnCount: 10, rowCount: 16 })
+  private subscriptions: Subscription[] = []
   state: DisplayGameState = {
     score: 0,
   }
 
   async componentDidMount() {
     const { actionCommand, gameOver } = this.props
-    actionCommand.subscribe(this.handleCommand)
-    this.game.scoreChange.subscribe(({ current }) =>
-      this.setState({ score: current }),
+
+    this.subscriptions.push(
+      actionCommand.subscribe(this.handleCommand),
+      this.game.scoreChange.subscribe(({ current }) =>
+        this.setState({ score: current }),
+      ),
     )
+
     await this.game.start()
     gameOver.next(this.state.score)
+  }
+
+  componentWillUnmount() {
+    this.subscriptions.map(s => s.unsubscribe())
   }
 
   private handleCommand = (command: string) => {
