@@ -1,12 +1,12 @@
 import { last } from "ramda"
+import { colorGradients } from "../../styles/colors"
 import { Active, Board } from "./board"
 import { GetNextShape, getNextShape as _getNextShape } from "./get-next-shape"
 import { createEmptyMatrix } from "./matrix"
 import { Shape, TetrisMatrix } from "./shape"
 
 const _ = undefined
-const redGradient = ["#ff4396", "#ff292c"]
-const p = { color: redGradient }
+const p = { color: colorGradients.RED }
 
 interface Test {
   only?: boolean

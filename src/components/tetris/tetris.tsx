@@ -1,11 +1,13 @@
 import memoize from "fast-memoize"
 import React, { Component } from "react"
 import { ReplaySubject } from "rxjs"
+import { clientConfig } from "../../client-config"
 import { TetrisMatrix } from "../../games/tetris/shape"
 import { svgToImage } from "../../helpers"
+import { colors } from "../../styles/colors"
 import {
-  withAutoUnsubscribe,
   AutoUnsubscribeProps,
+  withAutoUnsubscribe,
 } from "../with-auto-unsubscribe"
 import { calculateCanvasSize } from "./calculate-canvas-size"
 
@@ -17,7 +19,6 @@ interface Game {
 
 interface TetrisProps extends AutoUnsubscribeProps {
   game: Game
-  staticPath: string
 }
 
 interface TetrisState {
@@ -56,7 +57,7 @@ class _Tetris extends Component<TetrisProps, TetrisState> {
 
   private loadShapeBlock(): Promise<void> {
     const xhr = new XMLHttpRequest()
-    const url = `${this.props.staticPath}/block.svg`
+    const url = `${clientConfig.staticPath}/block.svg`
     xhr.open("GET", url, true)
     xhr.overrideMimeType("image/svg+xml")
 
@@ -145,7 +146,7 @@ class _Tetris extends Component<TetrisProps, TetrisState> {
         const x = columnIndex * cellWidth + paddingX
         const y = rowIndex * cellHeight + paddingY
 
-        ctx.fillStyle = "#1d1f21"
+        ctx.fillStyle = colors.DARK_GRAY
         ctx.fillRect(x, y, innerWidth, innerHeight)
 
         if (cell) {

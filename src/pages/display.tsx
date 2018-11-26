@@ -134,7 +134,6 @@ class Display extends Component<DisplayProps, DisplayComponentState> {
           <DisplayGame
             actionCommand={this.actionCommand}
             gameOver={this.gameOver}
-            staticPath="/static"
           />
         )
       case views.DISPLAY_GAME_OVER:

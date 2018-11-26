@@ -1,3 +1,4 @@
+import { colorGradients } from "../../styles/colors"
 import { getNextShape } from "./get-next-shape"
 import { Shape } from "./shape"
 
@@ -9,8 +10,7 @@ afterAll(() => {
 test("generate random shape with color", () => {
   Math.random = () => 0
   const createFirstShape = Shape.createIShape
-  const greenGradient = ["#0aff00", "#00edff"]
-  const expectedShape = createFirstShape(greenGradient)
+  const expectedShape = createFirstShape(colorGradients.GREEN)
 
   const shape = getNextShape()
 

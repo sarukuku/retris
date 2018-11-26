@@ -72,7 +72,7 @@ class Retris extends App<RetrisProps> {
               body {
                 overflow-y: hidden;
                 font-family: ${withFallback(fonts.JOSEFIN)};
-                color: ${colors.BLACK};
+                color: ${colors.GRAY};
                 line-height: 1.1;
               }
             `}</style>

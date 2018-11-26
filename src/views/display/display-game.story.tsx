@@ -37,7 +37,6 @@ class TetrisWrapper extends Component {
           <DisplayGame
             actionCommand={this.actionCommand}
             gameOver={new Subject<number>()}
-            staticPath=""
           />
         </div>
         <style global={true} jsx>{`

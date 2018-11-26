@@ -13,7 +13,6 @@ import { Game } from "../../games/tetris/game"
 interface DisplayGameProps extends AutoUnsubscribeProps {
   actionCommand: Subject<string>
   gameOver: Subject<number>
-  staticPath: string
 }
 
 interface DisplayGameState {
@@ -66,13 +65,12 @@ class _DisplayGame extends Component<DisplayGameProps, DisplayGameState> {
     }`
 
     const { score } = this.state
-    const { staticPath } = this.props
 
     return (
       <Fragment>
         <div className="wrap">
           <div className="tetris-wrap">
-            <Tetris game={this.game} staticPath={staticPath} />
+            <Tetris game={this.game} />
             Score: {score}
           </div>
           <JoinHelpBar className={className} />

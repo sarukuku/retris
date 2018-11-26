@@ -1,3 +1,4 @@
+const webpack = require("webpack")
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin")
 
 module.exports = (baseConfig, env, config) => {
@@ -12,6 +13,7 @@ module.exports = (baseConfig, env, config) => {
       tslint: "tslint.json",
       formatter: "codeframe",
     }),
+    new webpack.EnvironmentPlugin({ STATIC_PATH: process.env.STATIC_PATH }),
   )
 
   return config
