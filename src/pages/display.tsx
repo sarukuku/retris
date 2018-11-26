@@ -1,6 +1,7 @@
 import { NextContext } from "next"
 import React, { Component } from "react"
 import { Subject } from "rxjs"
+import io from "socket.io-client"
 import { commands } from "../commands"
 import { AnalyticsProps, pageWithAnalytics } from "../components/with-analytics"
 import {
@@ -143,5 +144,5 @@ class Display extends Component<DisplayProps, DisplayComponentState> {
 }
 
 export default pageWithAutoUnsubscribe(
-  pageWithAnalytics(pageWithSocket(Display, "/display")),
+  pageWithAnalytics(pageWithSocket(Display, () => io("/display"))),
 )

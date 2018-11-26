@@ -1,9 +1,12 @@
 import React, { ComponentType } from "react"
-import io from "socket.io-client"
 import { retainGetInitialProps } from "./retain-get-initial-props"
 import { WithoutProps } from "./without-props"
 
-type Socket = typeof io.Socket
+export interface Socket {
+  on(event: string, handler: (...args: any[]) => void): void
+  emit(event: string, payload?: string): void
+  close(): void
+}
 
 export interface SocketProps {
   socket: Socket
@@ -17,7 +20,7 @@ type WithoutSocketProps<Props> = WithoutProps<Props, SocketProps>
 
 export function withSocket<Props>(
   Component: ComponentType<Props & SocketProps>,
-  uri: string,
+  createSocket: () => Socket,
 ): ComponentType<WithoutSocketProps<Props>> {
   class WithSocket extends React.Component<
     WithoutSocketProps<Props>,
@@ -26,8 +29,7 @@ export function withSocket<Props>(
     state: SocketState = {}
 
     componentDidMount() {
-      const socket = io(uri)
-
+      const socket = createSocket()
       socket.on("connect", () => {
         this.setState({ socket })
       })

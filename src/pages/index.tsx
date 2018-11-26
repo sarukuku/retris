@@ -1,5 +1,6 @@
 import React, { Component } from "react"
 import { Subject } from "rxjs"
+import io from "socket.io-client"
 import { commands } from "../commands"
 import { AnalyticsProps, pageWithAnalytics } from "../components/with-analytics"
 import {
@@ -95,5 +96,5 @@ class Controller extends Component<ControllerProps, ControllerState> {
 }
 
 export default pageWithAutoUnsubscribe(
-  pageWithAnalytics(pageWithSocket(Controller, "/controller")),
+  pageWithAnalytics(pageWithSocket(Controller, () => io("/controller"))),
 )
