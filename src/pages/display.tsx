@@ -1,16 +1,16 @@
 import { NextContext } from "next"
-import React, { Component } from "react"
+import React, { Component, Fragment } from "react"
 import { Subject } from "rxjs"
 import io from "socket.io-client"
 import { commands } from "../commands"
+import { AttractionLoop } from "../components/attraction-loop"
 import { AnalyticsProps, pageWithAnalytics } from "../components/with-analytics"
 import {
-  pageWithAutoUnsubscribe,
   AutoUnsubscribeProps,
+  pageWithAutoUnsubscribe,
 } from "../components/with-auto-unsubscribe"
 import { pageWithSocket, SocketProps } from "../components/with-socket"
 import { DisplayState } from "../server/state"
-import { colors } from "../styles/colors"
 import { views } from "../views"
 import { DisplayGame } from "../views/display/display-game"
 import { GameOver } from "../views/display/game-over"
@@ -74,37 +74,16 @@ class Display extends Component<DisplayProps, DisplayComponentState> {
   }
 
   render() {
-    const { queueLength } = this.state
-
     this.sendPageView()
-
     return (
-      <main>
-        <div className="info-bar">{queueLength} people in queue</div>
-        <div className="view">{this.renderView()}</div>
+      <Fragment>
+        <div className="display">{this.renderView()}</div>
         <style jsx>{`
-          main {
-            background-color: ${colors.PETER_RIVER};
-            background-image: url("/static/r-symbol.png");
-            background-size: 50px;
-            background-repeat: no-repeat;
-            background-position: 1vw 1vw;
+          .display {
             height: 100vh;
-            display: flex;
-            flex-direction: column;
-          }
-
-          .info-bar {
-            text-align: right;
-            padding: 10px;
-          }
-
-          .view {
-            flex-grow: 1;
-            display: flex;
           }
         `}</style>
-      </main>
+      </Fragment>
     )
   }
 
@@ -126,9 +105,17 @@ class Display extends Component<DisplayProps, DisplayComponentState> {
     switch (activeView) {
       default:
       case views.DISPLAY_WAITING:
-        return <Waiting address={address} />
       case views.DISPLAY_WAITING_TO_START:
-        return <WaitingToStart />
+        return (
+          <Fragment>
+            {activeView === views.DISPLAY_WAITING ? (
+              <Waiting address={address} />
+            ) : (
+              <WaitingToStart />
+            )}
+            <AttractionLoop />
+          </Fragment>
+        )
       case views.DISPLAY_GAME:
         return (
           <DisplayGame

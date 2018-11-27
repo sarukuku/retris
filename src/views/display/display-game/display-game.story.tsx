@@ -1,7 +1,7 @@
 import { storiesOf } from "@storybook/react"
 import React, { Component, Fragment } from "react"
 import { Subject } from "rxjs"
-import { commands } from "../../commands"
+import { commands } from "../../../commands"
 import { DisplayGame } from "./display-game"
 
 storiesOf("Tetris", module).add("Tetris", () => <TetrisWrapper />)

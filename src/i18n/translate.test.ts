@@ -1,10 +1,10 @@
-import { defaultTranslations, Translations } from "./default-translations"
+import { defaultTranslations, TranslationKey } from "./default-translations"
 import { createTranslate } from "./translate"
 
 test("default translation", () => {
   const translate = createTranslate({} as any)
-  const key = "display.waiting.header.line1"
 
+  const key = Object.keys(defaultTranslations)[0] as TranslationKey
   const result = translate(key)
 
   expect(result).toEqual(defaultTranslations[key])
@@ -12,25 +12,24 @@ test("default translation", () => {
 
 test("translation", () => {
   const translate = createTranslate(translations)
-  const key = "display.waiting.header.line1"
 
-  const result = translate(key)
+  const result = translate(translationKey)
 
-  expect(result).toEqual(translations[key])
+  expect(result).toEqual(translations[translationKey])
 })
 
 test("interpolation", () => {
-  const key = "display.waiting.header.line1"
   const translate = createTranslate({
     ...translations,
-    [key]: "hello {{world}}",
+    [translationKey]: "hello {{world}}",
   })
 
-  const result = translate(key, { world: "foo" })
+  const result = translate(translationKey, { world: "foo" })
 
   expect(result).toEqual("hello foo")
 })
 
-const translations: Translations = {
-  "display.waiting.header.line1": "display.waiting.header.line1",
-}
+const translationKey = "aTranslationKey" as TranslationKey
+const translations = {
+  [translationKey]: "translationValue",
+} as any

@@ -29,7 +29,8 @@ type Ctx = CanvasRenderingContext2D
 type Canvas = HTMLCanvasElement
 
 class _Tetris extends Component<TetrisProps, TetrisState> {
-  private board: TetrisMatrix
+  private board?: TetrisMatrix
+  private previousBoard?: TetrisMatrix
   private blockSVG: SVGElement
   private readonly canvasRef = React.createRef<HTMLCanvasElement>()
 
@@ -41,18 +42,24 @@ class _Tetris extends Component<TetrisProps, TetrisState> {
 
     const canvasRef = this.canvasRef
     const ctx = this.ctx
-    const renderFrame = () => {
-      if (canvasRef.current && ctx) {
-        this.renderGame(canvasRef.current, ctx)
-      }
-      window.requestAnimationFrame(renderFrame)
-    }
-    window.requestAnimationFrame(renderFrame)
+    window.requestAnimationFrame(() => this.renderFrame(canvasRef.current, ctx))
 
     const { game, unsubscribeOnUnmount } = this.props
     unsubscribeOnUnmount(
       game.boardChange.subscribe(board => (this.board = board)),
     )
+  }
+
+  private renderFrame = (canvas: Canvas | null, ctx?: Ctx): void => {
+    if (canvas && ctx && this.shouldRender()) {
+      this.previousBoard = this.board
+      this.renderGame(canvas, ctx)
+    }
+    window.requestAnimationFrame(() => this.renderFrame(canvas, ctx))
+  }
+
+  private shouldRender() {
+    return this.previousBoard !== this.board
   }
 
   private loadShapeBlock(): Promise<void> {
