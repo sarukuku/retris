@@ -1,6 +1,6 @@
 import React, { Component } from "react"
+import { TranslateProps, withTranslate } from "../../components/with-translate"
 import { colors } from "../../styles/colors"
-import { withTranslate, TranslateProps } from "../../components/with-translate"
 
 interface StartGameProps extends TranslateProps {
   onStartGame: () => void
