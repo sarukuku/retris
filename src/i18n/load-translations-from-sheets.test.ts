@@ -1,12 +1,14 @@
 import nock from "nock"
-import { defaultTranslations } from "./default-translations"
+import { defaultTranslations, TranslationKey } from "./default-translations"
 import {
   createLoadTranslationsFromSheets,
   SheetsResponse,
 } from "./load-translations-from-sheets"
 
 test("default translations if no sheet API config is provided", async () => {
-  const loadDefaultTranslations = createLoadTranslationsFromSheets()
+  const loadDefaultTranslations = createLoadTranslationsFromSheets(
+    defaultTranslations,
+  )
 
   const translations = await loadDefaultTranslations()
 
@@ -17,19 +19,24 @@ const sheetsAPIMock = nock("https://sheets.googleapis.com/v4/spreadsheets")
 const apiKey = "apiKey"
 const sheetName = "sheetName"
 const spreadsheetID = "spreadsheetID"
-const loadTranslations = createLoadTranslationsFromSheets({
-  apiKey,
-  sheetName,
-  spreadsheetID,
-})
+const fakeDefaultTranslations = { aTranslationKey: "aTranslationValue" } as any
+const loadTranslations = createLoadTranslationsFromSheets(
+  fakeDefaultTranslations,
+  {
+    apiKey,
+    sheetName,
+    spreadsheetID,
+  },
+)
 
 test("load translation", async () => {
   mockWithResponse(sheetsResponse)
 
   const translations = await loadTranslations()
 
+  const [key, value] = sheetsResponse.values[0]
   expect(translations).toEqual({
-    "display.waiting.header.big": "Line1",
+    [key]: value,
   })
 })
 
@@ -75,10 +82,10 @@ describe("validation error", () => {
   })
 
   test("'1' is not a valid translated string, type is number", async () => {
-    mockWithResponse({ values: [["display.waiting.header.big", 1]] })
+    mockWithResponse({ values: [["aTranslationKey", 1]] })
 
     await expect(loadTranslations()).rejects.toThrow(
-      `Invalid Sheets Response: ["'1' is not a valid translated string, key is 'display.waiting.header.line1', type is number"]`,
+      `Invalid Sheets Response: ["'1' is not a valid translated string, key is 'aTranslationKey', type is number"]`,
     )
   })
 
@@ -87,14 +94,14 @@ describe("validation error", () => {
       values: [
         "foo",
         ["not.a.valid.translation.key", "foo"],
-        ["display.waiting.header.big", null],
+        ["aTranslationKey", null],
       ],
     })
 
     const errors = [
       "'foo' is not a [key, value] pair",
       "'not.a.valid.translation.key' is not a valid translation key",
-      "'null' is not a valid translated string, key is 'display.waiting.header.line1', type is object",
+      "'null' is not a valid translated string, key is 'aTranslationKey', type is object",
     ]
     await expect(loadTranslations()).rejects.toThrow(
       `Invalid Sheets Response: ${JSON.stringify(errors)}`,
@@ -109,5 +116,5 @@ function mockWithResponse(response: any): void {
 }
 
 const sheetsResponse: SheetsResponse = {
-  values: [["display.waiting.header.big", "Line1"]],
+  values: [["aTranslationKey" as TranslationKey, "aDefaultTranslationValue"]],
 }

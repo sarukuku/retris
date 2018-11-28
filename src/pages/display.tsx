@@ -1,16 +1,16 @@
 import { NextContext } from "next"
-import React, { Component } from "react"
+import React, { Component, Fragment } from "react"
 import { Subject } from "rxjs"
 import io from "socket.io-client"
 import { commands } from "../commands"
+import { AttractionLoop } from "../components/attraction-loop"
+import { BlurredOverlay } from "../components/blurred-overlay"
 import { AnalyticsProps, pageWithAnalytics } from "../components/with-analytics"
 import {
-  pageWithAutoUnsubscribe,
   AutoUnsubscribeProps,
+  pageWithAutoUnsubscribe,
 } from "../components/with-auto-unsubscribe"
 import { pageWithSocket, SocketProps } from "../components/with-socket"
-import { DisplayState } from "../server/state"
-import { colors } from "../styles/colors"
 import { views } from "../views"
 import { DisplayGame } from "../views/display/display-game"
 import { GameOver } from "../views/display/game-over"
@@ -30,7 +30,7 @@ interface DisplayComponentState {
   queueLength: number
 }
 
-class Display extends Component<DisplayProps, DisplayComponentState> {
+export class _Display extends Component<DisplayProps, DisplayComponentState> {
   private previousActiveView?: string
 
   state: DisplayComponentState = {
@@ -51,13 +51,19 @@ class Display extends Component<DisplayProps, DisplayComponentState> {
 
   componentDidMount() {
     const { socket, unsubscribeOnUnmount } = this.props
-    socket.on("state", (data: Required<DisplayState>) => {
-      this.setState(data)
-    })
-    socket.on(commands.ACTION, (action: string) =>
-      this.actionCommand.next(action),
+
+    unsubscribeOnUnmount(
+      socket.subscribe(({ event, payload }) => {
+        switch (event) {
+          case "state":
+            this.setState(payload)
+            break
+          case commands.ACTION:
+            this.actionCommand.next(payload)
+        }
+      }),
+      this.gameOver.subscribe(this.onGameOver),
     )
-    unsubscribeOnUnmount(this.gameOver.subscribe(this.onGameOver))
   }
 
   private onGameOver = (totalScore: number) => {
@@ -70,41 +76,20 @@ class Display extends Component<DisplayProps, DisplayComponentState> {
       value: totalScore,
     })
 
-    socket.emit(commands.GAME_OVER)
+    socket.next({ event: commands.GAME_OVER })
   }
 
   render() {
-    const { queueLength } = this.state
-
     this.sendPageView()
-
     return (
-      <main>
-        <div className="info-bar">{queueLength} people in queue</div>
-        <div className="view">{this.renderView()}</div>
+      <Fragment>
+        <div className="display">{this.renderView()}</div>
         <style jsx>{`
-          main {
-            background-color: ${colors.PETER_RIVER};
-            background-image: url("/static/r-symbol.png");
-            background-size: 50px;
-            background-repeat: no-repeat;
-            background-position: 1vw 1vw;
+          .display {
             height: 100vh;
-            display: flex;
-            flex-direction: column;
-          }
-
-          .info-bar {
-            text-align: right;
-            padding: 10px;
-          }
-
-          .view {
-            flex-grow: 1;
-            display: flex;
           }
         `}</style>
-      </main>
+      </Fragment>
     )
   }
 
@@ -126,23 +111,35 @@ class Display extends Component<DisplayProps, DisplayComponentState> {
     switch (activeView) {
       default:
       case views.DISPLAY_WAITING:
-        return <Waiting address={address} />
       case views.DISPLAY_WAITING_TO_START:
-        return <WaitingToStart />
-      case views.DISPLAY_GAME:
         return (
-          <DisplayGame
-            actionCommand={this.actionCommand}
-            gameOver={this.gameOver}
-            staticPath="/static"
-          />
+          <Fragment>
+            {activeView === views.DISPLAY_WAITING ? (
+              <Waiting address={address} />
+            ) : (
+              <WaitingToStart />
+            )}
+            <AttractionLoop />
+          </Fragment>
         )
+      case views.DISPLAY_GAME:
       case views.DISPLAY_GAME_OVER:
-        return <GameOver score={score} />
+        const isGameOver = activeView === views.DISPLAY_GAME_OVER
+        return (
+          <Fragment>
+            <BlurredOverlay isActive={isGameOver}>
+              <DisplayGame
+                actionCommand={this.actionCommand}
+                gameOver={this.gameOver}
+              />
+            </BlurredOverlay>
+            {isGameOver && <GameOver score={score} />}
+          </Fragment>
+        )
     }
   }
 }
 
 export default pageWithAutoUnsubscribe(
-  pageWithAnalytics(pageWithSocket(Display, () => io("/display"))),
+  pageWithAnalytics(pageWithSocket(_Display, () => io("/display"))),
 )

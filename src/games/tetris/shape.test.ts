@@ -1,7 +1,8 @@
+import { colorGradients } from "../../styles/colors"
 import { Shape } from "./shape"
 
 const _ = undefined
-const color = ["#0aff00", "#00edff"]
+const color = colorGradients.GREEN
 const x = { color }
 
 const rotateTests = [

@@ -1,11 +1,13 @@
 import memoize from "fast-memoize"
 import React, { Component } from "react"
 import { ReplaySubject } from "rxjs"
+import { clientConfig } from "../../client-config"
 import { TetrisMatrix } from "../../games/tetris/shape"
 import { svgToImage } from "../../helpers"
+import { colors } from "../../styles/colors"
 import {
-  withAutoUnsubscribe,
   AutoUnsubscribeProps,
+  withAutoUnsubscribe,
 } from "../with-auto-unsubscribe"
 import { calculateCanvasSize } from "./calculate-canvas-size"
 
@@ -17,7 +19,6 @@ interface Game {
 
 interface TetrisProps extends AutoUnsubscribeProps {
   game: Game
-  staticPath: string
 }
 
 interface TetrisState {
@@ -28,7 +29,8 @@ type Ctx = CanvasRenderingContext2D
 type Canvas = HTMLCanvasElement
 
 class _Tetris extends Component<TetrisProps, TetrisState> {
-  private board: TetrisMatrix
+  private board?: TetrisMatrix
+  private previousBoard?: TetrisMatrix
   private blockSVG: SVGElement
   private readonly canvasRef = React.createRef<HTMLCanvasElement>()
 
@@ -40,13 +42,7 @@ class _Tetris extends Component<TetrisProps, TetrisState> {
 
     const canvasRef = this.canvasRef
     const ctx = this.ctx
-    const renderFrame = () => {
-      if (canvasRef.current && ctx) {
-        this.renderGame(canvasRef.current, ctx)
-      }
-      window.requestAnimationFrame(renderFrame)
-    }
-    window.requestAnimationFrame(renderFrame)
+    window.requestAnimationFrame(() => this.renderFrame(canvasRef.current, ctx))
 
     const { game, unsubscribeOnUnmount } = this.props
     unsubscribeOnUnmount(
@@ -54,9 +50,21 @@ class _Tetris extends Component<TetrisProps, TetrisState> {
     )
   }
 
+  private renderFrame = (canvas: Canvas | null, ctx?: Ctx): void => {
+    if (canvas && ctx && this.shouldRender()) {
+      this.previousBoard = this.board
+      this.renderGame(canvas, ctx)
+    }
+    window.requestAnimationFrame(() => this.renderFrame(canvas, ctx))
+  }
+
+  private shouldRender() {
+    return this.previousBoard !== this.board
+  }
+
   private loadShapeBlock(): Promise<void> {
     const xhr = new XMLHttpRequest()
-    const url = `${this.props.staticPath}/block.svg`
+    const url = `${clientConfig.staticPath}/block.svg`
     xhr.open("GET", url, true)
     xhr.overrideMimeType("image/svg+xml")
 
@@ -145,7 +153,7 @@ class _Tetris extends Component<TetrisProps, TetrisState> {
         const x = columnIndex * cellWidth + paddingX
         const y = rowIndex * cellHeight + paddingY
 
-        ctx.fillStyle = "#1d1f21"
+        ctx.fillStyle = colors.DARK_GRAY
         ctx.fillRect(x, y, innerWidth, innerHeight)
 
         if (cell) {

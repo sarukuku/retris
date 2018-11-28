@@ -1,5 +1,11 @@
 import React, { ComponentType } from "react"
+import { ReplaySubject } from "rxjs"
+import { commands } from "../commands"
 import { retainGetInitialProps } from "./retain-get-initial-props"
+import {
+  AutoUnsubscribeProps,
+  withAutoUnsubscribe,
+} from "./with-auto-unsubscribe"
 import { WithoutProps } from "./without-props"
 
 export interface Socket {
@@ -8,12 +14,17 @@ export interface Socket {
   close(): void
 }
 
+export interface SocketPayload {
+  event: string
+  payload?: any
+}
+
 export interface SocketProps {
-  socket: Socket
+  socket: ReplaySubject<SocketPayload>
 }
 
 interface SocketState {
-  socket?: Socket
+  didSocketConnect: boolean
 }
 
 type WithoutSocketProps<Props> = WithoutProps<Props, SocketProps>
@@ -23,35 +34,60 @@ export function withSocket<Props>(
   createSocket: () => Socket,
 ): ComponentType<WithoutSocketProps<Props>> {
   class WithSocket extends React.Component<
-    WithoutSocketProps<Props>,
+    WithoutSocketProps<Props> & AutoUnsubscribeProps,
     SocketState
   > {
-    state: SocketState = {}
+    state: SocketState = {
+      didSocketConnect: false,
+    }
+    private socket: Socket
+    private socketSubject = new ReplaySubject<SocketPayload>()
 
     componentDidMount() {
-      const socket = createSocket()
-      socket.on("connect", () => {
-        this.setState({ socket })
+      this.socket = createSocket()
+      this.socket.on("connect", () => {
+        this.setupCommFromServer()
+        this.setupCommToServer()
+        this.setState({ didSocketConnect: true })
       })
     }
 
+    private setupCommFromServer() {
+      this.socket.on("state", payload => {
+        this.socketSubject.next({ event: "state", payload })
+      })
+      this.socket.on(commands.ACTION, payload => {
+        this.socketSubject.next({ event: commands.ACTION, payload })
+      })
+    }
+
+    private setupCommToServer() {
+      this.props.unsubscribeOnUnmount(
+        this.socketSubject.subscribe(({ event, payload }) => {
+          this.socket.emit(event, payload)
+        }),
+      )
+    }
+
     componentWillUnmount() {
-      const { socket } = this.state
-      if (socket) {
-        socket.close()
+      if (this.socket) {
+        this.socket.close()
       }
     }
 
     render() {
-      const { socket } = this.state
-      if (!socket) {
+      const { didSocketConnect } = this.state
+      if (!didSocketConnect) {
         return null
       }
-      return <Component socket={socket} {...this.props} />
+
+      return <Component socket={this.socketSubject} {...this.props} />
     }
   }
 
-  return WithSocket
+  return withAutoUnsubscribe(WithSocket) as ComponentType<
+    WithoutSocketProps<Props>
+  >
 }
 
 export const pageWithSocket = retainGetInitialProps(withSocket)
