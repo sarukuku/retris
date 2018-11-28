@@ -5,7 +5,7 @@ import { ReaktorTetris } from "./reaktor-tetris"
 storiesOf("ReaktorTetris", module).add("Tetris", () => (
   <Fragment>
     <div className="tetris-wrapper">
-      <ReaktorTetris staticPath="" />
+      <ReaktorTetris />
     </div>
     <style global={true} jsx>{`
       html,

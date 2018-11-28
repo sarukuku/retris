@@ -6,8 +6,6 @@ import { createEmptyMatrix } from "./matrix"
 import { Score } from "./score"
 import { TetrisMatrix } from "./shape"
 
-const TEN_SECONDS = 10000
-
 export interface ScoreChange {
   gained: number
   current: number
@@ -47,8 +45,9 @@ export class Game {
         this.currentLevel,
         numberOfRowsCleared,
       )
-      const current = this.score.current
-      this.scoreChange.next({ gained, current })
+      const currentScore = this.score.current
+      this.currentLevel = Math.floor(currentScore / 500) + 1
+      this.scoreChange.next({ gained, current: currentScore })
     })
   }
 
@@ -61,18 +60,10 @@ export class Game {
   }
 
   async start() {
-    const handle = setInterval(this.increaseLevel, TEN_SECONDS)
-
     while (!this.isGameOver) {
       this.board.step()
       await wait(this.mapLevelToTime())
     }
-
-    clearInterval(handle)
-  }
-
-  private increaseLevel = () => {
-    this.currentLevel++
   }
 
   private mapLevelToTime(): number {

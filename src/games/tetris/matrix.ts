@@ -8,7 +8,11 @@ export function createEmptyMatrix<T>(
   _columnCount: number,
   _rowCount: number,
 ): Matrix<T> {
-  return times(() => times(always(undefined), _columnCount), _rowCount)
+  return times(() => createEmptyRow(_columnCount), _rowCount)
+}
+
+export function createEmptyRow<T>(_columnCount: number): Row<T> {
+  return times(always(undefined), _columnCount)
 }
 
 export function rotateMatrix<T>(matrix: Matrix<T>): Matrix<T> {

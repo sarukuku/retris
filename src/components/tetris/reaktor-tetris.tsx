@@ -1,20 +1,15 @@
 import React, { Component } from "react"
-import { ReaktorGame } from "../../games/tetris/reaktor-game"
+import { LoopedReaktorGame } from "../../games/tetris/looped-reaktor-game"
 import { Tetris } from "./tetris"
 
-interface ReaktorTetrisProps {
-  staticPath: string
-}
-
-export class ReaktorTetris extends Component<ReaktorTetrisProps> {
-  private game = new ReaktorGame()
+export class ReaktorTetris extends Component {
+  private game = new LoopedReaktorGame()
 
   async componentDidMount() {
-    await this.game.start()
+    this.game.start()
   }
 
   render() {
-    const { staticPath } = this.props
-    return <Tetris game={this.game} staticPath={staticPath} />
+    return <Tetris game={this.game} />
   }
 }
