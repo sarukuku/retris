@@ -38,18 +38,20 @@ class Controller extends Component<ControllerProps, ControllerState> {
 
   sendCommand = (command: string) => {
     const { socket } = this.props
-    socket.emit(command)
+    socket.next({ event: command })
   }
 
   componentDidMount() {
     const { socket, unsubscribeOnUnmount } = this.props
-    socket.on("state", (state: Required<ControllerState>) => {
-      this.setState(state)
-    })
-
     unsubscribeOnUnmount(
-      this.actionCommand.subscribe((action: string) => {
-        socket.emit(commands.ACTION, action)
+      this.actionCommand.subscribe((action: string) =>
+        socket.next({ event: commands.ACTION, payload: action }),
+      ),
+      socket.subscribe(({ event, payload }) => {
+        switch (event) {
+          case "state":
+            this.setState(payload)
+        }
       }),
     )
   }

@@ -10,7 +10,6 @@ import {
   pageWithAutoUnsubscribe,
 } from "../components/with-auto-unsubscribe"
 import { pageWithSocket, SocketProps } from "../components/with-socket"
-import { DisplayState } from "../server/state"
 import { views } from "../views"
 import { DisplayGame } from "../views/display/display-game"
 import { GameOver } from "../views/display/game-over"
@@ -30,7 +29,7 @@ interface DisplayComponentState {
   queueLength: number
 }
 
-class Display extends Component<DisplayProps, DisplayComponentState> {
+export class _Display extends Component<DisplayProps, DisplayComponentState> {
   private previousActiveView?: string
 
   state: DisplayComponentState = {
@@ -51,13 +50,19 @@ class Display extends Component<DisplayProps, DisplayComponentState> {
 
   componentDidMount() {
     const { socket, unsubscribeOnUnmount } = this.props
-    socket.on("state", (data: Required<DisplayState>) => {
-      this.setState(data)
-    })
-    socket.on(commands.ACTION, (action: string) =>
-      this.actionCommand.next(action),
+
+    unsubscribeOnUnmount(
+      socket.subscribe(({ event, payload }) => {
+        switch (event) {
+          case "state":
+            this.setState(payload)
+            break
+          case commands.ACTION:
+            this.actionCommand.next(payload)
+        }
+      }),
+      this.gameOver.subscribe(this.onGameOver),
     )
-    unsubscribeOnUnmount(this.gameOver.subscribe(this.onGameOver))
   }
 
   private onGameOver = (totalScore: number) => {
@@ -70,7 +75,7 @@ class Display extends Component<DisplayProps, DisplayComponentState> {
       value: totalScore,
     })
 
-    socket.emit(commands.GAME_OVER)
+    socket.next({ event: commands.GAME_OVER })
   }
 
   render() {
@@ -130,5 +135,5 @@ class Display extends Component<DisplayProps, DisplayComponentState> {
 }
 
 export default pageWithAutoUnsubscribe(
-  pageWithAnalytics(pageWithSocket(Display, () => io("/display"))),
+  pageWithAnalytics(pageWithSocket(_Display, () => io("/display"))),
 )

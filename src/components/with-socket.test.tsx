@@ -1,6 +1,7 @@
 import React from "react"
 import TestRenderer from "react-test-renderer"
-import { withSocket, Socket } from "./with-socket"
+import { commands } from "../commands"
+import { Socket, withSocket } from "./with-socket"
 
 test("invokes connect on mount", () => {
   const on = jest.fn()
@@ -22,15 +23,40 @@ test("invokes close on unmount", () => {
   expect(close).toHaveBeenCalled()
 })
 
-test("passes socket to component upon render", () => {
-  const on = (_event: string, handler: () => void) => handler()
-  const renderComponent = jest.fn(() => <div />)
+test("invokes next() upon socket data coming from server", () => {
+  const statePayload = "foo"
+  const actionPayload = "bar"
+  const on = (_event: string, handler: (payload?: any) => void) => {
+    if (_event === "connect") {
+      return handler()
+    }
+    if (_event === "state") {
+      return handler(statePayload)
+    }
+    if (_event === commands.ACTION) {
+      return handler(actionPayload)
+    }
+  }
   const socket = createSocket({ on })
-  const Component = withSocket(renderComponent, () => socket)
+  const subscribeSpy = jest.fn()
+  const Component = withSocket(
+    ({ socket: socketSubject }) => {
+      socketSubject.subscribe(subscribeSpy)
+      return <div />
+    },
+    () => socket,
+  )
 
   TestRenderer.create(<Component />)
 
-  expect(renderComponent).toHaveBeenCalledWith({ socket }, expect.anything())
+  expect(subscribeSpy).toHaveBeenCalledWith({
+    event: "state",
+    payload: statePayload,
+  })
+  expect(subscribeSpy).toHaveBeenCalledWith({
+    event: commands.ACTION,
+    payload: actionPayload,
+  })
 })
 
 test("render null if socket is not connected", () => {
