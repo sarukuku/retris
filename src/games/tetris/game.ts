@@ -46,7 +46,7 @@ export class Game {
         numberOfRowsCleared,
       )
       const currentScore = this.score.current
-      this.currentLevel = Math.floor(currentScore / 2)
+      this.currentLevel = Math.floor(currentScore / 500) + 1
       this.scoreChange.next({ gained, current: currentScore })
     })
   }
