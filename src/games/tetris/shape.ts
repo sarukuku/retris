@@ -4,7 +4,7 @@ import { Matrix, rotateMatrix, Row } from "./matrix"
 
 const _ = undefined
 
-interface TetrisCell {
+export interface TetrisCell {
   color: string[]
 }
 

@@ -3,7 +3,7 @@ import { ReplaySubject } from "rxjs"
 import { wait } from "../../helpers"
 import { Board } from "./board"
 import { createEmptyMatrix, createEmptyRow } from "./matrix"
-import { Shape, TetrisMatrix, TetrisRow } from "./shape"
+import { Shape, TetrisMatrix, TetrisRow, TetrisCell } from "./shape"
 
 const I = () => Shape.createIShape()
 const J = () => Shape.createJShape()
@@ -128,7 +128,6 @@ const shapes = [
   },
 ]
 
-const FIVE_SECONDS = 5000
 const GAME_STEP_TIME = 100
 const SHAPE_POSITION_TIME = 40
 
@@ -194,8 +193,23 @@ export class ReaktorGame {
       await wait(GAME_STEP_TIME)
     }
 
-    await wait(FIVE_SECONDS)
+    await this.flashBoard(this.latestBoard)
+    await wait(1000)
     await this.flushBoard(this.latestBoard)
+  }
+
+  private async flashBoard(board: TetrisMatrix): Promise<void> {
+    const flashCount = 3
+    const emptyMatrix = createEmptyMatrix<TetrisCell>(
+      this.getColumnCount(),
+      this.getRowCount(),
+    )
+    for (let i = 0; i < flashCount; i++) {
+      await wait(500)
+      this.boardChange.next(emptyMatrix)
+      await wait(500)
+      this.boardChange.next(board)
+    }
   }
 
   private async flushBoard(board: TetrisMatrix): Promise<void> {
