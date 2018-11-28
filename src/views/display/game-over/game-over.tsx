@@ -30,7 +30,6 @@ const _GameOver: SFC<GameOverProps> = ({ score, translate }) => (
         display: flex;
         flex-direction: column;
         align-items: center;
-        background-color: ${colors.DARK_GRAY};
         justify-content: center;
       }
     `}</style>

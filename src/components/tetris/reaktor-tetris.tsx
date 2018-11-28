@@ -1,12 +1,12 @@
 import React, { Component } from "react"
-import { ReaktorGame } from "../../games/tetris/reaktor-game"
+import { LoopedReaktorGame } from "../../games/tetris/looped-reaktor-game"
 import { Tetris } from "./tetris"
 
 export class ReaktorTetris extends Component {
-  private game = new ReaktorGame()
+  private game = new LoopedReaktorGame()
 
   async componentDidMount() {
-    await this.game.start()
+    this.game.start()
   }
 
   render() {

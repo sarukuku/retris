@@ -4,6 +4,7 @@ import { Subject } from "rxjs"
 import io from "socket.io-client"
 import { commands } from "../commands"
 import { AttractionLoop } from "../components/attraction-loop"
+import { BlurredOverlay } from "../components/blurred-overlay"
 import { AnalyticsProps, pageWithAnalytics } from "../components/with-analytics"
 import {
   AutoUnsubscribeProps,
@@ -122,14 +123,19 @@ export class _Display extends Component<DisplayProps, DisplayComponentState> {
           </Fragment>
         )
       case views.DISPLAY_GAME:
-        return (
-          <DisplayGame
-            actionCommand={this.actionCommand}
-            gameOver={this.gameOver}
-          />
-        )
       case views.DISPLAY_GAME_OVER:
-        return <GameOver score={score} />
+        const isGameOver = activeView === views.DISPLAY_GAME_OVER
+        return (
+          <Fragment>
+            <BlurredOverlay isActive={isGameOver}>
+              <DisplayGame
+                actionCommand={this.actionCommand}
+                gameOver={this.gameOver}
+              />
+            </BlurredOverlay>
+            {isGameOver && <GameOver score={score} />}
+          </Fragment>
+        )
     }
   }
 }
