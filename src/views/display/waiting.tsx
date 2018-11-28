@@ -10,7 +10,7 @@ class _Waiting extends Component<WaitingProps> {
     const { address, translate } = this.props
     return (
       <div className="wrap">
-        <h1>{translate("display.waiting.header.line1", { address })}</h1>
+        <h1>{translate("display.waiting.header.big", { address })}</h1>
         <style jsx>{`
           .wrap {
             flex-grow: 1;
