@@ -6,12 +6,12 @@ import { withTranslate } from "./with-translate"
 
 test("translate HOC", () => {
   const Component = withTranslate(({ translate }) => {
-    const value = translate("display.waiting.header.line1")
+    const value = translate("display.waiting.header.big")
     return <div>{value}</div>
   })
   const translationValue = "fooBar"
   const translateFn = createTranslate({
-    "display.waiting.header.line1": translationValue,
+    "display.waiting.header.big": translationValue,
   })
 
   const testRenderer = TestRenderer.create(

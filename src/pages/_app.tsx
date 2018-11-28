@@ -41,7 +41,6 @@ class Retris extends App<RetrisProps> {
                 name="viewport"
                 content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, shrink-to-fit=no"
               />
-              <link rel="stylesheet" type="text/css" href="/static/fonts/fonts.css" />
             </Head>
             <Component {...pageProps} />
             <style global jsx>{`
@@ -64,25 +63,25 @@ class Retris extends App<RetrisProps> {
               }
 
               @font-face {
-                font-family: "Jungka";
+                font-family: ${fonts.JUNGKA};
                 src: url("/static/fonts/jungka-light.otf") format("opentype");
                 font-weight: 200;
               }
 
               @font-face {
-                font-family: "Jungka";
+                font-family: ${fonts.JUNGKA};
                 src: url("/static/fonts/jungka-regular.otf") format("opentype");
                 font-weight: 400;
               }
 
               @font-face {
-                font-family: "Jungka";
+                font-family: ${fonts.JUNGKA};
                 src: url("/static/fonts/jungka-medium.otf") format("opentype");
                 font-weight: 500;
               }
 
               @font-face {
-                font-family: "Jungka";
+                font-family: ${fonts.JUNGKA};
                 src: url("/static/fonts/jungka-bold.otf") format("opentype");
                 font-weight: 600;
               }

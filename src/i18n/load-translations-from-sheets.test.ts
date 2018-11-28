@@ -29,7 +29,7 @@ test("load translation", async () => {
   const translations = await loadTranslations()
 
   expect(translations).toEqual({
-    "display.waiting.header.line1": "Line1",
+    "display.waiting.header.big": "Line1",
   })
 })
 
@@ -75,7 +75,7 @@ describe("validation error", () => {
   })
 
   test("'1' is not a valid translated string, type is number", async () => {
-    mockWithResponse({ values: [["display.waiting.header.line1", 1]] })
+    mockWithResponse({ values: [["display.waiting.header.big", 1]] })
 
     await expect(loadTranslations()).rejects.toThrow(
       `Invalid Sheets Response: ["'1' is not a valid translated string, key is 'display.waiting.header.line1', type is number"]`,
@@ -87,7 +87,7 @@ describe("validation error", () => {
       values: [
         "foo",
         ["not.a.valid.translation.key", "foo"],
-        ["display.waiting.header.line1", null],
+        ["display.waiting.header.big", null],
       ],
     })
 
@@ -109,5 +109,5 @@ function mockWithResponse(response: any): void {
 }
 
 const sheetsResponse: SheetsResponse = {
-  values: [["display.waiting.header.line1", "Line1"]],
+  values: [["display.waiting.header.big", "Line1"]],
 }
