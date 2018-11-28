@@ -1,5 +1,5 @@
 import React, { Component } from "react"
-import { colors } from '../../styles/colors'
+import { colors } from "../../styles/colors"
 import { withTranslate, TranslateProps } from "../../components/with-translate"
 
 interface StartGameProps extends TranslateProps {
@@ -33,7 +33,9 @@ class _StartGame extends Component<StartGameProps> {
             </div>
           </div>
         </div>
-        <button onClick={onStartGame}>{translate("controller.start-game.start-button")}</button>
+        <button onClick={onStartGame}>
+          {translate("controller.start-game.start-button")}
+        </button>
         <style jsx>{`
           .wrap {
             width: 100%;
@@ -57,7 +59,7 @@ class _StartGame extends Component<StartGameProps> {
           .instructions {
             display: flex;
             margin-bottom: 2rem;
-            opacity: .5;
+            opacity: 0.5;
             text-transform: lowercase;
           }
 
@@ -69,7 +71,8 @@ class _StartGame extends Component<StartGameProps> {
             margin: 1rem;
           }
 
-          .arrow, .hand {
+          .arrow,
+          .hand {
             align-self: center;
           }
 
@@ -82,12 +85,12 @@ class _StartGame extends Component<StartGameProps> {
             display: block;
             width: 1rem;
             height: 1rem;
-            box-shadow: inset 0 0 .5rem 0 ${colors.WHITE};
+            box-shadow: inset 0 0 0.5rem 0 ${colors.WHITE};
             border-radius: 100%;
           }
 
           .swipe-illustration__wrap .arrow {
-            margin-bottom: -.4rem;
+            margin-bottom: -0.4rem;
           }
 
           .swipe-illustration__wrap .arrow:last-child {
@@ -96,15 +99,15 @@ class _StartGame extends Component<StartGameProps> {
 
           .swipe-illustration .hand,
           .tap-illustration .hand {
-            margin-top: .4rem;
+            margin-top: 0.4rem;
           }
 
           .swipe-illustration .hand {
-            margin-right: -.6rem;
+            margin-right: -0.6rem;
           }
 
           .tap-illustration .hand {
-            margin-right: -.6rem;
+            margin-right: -0.6rem;
           }
 
           .tap-illustration > span {
@@ -112,7 +115,7 @@ class _StartGame extends Component<StartGameProps> {
             position: relative;
             width: 1rem;
             height: 1rem;
-            box-shadow: inset 0 0 .5rem 0 ${colors.WHITE};
+            box-shadow: inset 0 0 0.5rem 0 ${colors.WHITE};
             border-radius: 100%;
             margin: 0 auto;
           }
@@ -152,7 +155,11 @@ class _StartGame extends Component<StartGameProps> {
             width: 10.2rem;
             height: 10.5rem;
             border-radius: 100%;
-            background: linear-gradient(to bottom, ${colors.YELLOW} 0%, ${colors.ORANGE} 100%);
+            background: linear-gradient(
+              to bottom,
+              ${colors.YELLOW} 0%,
+              ${colors.ORANGE} 100%
+            );
             z-index: -1;
             text-transform: uppercase;
             animation: rotate 10s linear infinite;

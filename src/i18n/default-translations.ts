@@ -20,7 +20,7 @@ export const defaultTranslations = {
   "controller.start-game.start-button": "Start",
   "controller.in-queue.heading": "Hang tight! 🎮",
   "controller.in-queue.queue-intro-start": "There are",
-  "controller.in-queue.queue-intro-end": "players in the line before you."
+  "controller.in-queue.queue-intro-end": "players in the line before you.",
 }
 
 export type DefaultTranslations = typeof defaultTranslations

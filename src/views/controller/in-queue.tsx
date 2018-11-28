@@ -13,9 +13,13 @@ class _InQueue extends Component<InQueueProps> {
       <main className="wrap">
         <h1>{translate("controller.in-queue.heading")}</h1>
         <p>
-          <span className="opaque">{translate("controller.in-queue.queue-intro-start")}</span>
+          <span className="opaque">
+            {translate("controller.in-queue.queue-intro-start")}
+          </span>
           <span>{queueLength}</span>
-          <span className="opaque">{translate("controller.in-queue.queue-intro-end")}</span>
+          <span className="opaque">
+            {translate("controller.in-queue.queue-intro-end")}
+          </span>
         </p>
         <style jsx>{`
           .wrap {
@@ -38,7 +42,7 @@ class _InQueue extends Component<InQueueProps> {
           }
 
           .opaque {
-            opacity: .5;
+            opacity: 0.5;
           }
 
           p > span.opaque {
@@ -51,7 +55,7 @@ class _InQueue extends Component<InQueueProps> {
             opacity: 1;
             font-size: 6rem;
             font-weight: 600;
-            margin-bottom: -.8rem;
+            margin-bottom: -0.8rem;
           }
         `}</style>
       </main>
