@@ -1,8 +1,8 @@
 import React, { Component } from "react"
 import { Button } from "../../components/button"
 import { TranslateProps, withTranslate } from "../../components/with-translate"
+import { formatScore } from "../../helpers"
 import { colors } from "../../styles/colors"
-import { formatScore } from "../display/game-over/format-score"
 
 interface GameOverProps extends TranslateProps {
   onRestart: () => void

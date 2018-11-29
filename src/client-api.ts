@@ -1,6 +1,6 @@
 import { IncomingMessage } from "http"
 import fetch from "isomorphic-unfetch"
-import { parseJSON } from "./helpers"
+import { parseJSONResponse } from "./helpers"
 import { Translations } from "./i18n/default-translations"
 
 export class ClientAPI {
@@ -18,7 +18,7 @@ export class ClientAPI {
 
   async getTranslations(): Promise<Translations> {
     const res = await fetch(`${this.baseURL}/api/translations`)
-    const json = await parseJSON(res)
+    const json = await parseJSONResponse(res)
     return json
   }
 }

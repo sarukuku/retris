@@ -1,10 +1,10 @@
 import fetch from "isomorphic-unfetch"
 import { isEmpty } from "ramda"
-import { parseJSON } from "../helpers"
+import { parseJSONResponse } from "../helpers/parse-json-response"
 import {
+  DefaultTranslations,
   TranslationKey,
   Translations,
-  DefaultTranslations,
 } from "./default-translations"
 import { LoadTranslations } from "./load-translations"
 
@@ -28,7 +28,7 @@ export function createLoadTranslationsFromSheets(
     }
 
     const res = await fetchSheet()
-    const json = await parseJSON(res)
+    const json = await parseJSONResponse(res)
     if (!json) {
       throw new InvalidSheetsResponseError(["Response is not JSON"])
     }

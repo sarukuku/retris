@@ -46,7 +46,7 @@ export class _Display extends Component<DisplayProps, DisplayComponentState> {
     if (ctx.req) {
       return { address: ctx.req.headers.host }
     }
-    return { address: window.location.origin }
+    return { address: window.location.hostname }
   }
 
   componentDidMount() {

@@ -45,7 +45,7 @@ const View = () => {
     <TranslationContext.Provider value={createTranslate(defaultTranslations)}>
       <Display
         analytics={analyticsStub}
-        address={window.location.origin}
+        address={window.location.hostname}
         socket={socket}
       />
     </TranslationContext.Provider>

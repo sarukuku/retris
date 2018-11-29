@@ -12,16 +12,10 @@ interface WaitingProps extends TranslateProps {
 const _Waiting: SFC<WaitingProps> = ({ translate, address }) => (
   <Fragment>
     <div className="waiting">
-      <h1 style={{ color: colors.WHITE }}>
-        {translate("display.waiting.header.big")}
-      </h1>
-      <h2 style={{ color: colors.WHITE }}>
-        {translate("display.waiting.header.small")}
-      </h2>
-      <h3 style={{ color: colors.WHITE }}>{address}</h3>
-      <h4 style={{ color: colors.WHITE }}>
-        {translate("display.waiting.info")}
-      </h4>
+      <h1>{translate("display.waiting.header.big")}</h1>
+      <p>{translate("display.waiting.info")}</p>
+      <h2>{translate("display.waiting.header.small")}</h2>
+      <p>{address}</p>
     </div>
     <style jsx>{`
       .waiting {
@@ -30,6 +24,26 @@ const _Waiting: SFC<WaitingProps> = ({ translate, address }) => (
         flex-direction: column;
         align-items: center;
         justify-content: center;
+        color: ${colors.WHITE};
+        text-align: center;
+      }
+
+      h1 {
+        font-size: 10vmax;
+        text-transform: uppercase;
+        margin: 2rem 2rem 6rem 2rem;
+      }
+
+      p {
+        font-size: 3.5vmax;
+        margin-top: 0;
+        margin: 0 2rem 6rem 2rem;
+      }
+
+      h2 {
+        font-size: 3.5vmax;
+        text-transform: uppercase;
+        margin-bottom: 0.5rem;
       }
     `}</style>
   </Fragment>

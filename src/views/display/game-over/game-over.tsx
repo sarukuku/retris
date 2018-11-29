@@ -3,8 +3,8 @@ import {
   TranslateProps,
   withTranslate,
 } from "../../../components/with-translate"
+import { formatScore } from "../../../helpers"
 import { colors } from "../../../styles/colors"
-import { formatScore } from "./format-score"
 
 interface GameOverProps extends TranslateProps {
   score: number
@@ -13,16 +13,10 @@ interface GameOverProps extends TranslateProps {
 const _GameOver: SFC<GameOverProps> = ({ score, translate }) => (
   <Fragment>
     <div className="game-over">
-      <h2 style={{ color: colors.WHITE }}>
-        {translate("display.game-over.your-score")}
-      </h2>
-      <h1 style={{ color: colors.WHITE }}>{formatScore(score)}</h1>
-      <h4 style={{ color: colors.WHITE }}>
-        {translate("display.game-over.about-us")}
-      </h4>
-      <h4 style={{ color: colors.WHITE }}>
-        {translate("display.game-over.website")}
-      </h4>
+      <h1>{translate("display.game-over.your-score")}</h1>
+      <p className="score">{formatScore(score)}</p>
+      <p>{translate("display.game-over.about-us")}</p>
+      <p>{translate("display.game-over.website")}</p>
     </div>
     <style jsx>{`
       .game-over {
@@ -31,6 +25,25 @@ const _GameOver: SFC<GameOverProps> = ({ score, translate }) => (
         flex-direction: column;
         align-items: center;
         justify-content: center;
+        color: ${colors.WHITE};
+      }
+
+      h1 {
+        margin-bottom: 0;
+        text-transform: uppercase;
+        font-size: 5vmax;
+      }
+
+      p {
+        font-size: 3.5vmax;
+        margin-bottom: 0;
+      }
+
+      .score {
+        font-size: 12vmax;
+        text-transform: uppercase;
+        margin: 0 2rem 2rem 2rem;
+        font-weight: 600;
       }
     `}</style>
   </Fragment>

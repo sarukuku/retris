@@ -8,7 +8,7 @@ export const colors = {
   PETER_RIVER: "#3498db",
   BELIZE_HOLE: "#2980b9",
   YELLOW: "#fad961",
-  ORANGE: "#f76b1c"
+  ORANGE: "#f76b1c",
 }
 
 export const colorGradients = {
