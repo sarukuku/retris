@@ -22,7 +22,7 @@ interface ControllerProps
     SocketProps,
     AutoUnsubscribeProps {}
 
-class Controller extends Component<ControllerProps, ControllerState> {
+export class _Controller extends Component<ControllerProps, ControllerState> {
   private previousActiveView?: string
   private actionCommand = new Subject<string>()
 
@@ -77,7 +77,7 @@ class Controller extends Component<ControllerProps, ControllerState> {
   }
 
   private renderView() {
-    const { activeView, queueLength = 0 } = this.state
+    const { activeView, queueLength = 0, score = 0 } = this.state
 
     switch (activeView) {
       case views.CONTROLLER_GAME_OFFLINE:
@@ -89,7 +89,7 @@ class Controller extends Component<ControllerProps, ControllerState> {
       case views.CONTROLLER_GAME_CONTROLS:
         return <GameController actionCommand={this.actionCommand} />
       case views.CONTROLLER_GAME_OVER:
-        return <GameOver onRestart={this.onJoinGame} />
+        return <GameOver score={score} onRestart={this.onJoinGame} />
       case undefined:
       default:
         return <Loading />
@@ -98,5 +98,5 @@ class Controller extends Component<ControllerProps, ControllerState> {
 }
 
 export default pageWithAutoUnsubscribe(
-  pageWithAnalytics(pageWithSocket(Controller, () => io("/controller"))),
+  pageWithAnalytics(pageWithSocket(_Controller, () => io("/controller"))),
 )

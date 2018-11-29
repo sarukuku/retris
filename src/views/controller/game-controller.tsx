@@ -1,6 +1,7 @@
 import React, { Component } from "react"
 import Swipeable from "react-swipeable"
 import { Subject } from "rxjs"
+import { clientConfig } from "../../client-config"
 import { commands } from "../../commands"
 import { colors } from "../../styles/colors"
 
@@ -20,20 +21,24 @@ export class GameController extends Component<GameControllerProps> {
         stopPropagation={true}
         delta={50}
       >
-        <main className="wrap" onClick={() => actionCommand.next(commands.TAP)}>
-          <p>Tap and swipe to play!</p>
-        </main>
+        <main
+          className="wrap"
+          onClick={() => actionCommand.next(commands.TAP)}
+        />
         <style jsx>{`
           .wrap {
             width: 100%;
             height: 100%;
-            position: fixed;
+            position: absolute;
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: ${colors.PETER_RIVER};
-            border: 6px solid ${colors.BELIZE_HOLE};
-            padding: 2rem;
+            background-color: ${colors.BLACK};
+            color: ${colors.WHITE};
+            background-image: url("${clientConfig.staticPath}/grid.svg");
+            background-repeat: no-repeat;
+            background-size: 90%;
+            background-position: 50% 75%;
           }
 
           p {

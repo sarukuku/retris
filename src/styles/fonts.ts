@@ -1,6 +1,5 @@
 export const fonts = {
-  JOSEFIN: "Josefin Sans",
-  PRESS_START_2P: "Press Start 2P",
+  JUNGKA: "Jungka"
 }
 
 export function withFallback(font: string) {
