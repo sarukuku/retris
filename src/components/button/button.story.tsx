@@ -6,6 +6,7 @@ storiesOf("Button", module).add("Big", () => (
   <Button
     isBig
     onClick={() => {
+      // tslint:disable-next-line
       console.log("Click!")
     }}
     label="Start"
@@ -15,6 +16,7 @@ storiesOf("Button", module).add("Big", () => (
 storiesOf("Button", module).add("Small", () => (
   <Button
     onClick={() => {
+      // tslint:disable-next-line
       console.log("Click!")
     }}
     label="Restart"
