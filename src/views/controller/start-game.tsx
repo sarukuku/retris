@@ -1,7 +1,7 @@
 import React, { Component } from "react"
+import { clientConfig } from "../../client-config"
 import { TranslateProps, withTranslate } from "../../components/with-translate"
 import { colors } from "../../styles/colors"
-import { clientConfig } from "../../client-config"
 
 interface StartGameProps extends TranslateProps {
   onStartGame: () => void
