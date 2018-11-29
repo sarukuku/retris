@@ -8,15 +8,11 @@ import { colors } from "../../../styles/colors"
 const _WaitingToStart: SFC<TranslateProps> = ({ translate }) => (
   <Fragment>
     <div className="waiting-to-start">
-      <h1 style={{ color: colors.WHITE }}>
-        {translate("display.waiting-to-start.header.big")}
-      </h1>
-      <h2 style={{ color: colors.WHITE }}>
+      <h1>{translate("display.waiting-to-start.header.big")}</h1>
+      <p>
         {translate("display.waiting-to-start.header.small.line1")}
-      </h2>
-      <h2 style={{ color: colors.WHITE }}>
-        {translate("display.waiting-to-start.header.small.line2")}
-      </h2>
+        <span>{translate("display.waiting-to-start.header.small.line2")}</span>
+      </p>
     </div>
     <style jsx>{`
       .waiting-to-start {
@@ -25,6 +21,24 @@ const _WaitingToStart: SFC<TranslateProps> = ({ translate }) => (
         flex-direction: column;
         align-items: center;
         justify-content: center;
+        color: ${colors.WHITE};
+        text-align: center;
+      }
+
+      h1 {
+        font-size: 10vmax;
+        text-transform: uppercase;
+        margin: 1rem;
+      }
+
+      p {
+        font-size: 3.5vmax;
+        text-transform: uppercase;
+      }
+
+      p span {
+        display: block;
+        opacity: 0.5;
       }
     `}</style>
   </Fragment>
