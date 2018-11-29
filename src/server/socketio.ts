@@ -16,8 +16,8 @@ export function createSocketIOServer(
     const display = new SocketIODisplay(displaySocket)
     state.onDisplayConnect(display)
 
-    displaySocket.on(commands.GAME_OVER, () => {
-      state.onDisplayGameOver()
+    displaySocket.on(commands.GAME_OVER, score => {
+      state.onDisplayGameOver(score)
     })
 
     displaySocket.on("disconnect", () => {

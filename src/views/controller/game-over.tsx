@@ -1,17 +1,17 @@
 import React, { Component } from "react"
-import { colors } from "../../styles/colors"
-import { withTranslate, TranslateProps } from "../../components/with-translate"
 import { Button } from "../../components/button/button"
+import { TranslateProps, withTranslate } from "../../components/with-translate"
+import { colors } from "../../styles/colors"
 import { formatScore } from "../display/game-over/format-score"
 
 interface GameOverProps extends TranslateProps {
   onRestart: () => void
-  score?: number
+  score: number
 }
 
 class _GameOver extends Component<GameOverProps> {
   render() {
-    const { onRestart, translate, score = 600 } = this.props
+    const { onRestart, translate, score } = this.props
 
     return (
       <main className="wrap">
