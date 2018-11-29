@@ -64,30 +64,6 @@ class Retris extends App<RetrisProps> {
                 height: 100%;
                 position: fixed;
               }
-
-              @font-face {
-                font-family: ${fonts.JUNGKA};
-                src: url("/static/fonts/jungka-light.otf") format("opentype");
-                font-weight: 200;
-              }
-
-              @font-face {
-                font-family: ${fonts.JUNGKA};
-                src: url("/static/fonts/jungka-regular.otf") format("opentype");
-                font-weight: 400;
-              }
-
-              @font-face {
-                font-family: ${fonts.JUNGKA};
-                src: url("/static/fonts/jungka-medium.otf") format("opentype");
-                font-weight: 500;
-              }
-
-              @font-face {
-                font-family: ${fonts.JUNGKA};
-                src: url("/static/fonts/jungka-bold.otf") format("opentype");
-                font-weight: 600;
-              }
             `}</style>
           </Container>
         </TranslationContext.Provider>

@@ -57,7 +57,7 @@ class _InQueue extends Component<InQueueProps> {
             opacity: 1;
             font-size: 6rem;
             font-weight: 600;
-            margin-bottom: -0.8rem;
+            margin-bottom: -0.1rem;
           }
         `}</style>
       </main>

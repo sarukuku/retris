@@ -36,7 +36,7 @@ export const Button: React.SFC<ButtonProps> = ({
         border-radius: 100%;
         color: ${colors.WHITE};
         border: none;
-        font-size: 1rem;
+        font-size: 0.8rem;
         text-transform: uppercase;
         font-weight: 500;
       }

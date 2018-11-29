@@ -1,9 +1,9 @@
 import React, { Component } from "react"
 import Swipeable from "react-swipeable"
 import { Subject } from "rxjs"
+import { clientConfig } from "../../client-config"
 import { commands } from "../../commands"
 import { colors } from "../../styles/colors"
-import { clientConfig } from "../../client-config"
 
 interface GameControllerProps {
   actionCommand: Subject<string>
