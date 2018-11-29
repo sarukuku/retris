@@ -1,5 +1,6 @@
 import React, { Component } from "react"
 import { withTranslate, TranslateProps } from "../../components/with-translate"
+import { colors } from "../../styles/colors"
 
 interface InQueueProps extends TranslateProps {
   queueLength: number
@@ -25,15 +26,16 @@ class _InQueue extends Component<InQueueProps> {
           .wrap {
             width: 100%;
             height: 100%;
-            position: fixed;
+            position: absolute;
             display: flex;
             justify-content: center;
             align-content: center;
             align-items: center;
-            padding: 1rem;
             flex-wrap: wrap;
             text-align: center;
             flex-direction: column;
+            background-color: ${colors.BLACK};
+            color: ${colors.WHITE};
           }
 
           h1 {

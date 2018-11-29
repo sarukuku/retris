@@ -16,11 +16,12 @@ export class JoinGame extends Component<JoinGameProps> {
           .wrap {
             width: 100%;
             height: 100%;
-            position: fixed;
+            position: absolute;
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: ${colors.PETER_RIVER};
+            background-color: ${colors.BLACK};
+            color: ${colors.WHITE};
           }
 
           button {

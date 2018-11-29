@@ -1,4 +1,5 @@
 import React, { Component } from "react"
+import { colors } from "../../styles/colors"
 
 export class NotRunning extends Component {
   render() {
@@ -9,12 +10,13 @@ export class NotRunning extends Component {
           .wrap {
             width: 100%;
             height: 100%;
-            position: fixed;
+            position: absolute;
             display: flex;
             justify-content: center;
             align-items: center;
             text-align: center;
-            border: 2px solid black;
+            background-color: ${colors.BLACK};
+            color: ${colors.WHITE};
           }
 
           p {

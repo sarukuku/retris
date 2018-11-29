@@ -17,15 +17,16 @@ export class GameOver extends Component<GameOverProps> {
           .wrap {
             width: 100%;
             height: 100%;
-            position: fixed;
+            position: absolute;
             display: flex;
             justify-content: center;
             align-content: center;
             align-items: center;
             background-color: ${colors.PETER_RIVER};
-            padding: 1rem;
             flex-wrap: wrap;
             text-align: center;
+            background-color: ${colors.BLACK};
+            color: ${colors.WHITE};
           }
 
           button {

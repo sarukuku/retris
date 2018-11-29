@@ -22,7 +22,7 @@ interface ControllerProps
     SocketProps,
     AutoUnsubscribeProps {}
 
-class Controller extends Component<ControllerProps, ControllerState> {
+export class _Controller extends Component<ControllerProps, ControllerState> {
   private previousActiveView?: string
   private actionCommand = new Subject<string>()
 
@@ -98,5 +98,5 @@ class Controller extends Component<ControllerProps, ControllerState> {
 }
 
 export default pageWithAutoUnsubscribe(
-  pageWithAnalytics(pageWithSocket(Controller, () => io("/controller"))),
+  pageWithAnalytics(pageWithSocket(_Controller, () => io("/controller"))),
 )

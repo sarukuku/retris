@@ -1,4 +1,3 @@
-import { button, withKnobs } from "@storybook/addon-knobs"
 import { storiesOf } from "@storybook/react"
 import React from "react"
 import { ReplaySubject } from "rxjs"
@@ -38,43 +37,51 @@ document.addEventListener("keyup", e => {
       break
   }
 })
+
 const Display = withAutoUnsubscribe(_Display)
 
-storiesOf("Display", module)
-  .addDecorator(withKnobs)
-  .add("default", () => {
-    button("Waiting", () =>
-      socket.next({
-        event: "state",
-        payload: { activeView: views.DISPLAY_WAITING },
-      }),
-    )
-    button("Waiting To Start", () =>
-      socket.next({
-        event: "state",
-        payload: { activeView: views.DISPLAY_WAITING_TO_START },
-      }),
-    )
-    button("Game", () =>
-      socket.next({
-        event: "state",
-        payload: { activeView: views.DISPLAY_GAME },
-      }),
-    )
-    button("Game Over", () =>
-      socket.next({
-        event: "state",
-        payload: { activeView: views.DISPLAY_GAME_OVER },
-      }),
-    )
+const View = () => {
+  return (
+    <TranslationContext.Provider value={createTranslate(defaultTranslations)}>
+      <Display
+        analytics={analyticsStub}
+        address={window.location.origin}
+        socket={socket}
+      />
+    </TranslationContext.Provider>
+  )
+}
 
-    return (
-      <TranslationContext.Provider value={createTranslate(defaultTranslations)}>
-        <Display
-          analytics={analyticsStub}
-          address={window.location.origin}
-          socket={socket}
-        />
-      </TranslationContext.Provider>
-    )
+storiesOf("Display", module)
+  .add("Waiting", () => {
+    socket.next({
+      event: "state",
+      payload: { activeView: views.DISPLAY_WAITING },
+    })
+
+    return View()
+  })
+  .add("Waiting To Start", () => {
+    socket.next({
+      event: "state",
+      payload: { activeView: views.DISPLAY_WAITING_TO_START },
+    })
+
+    return View()
+  })
+  .add("Game", () => {
+    socket.next({
+      event: "state",
+      payload: { activeView: views.DISPLAY_GAME },
+    })
+
+    return View()
+  })
+  .add("Game Over", () => {
+    socket.next({
+      event: "state",
+      payload: { activeView: views.DISPLAY_GAME_OVER },
+    })
+
+    return View()
   })

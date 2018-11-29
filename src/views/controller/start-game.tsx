@@ -1,6 +1,7 @@
 import React, { Component } from "react"
 import { TranslateProps, withTranslate } from "../../components/with-translate"
 import { colors } from "../../styles/colors"
+import { clientConfig } from "../../client-config"
 
 interface StartGameProps extends TranslateProps {
   onStartGame: () => void
@@ -18,37 +19,53 @@ class _StartGame extends Component<StartGameProps> {
             <p>{translate("controller.start-game.swipe-instruction")}</p>
             <div className="swipe-illustration">
               <div className="swipe-illustration__wrap">
-                <img className="arrow" src="/static/arrow.svg" />
+                <img
+                  className="arrow"
+                  src={`${clientConfig.staticPath}/arrow.svg`}
+                />
                 <span />
-                <img className="arrow" src="/static/arrow.svg" />
+                <img
+                  className="arrow"
+                  src={`${clientConfig.staticPath}/arrow.svg`}
+                />
               </div>
-              <img className="hand" src="/static/hand.svg" />
+              <img
+                className="hand"
+                src={`${clientConfig.staticPath}/hand.svg`}
+              />
             </div>
           </div>
           <div>
             <p>{translate("controller.start-game.tap-instruction")}</p>
             <div className="tap-illustration">
               <span />
-              <img className="hand" src="/static/hand.svg" />
+              <img
+                className="hand"
+                src={`${clientConfig.staticPath}/hand.svg`}
+              />
             </div>
           </div>
         </div>
-        <button onClick={onStartGame}>
-          {translate("controller.start-game.start-button")}
-        </button>
+        <div className="animated-btn">
+          <span />
+          <button onClick={onStartGame}>
+            {translate("controller.start-game.start-button")}
+          </button>
+        </div>
         <style jsx>{`
           .wrap {
             width: 100%;
             height: 100%;
-            position: fixed;
+            position: absolute;
             display: flex;
             justify-content: center;
             align-content: center;
             align-items: center;
-            padding: 1rem;
             flex-wrap: wrap;
             text-align: center;
             flex-direction: column;
+            background-color: ${colors.BLACK};
+            color: ${colors.WHITE};
           }
 
           h1 {
@@ -133,7 +150,11 @@ class _StartGame extends Component<StartGameProps> {
             border-radius: 100%;
           }
 
-          button {
+          .animated-btn {
+            position: relative;
+          }
+
+          .animated-btn button {
             display: block;
             position: relative;
             background: ${colors.BLACK};
@@ -147,8 +168,8 @@ class _StartGame extends Component<StartGameProps> {
             font-weight: 500;
           }
 
-          button:after {
-            content: "";
+          .animated-btn span {
+            display: block;
             position: absolute;
             top: -0.25rem;
             left: -0.1rem;
@@ -160,7 +181,6 @@ class _StartGame extends Component<StartGameProps> {
               ${colors.YELLOW} 0%,
               ${colors.ORANGE} 100%
             );
-            z-index: -1;
             text-transform: uppercase;
             animation: rotate 10s linear infinite;
           }

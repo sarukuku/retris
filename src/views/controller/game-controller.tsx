@@ -27,13 +27,12 @@ export class GameController extends Component<GameControllerProps> {
           .wrap {
             width: 100%;
             height: 100%;
-            position: fixed;
+            position: absolute;
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: ${colors.PETER_RIVER};
-            border: 6px solid ${colors.BELIZE_HOLE};
-            padding: 2rem;
+            background-color: ${colors.BLACK};
+            color: ${colors.WHITE};
           }
 
           p {
