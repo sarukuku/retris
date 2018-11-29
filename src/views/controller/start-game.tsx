@@ -2,6 +2,7 @@ import React, { Component } from "react"
 import { clientConfig } from "../../client-config"
 import { TranslateProps, withTranslate } from "../../components/with-translate"
 import { colors } from "../../styles/colors"
+import { Button } from "../../components/button/button"
 
 interface StartGameProps extends TranslateProps {
   onStartGame: () => void
@@ -46,12 +47,11 @@ class _StartGame extends Component<StartGameProps> {
             </div>
           </div>
         </div>
-        <div className="animated-btn">
-          <span />
-          <button onClick={onStartGame}>
-            {translate("controller.start-game.start-button")}
-          </button>
-        </div>
+        <Button
+          isBig
+          onClick={onStartGame}
+          label={translate("controller.start-game.start-button")}
+        />
         <style jsx>{`
           .wrap {
             width: 100%;
@@ -148,50 +148,6 @@ class _StartGame extends Component<StartGameProps> {
             opacity: 0.29;
             box-shadow: inset 0 0 1rem 0 ${colors.WHITE};
             border-radius: 100%;
-          }
-
-          .animated-btn {
-            position: relative;
-          }
-
-          .animated-btn button {
-            display: block;
-            position: relative;
-            background: ${colors.BLACK};
-            width: 10rem;
-            height: 10rem;
-            border-radius: 100%;
-            color: ${colors.WHITE};
-            border: none;
-            font-size: 2rem;
-            text-transform: uppercase;
-            font-weight: 500;
-          }
-
-          .animated-btn span {
-            display: block;
-            position: absolute;
-            top: -0.25rem;
-            left: -0.1rem;
-            width: 10.2rem;
-            height: 10.5rem;
-            border-radius: 100%;
-            background: linear-gradient(
-              to bottom,
-              ${colors.YELLOW} 0%,
-              ${colors.ORANGE} 100%
-            );
-            text-transform: uppercase;
-            animation: rotate 10s linear infinite;
-          }
-
-          @keyframes rotate {
-            from {
-              transform: rotate(0deg);
-            }
-            to {
-              transform: rotate(360deg);
-            }
           }
         `}</style>
       </main>

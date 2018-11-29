@@ -21,6 +21,13 @@ export const defaultTranslations = {
   "controller.in-queue.heading": "Hang tight! 🎮",
   "controller.in-queue.queue-intro-start": "There are",
   "controller.in-queue.queue-intro-end": "players in the line before you.",
+  "controller.game-over.heading": "Game over 😒",
+  "controller.game-over.score-label": "Score",
+  "controller.game-over.copy":
+    "Would you like to solve technical puzzles for a living? We're looking for people like you.",
+  "controller.game-over.link-title": "reaktor.com/careers",
+  "controller.game-over.link": "https://www.reaktor.com/careers/",
+  "controller.game-over.button-label": "Restart",
 }
 
 export type DefaultTranslations = typeof defaultTranslations

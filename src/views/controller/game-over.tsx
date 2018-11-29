@@ -1,18 +1,33 @@
 import React, { Component } from "react"
 import { colors } from "../../styles/colors"
+import { withTranslate, TranslateProps } from "../../components/with-translate"
+import { Button } from "../../components/button/button"
+import { formatScore } from "../display/game-over/format-score"
 
-interface GameOverProps {
+interface GameOverProps extends TranslateProps {
   onRestart: () => void
+  score?: number
 }
 
-export class GameOver extends Component<GameOverProps> {
+class _GameOver extends Component<GameOverProps> {
   render() {
-    const { onRestart } = this.props
+    const { onRestart, translate, score = 600 } = this.props
 
     return (
       <main className="wrap">
-        <p>Game Over!</p>
-        <button onClick={onRestart}>Restart</button>
+        <h1>{translate("controller.game-over.heading")}</h1>
+        <span className="score-label">
+          {translate("controller.game-over.score-label")}
+        </span>
+        <span className="score">{formatScore(score)}</span>
+        <p>{translate("controller.game-over.copy")}</p>
+        <a href={translate("controller.game-over.link")}>
+          {translate("controller.game-over.link-title")}
+        </a>
+        <Button
+          onClick={onRestart}
+          label={translate("controller.game-over.button-label")}
+        />
         <style jsx>{`
           .wrap {
             width: 100%;
@@ -23,7 +38,7 @@ export class GameOver extends Component<GameOverProps> {
             align-content: center;
             align-items: center;
             background-color: ${colors.PETER_RIVER};
-            flex-wrap: wrap;
+            flex-direction: column;
             text-align: center;
             background-color: ${colors.BLACK};
             color: ${colors.WHITE};
@@ -45,3 +60,5 @@ export class GameOver extends Component<GameOverProps> {
     )
   }
 }
+
+export const GameOver = withTranslate(_GameOver)
