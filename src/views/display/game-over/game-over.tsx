@@ -3,8 +3,8 @@ import {
   TranslateProps,
   withTranslate,
 } from "../../../components/with-translate"
+import { formatScore } from "../../../helpers"
 import { colors } from "../../../styles/colors"
-import { formatScore } from "./format-score"
 
 interface GameOverProps extends TranslateProps {
   score: number

@@ -11,8 +11,8 @@ import {
   withTranslate,
 } from "../../../components/with-translate"
 import { Game } from "../../../games/tetris/game"
+import { formatSeconds } from "../../../helpers"
 import { colors } from "../../../styles/colors"
-import { formatSeconds } from "./format-seconds"
 import { HUDItem } from "./hud-item"
 
 interface DisplayGameProps extends TranslateProps, AutoUnsubscribeProps {
