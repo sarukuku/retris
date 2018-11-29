@@ -52,19 +52,22 @@ describe("onDisplayGameOver", () => {
     const state = createTestState()
     const activeController = new TestController()
     state.setActiveContoller(activeController)
+    const score = 500
 
-    await state.onDisplayGameOver()
+    await state.onDisplayGameOver(score)
 
     expect(activeController.stateUpdates[0]).toEqual({
       activeView: views.CONTROLLER_GAME_OVER,
+      score,
     })
   })
 
   test(`set displays view to ${views.DISPLAY_GAME_OVER}`, async () => {
     const displays = new TestDisplays()
     const state = createTestState({ displays })
+    const score = 500
 
-    await state.onDisplayGameOver()
+    await state.onDisplayGameOver(score)
 
     expect(displays.stateUpdates[0]).toEqual({
       activeView: views.DISPLAY_GAME_OVER,
@@ -77,8 +80,9 @@ describe("onDisplayGameOver", () => {
     } after some time`, async () => {
       const displays = new TestDisplays()
       const state = createTestState({ displays })
+      const score = 500
 
-      await state.onDisplayGameOver()
+      await state.onDisplayGameOver(score)
 
       expect(displays.stateUpdates[1]).toEqual({
         activeView: views.DISPLAY_WAITING,
@@ -96,8 +100,9 @@ describe("onDisplayGameOver", () => {
       const nextActiveController = new TestController()
       state.setActiveContoller(activeController)
       state.setControllerQueue([nextActiveController])
+      const score = 500
 
-      await state.onDisplayGameOver()
+      await state.onDisplayGameOver(score)
 
       expect(nextActiveController.stateUpdates).toEqual([
         { activeView: views.CONTROLLER_START },
@@ -111,8 +116,9 @@ describe("onDisplayGameOver", () => {
       const nextActiveController = new TestController()
       const state = createTestState({ displays })
       state.setControllerQueue([nextActiveController])
+      const score = 500
 
-      await state.onDisplayGameOver()
+      await state.onDisplayGameOver(score)
 
       expect(displays.stateUpdates[1]).toEqual({
         activeView: views.DISPLAY_WAITING_TO_START,

@@ -26,6 +26,7 @@ export interface Controller {
 export interface ControllerState {
   activeView?: string
   queueLength?: number
+  score?: number
 }
 
 export interface Controllers {
@@ -57,10 +58,11 @@ export class State {
     this.displays.add(display)
   }
 
-  async onDisplayGameOver() {
+  async onDisplayGameOver(score: number) {
     if (this.activeController) {
       this.activeController.updateState({
         activeView: views.CONTROLLER_GAME_OVER,
+        score,
       })
     }
 

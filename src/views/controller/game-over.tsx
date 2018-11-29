@@ -6,12 +6,12 @@ import { formatScore } from "../display/game-over/format-score"
 
 interface GameOverProps extends TranslateProps {
   onRestart: () => void
-  score?: number
+  score: number
 }
 
 class _GameOver extends Component<GameOverProps> {
   render() {
-    const { onRestart, translate, score = 600 } = this.props
+    const { onRestart, translate, score } = this.props
 
     return (
       <main className="wrap">

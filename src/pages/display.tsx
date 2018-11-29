@@ -76,7 +76,7 @@ export class _Display extends Component<DisplayProps, DisplayComponentState> {
       value: totalScore,
     })
 
-    socket.next({ event: commands.GAME_OVER })
+    socket.next({ event: commands.GAME_OVER, payload: totalScore })
   }
 
   render() {
