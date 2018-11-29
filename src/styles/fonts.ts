@@ -1,5 +1,5 @@
 export const fonts = {
-  JUNGKA: "Jungka"
+  JUNGKA: "Jungka",
 }
 
 export function withFallback(font: string) {

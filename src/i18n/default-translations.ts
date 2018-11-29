@@ -3,7 +3,7 @@ export type Translations = typeof defaultTranslations
 export type TranslationKey = keyof Translations
 
 export const defaultTranslations = {
-  "display.waiting.header.big": "play game!",
+  "display.waiting.header.big": "Play tetris!",
   "display.waiting.header.small": "go to",
   "display.waiting.info": "This screen will turn into a Tetris matrix.",
   "display.waiting-to-start.header.big": "ready",
