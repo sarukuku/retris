@@ -1,8 +1,8 @@
 import React, { Component } from "react"
 import { clientConfig } from "../../client-config"
+import { Button } from "../../components/button/button"
 import { TranslateProps, withTranslate } from "../../components/with-translate"
 import { colors } from "../../styles/colors"
-import { Button } from "../../components/button/button"
 
 interface StartGameProps extends TranslateProps {
   onStartGame: () => void
