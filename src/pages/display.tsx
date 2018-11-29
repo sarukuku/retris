@@ -14,7 +14,7 @@ import { pageWithSocket, SocketProps } from "../components/with-socket"
 import { views } from "../views"
 import { DisplayGame } from "../views/display/display-game"
 import { GameOver } from "../views/display/game-over"
-import { Waiting } from "../views/display/waiting"
+import { Waiting } from "../views/display/waiting/waiting"
 import { WaitingToStart } from "../views/display/waiting-to-start"
 
 interface DisplayProps

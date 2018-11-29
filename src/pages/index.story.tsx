@@ -35,7 +35,7 @@ storiesOf("Controller", module)
       payload: { activeView: views.CONTROLLER_START },
     })
 
-    return View()
+    return <View />
   })
   .add("In Queue", () => {
     socket.next({
@@ -43,7 +43,7 @@ storiesOf("Controller", module)
       payload: { activeView: views.CONTROLLER_IN_QUEUE },
     })
 
-    return View()
+    return <View />
   })
   .add("Controls", () => {
     socket.next({
@@ -51,7 +51,7 @@ storiesOf("Controller", module)
       payload: { activeView: views.CONTROLLER_GAME_CONTROLS },
     })
 
-    return View()
+    return <View />
   })
   .add("Game Over", () => {
     socket.next({
@@ -59,7 +59,7 @@ storiesOf("Controller", module)
       payload: { activeView: views.CONTROLLER_GAME_OVER },
     })
 
-    return View()
+    return <View />
   })
   .add("Offline", () => {
     socket.next({
@@ -67,5 +67,5 @@ storiesOf("Controller", module)
       payload: { activeView: views.CONTROLLER_GAME_OFFLINE },
     })
 
-    return View()
+    return <View />
   })

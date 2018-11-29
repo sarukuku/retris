@@ -59,7 +59,7 @@ storiesOf("Display", module)
       payload: { activeView: views.DISPLAY_WAITING },
     })
 
-    return View()
+    return <View />
   })
   .add("Waiting To Start", () => {
     socket.next({
@@ -67,7 +67,7 @@ storiesOf("Display", module)
       payload: { activeView: views.DISPLAY_WAITING_TO_START },
     })
 
-    return View()
+    return <View />
   })
   .add("Game", () => {
     socket.next({
@@ -75,7 +75,7 @@ storiesOf("Display", module)
       payload: { activeView: views.DISPLAY_GAME },
     })
 
-    return View()
+    return <View />
   })
   .add("Game Over", () => {
     socket.next({
@@ -83,5 +83,5 @@ storiesOf("Display", module)
       payload: { activeView: views.DISPLAY_GAME_OVER },
     })
 
-    return View()
+    return <View />
   })
