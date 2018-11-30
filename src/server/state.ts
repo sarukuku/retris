@@ -1,4 +1,7 @@
 import { isEmpty } from "ramda"
+import { commands } from "../commands"
+import { Game } from "../games/tetris/game"
+import { TetrisMatrix } from "../games/tetris/shape"
 import { wait } from "../helpers"
 import { views } from "../views"
 
@@ -10,13 +13,14 @@ export interface Displays {
   add(display: Display): void
   remove(display: Display): void
   updateState(state: DisplayState): void
-  sendAction(action: string): void
   getState(): DisplayState | undefined
 }
 
 export interface DisplayState {
   activeView?: string
   queueLength?: number
+  board?: TetrisMatrix
+  score?: number
 }
 
 export interface Controller {
@@ -25,7 +29,7 @@ export interface Controller {
 
 export interface ControllerState {
   activeView?: string
-  queueLength?: number
+  positionInQueue?: number
   score?: number
 }
 
@@ -39,6 +43,7 @@ export class State {
   protected activeController?: Controller
   protected controllerQueue: Controller[] = []
   protected gameOverTimeout: number
+  private game?: Game
 
   constructor(
     protected displays: Displays,
@@ -93,10 +98,10 @@ export class State {
       this.displays.updateState({ queueLength: this.controllerQueue.length })
     }
 
-    this.controllers.updateState({ queueLength: this.controllerQueue.length })
+    controller.updateState({ positionInQueue: this.controllerQueue.length })
   }
 
-  onControllerStart(controller: Controller) {
+  async onControllerStart(controller: Controller) {
     if (this.activeController !== controller) {
       return
     }
@@ -104,16 +109,61 @@ export class State {
     this.activeController.updateState({
       activeView: views.CONTROLLER_GAME_CONTROLS,
     })
+
+    this.game = new Game({ columnCount: 10, rowCount: 16 })
+    this.game.boardChange.subscribe(board =>
+      this.displays.updateState({ board }),
+    )
+    this.game.scoreChange.subscribe(score =>
+      this.displays.updateState({ score: score.current }),
+    )
+
     this.displays.updateState({ activeView: views.DISPLAY_GAME })
+
+    await this.game.start()
+    await this.handleGameOver()
+  }
+
+  private async handleGameOver() {
+    if (this.activeController) {
+      this.activeController.updateState({
+        activeView: views.CONTROLLER_GAME_OVER,
+      })
+    }
+
+    this.displays.updateState({ activeView: views.DISPLAY_GAME_OVER })
+
+    await wait(this.gameOverTimeout)
+
+    this.assignNewActiveController()
   }
 
   onControllerAction(action: string) {
-    this.displays.sendAction(action)
+    if (!this.game) {
+      return
+    }
+
+    switch (action) {
+      case commands.LEFT:
+        this.game.left()
+        break
+      case commands.RIGHT:
+        this.game.right()
+        break
+      case commands.TAP:
+        this.game.rotate()
+        break
+      case commands.DOWN:
+        this.game.down()
+        break
+    }
   }
 
   onControllerDisconnect(controller: Controller) {
     if (controller === this.activeController) {
-      this.assignNewActiveController()
+      if (this.game) {
+        this.game.makeGameOver()
+      }
     }
 
     this.removeFromControllerQueue(controller)
@@ -123,7 +173,9 @@ export class State {
   private removeFromControllerQueue(controller: Controller): void {
     this.controllerQueue = this.controllerQueue.filter(c => c !== controller)
     this.displays.updateState({ queueLength: this.controllerQueue.length })
-    this.controllers.updateState({ queueLength: this.controllerQueue.length })
+    this.controllerQueue.forEach((c, index) =>
+      c.updateState({ positionInQueue: index + 1 }),
+    )
   }
 
   private assignNewActiveController() {

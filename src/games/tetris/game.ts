@@ -16,8 +16,6 @@ export class Game {
   private board: Board
   private score = new Score()
   private currentLevel = 1
-  private columnCount: number
-  private rowCount: number
 
   readonly boardChange: ReplaySubject<TetrisMatrix>
   readonly scoreChange = new Subject<ScoreChange>()
@@ -30,9 +28,6 @@ export class Game {
     columnCount: number
     rowCount: number
   }) {
-    this.rowCount = rowCount
-    this.columnCount = columnCount
-
     this.board = new Board(
       getNextShape,
       createEmptyMatrix(columnCount, rowCount),
@@ -51,12 +46,8 @@ export class Game {
     })
   }
 
-  getRowCount(): number {
-    return this.rowCount
-  }
-
-  getColumnCount(): number {
-    return this.columnCount
+  makeGameOver() {
+    this.isGameOver = true
   }
 
   async start() {

@@ -6,10 +6,6 @@ export class LoopedReaktorGame {
   private reaktorGame = new ReaktorGame()
   boardChange = new ReplaySubject<TetrisMatrix>()
 
-  getColumnCount = () => this.reaktorGame.getColumnCount()
-
-  getRowCount = () => this.reaktorGame.getRowCount()
-
   async start() {
     let subscripiton = this.reaktorGame.boardChange.subscribe(board =>
       this.boardChange.next(board),

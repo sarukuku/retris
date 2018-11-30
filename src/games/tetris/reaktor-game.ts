@@ -138,21 +138,15 @@ export class ReaktorGame {
   private currentPosition = 0
   private currentRotation = 0
   private latestBoard: TetrisMatrix
+  private rowCount = 16
+  private columnCount = 13
 
   readonly boardChange = new ReplaySubject<TetrisMatrix>()
-
-  getColumnCount() {
-    return 13
-  }
-
-  getRowCount() {
-    return 16
-  }
 
   constructor() {
     this.board = new Board(
       this.getNextShape,
-      createEmptyMatrix(this.getColumnCount(), this.getRowCount()),
+      createEmptyMatrix(this.columnCount, this.rowCount),
     )
     this.board.gameOver.subscribe(() => (this.isGameOver = true))
     this.board.boardChange.subscribe(board => {
@@ -201,8 +195,8 @@ export class ReaktorGame {
   private async flashBoard(board: TetrisMatrix): Promise<void> {
     const flashCount = 3
     const emptyMatrix = createEmptyMatrix<TetrisCell>(
-      this.getColumnCount(),
-      this.getRowCount(),
+      this.columnCount,
+      this.rowCount,
     )
     for (let i = 0; i < flashCount; i++) {
       await wait(500)
@@ -218,9 +212,9 @@ export class ReaktorGame {
     }
 
     const shiftedBoard = remove<TetrisRow>(
-      this.getRowCount(),
+      this.rowCount,
       1,
-      prepend<TetrisRow>(createEmptyRow(this.getColumnCount()), board),
+      prepend<TetrisRow>(createEmptyRow(this.columnCount), board),
     )
     this.boardChange.next(shiftedBoard)
     await wait(100)

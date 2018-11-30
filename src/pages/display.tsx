@@ -10,7 +10,12 @@ import {
   AutoUnsubscribeProps,
   pageWithAutoUnsubscribe,
 } from "../components/with-auto-unsubscribe"
-import { pageWithSocket, SocketProps } from "../components/with-socket"
+import {
+  pageWithSocket,
+  SocketPayload,
+  SocketProps,
+} from "../components/with-socket"
+import { DisplayState } from "../server/state"
 import { views } from "../views"
 import { DisplayGame } from "../views/display/display-game"
 import { GameOver } from "../views/display/game-over"
@@ -24,20 +29,10 @@ interface DisplayProps
   address: string
 }
 
-interface DisplayComponentState {
-  activeView: string
-  score: number
-  queueLength: number
-}
-
-export class _Display extends Component<DisplayProps, DisplayComponentState> {
+export class _Display extends Component<DisplayProps, DisplayState> {
   private previousActiveView?: string
 
-  state: DisplayComponentState = {
-    activeView: views.DISPLAY_WAITING,
-    score: 0,
-    queueLength: 0,
-  }
+  state: DisplayState = {}
 
   private actionCommand = new Subject<string>()
   private gameOver = new Subject<number>()
@@ -53,17 +48,19 @@ export class _Display extends Component<DisplayProps, DisplayComponentState> {
     const { socket, unsubscribeOnUnmount } = this.props
 
     unsubscribeOnUnmount(
-      socket.subscribe(({ event, payload }) => {
-        switch (event) {
-          case "state":
-            this.setState(payload)
-            break
-          case commands.ACTION:
-            this.actionCommand.next(payload)
-        }
-      }),
+      socket.subscribe(this.onSocket),
       this.gameOver.subscribe(this.onGameOver),
     )
+  }
+
+  private onSocket = ({ event, payload }: SocketPayload) => {
+    switch (event) {
+      case "state":
+        this.setState(payload)
+        break
+      case commands.ACTION:
+        this.actionCommand.next(payload)
+    }
   }
 
   private onGameOver = (totalScore: number) => {
@@ -101,12 +98,14 @@ export class _Display extends Component<DisplayProps, DisplayComponentState> {
     this.previousActiveView = activeView
 
     const { analytics } = this.props
-    analytics.sendPageView(activeView)
+    if (activeView) {
+      analytics.sendPageView(activeView)
+    }
   }
 
   private renderView() {
     const { address } = this.props
-    const { activeView, score } = this.state
+    const { activeView, score = 0, board } = this.state
 
     switch (activeView) {
       default:
@@ -128,10 +127,9 @@ export class _Display extends Component<DisplayProps, DisplayComponentState> {
         return (
           <Fragment>
             <BlurredOverlay isActive={isGameOver}>
-              <DisplayGame
-                actionCommand={this.actionCommand}
-                gameOver={this.gameOver}
-              />
+              {board && (
+                <DisplayGame actionCommand={this.actionCommand} board={board} />
+              )}
             </BlurredOverlay>
             {isGameOver && <GameOver score={score} />}
           </Fragment>

@@ -1,6 +1,5 @@
 import React, { Component, Fragment } from "react"
 import { interval, Subject } from "rxjs"
-import { commands } from "../../../commands"
 import { Tetris } from "../../../components/tetris"
 import {
   AutoUnsubscribeProps,
@@ -10,14 +9,14 @@ import {
   TranslateProps,
   withTranslate,
 } from "../../../components/with-translate"
-import { Game } from "../../../games/tetris/game"
+import { TetrisMatrix } from "../../../games/tetris/shape"
 import { formatSeconds } from "../../../helpers"
 import { colors } from "../../../styles/colors"
 import { HUDItem } from "./hud-item"
 
 interface DisplayGameProps extends TranslateProps, AutoUnsubscribeProps {
+  board: TetrisMatrix
   actionCommand: Subject<string>
-  gameOver: Subject<number>
 }
 
 interface DisplayGameState {
@@ -28,7 +27,6 @@ interface DisplayGameState {
 const ONE_SECOND = 1000
 
 class _DisplayGame extends Component<DisplayGameProps> {
-  private game = new Game({ columnCount: 10, rowCount: 16 })
   private timeTicker = interval(ONE_SECOND)
 
   state: DisplayGameState = {
@@ -37,42 +35,18 @@ class _DisplayGame extends Component<DisplayGameProps> {
   }
 
   async componentDidMount() {
-    const { actionCommand, gameOver, unsubscribeOnUnmount } = this.props
+    const { unsubscribeOnUnmount } = this.props
 
     unsubscribeOnUnmount(
-      actionCommand.subscribe(this.handleCommand),
-      this.game.scoreChange.subscribe(({ current }) =>
-        this.setState({ score: current }),
-      ),
       this.timeTicker.subscribe(() => {
         const { elapsedSeconds } = this.state
         this.setState({ elapsedSeconds: elapsedSeconds + 1 })
       }),
     )
-
-    await this.game.start()
-    gameOver.next(this.state.score)
-  }
-
-  private handleCommand = (command: string) => {
-    switch (command) {
-      case commands.LEFT:
-        this.game.left()
-        break
-      case commands.RIGHT:
-        this.game.right()
-        break
-      case commands.DOWN:
-        this.game.down()
-        break
-      case commands.TAP:
-        this.game.rotate()
-        break
-    }
   }
 
   render() {
-    const { translate } = this.props
+    const { translate, board } = this.props
     const { score, elapsedSeconds } = this.state
 
     return (
@@ -89,7 +63,7 @@ class _DisplayGame extends Component<DisplayGameProps> {
             />
           </div>
           <div className="display-game__tetris">
-            <Tetris game={this.game} />
+            <Tetris board={board} />
           </div>
         </div>
         <style jsx>{`
