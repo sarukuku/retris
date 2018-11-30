@@ -3,15 +3,17 @@ import Swipeable from "react-swipeable"
 import { Subject } from "rxjs"
 import { clientConfig } from "../../client-config"
 import { commands } from "../../commands"
+import { ControlInstructions } from "../../components/control-instructions"
+import { TranslateProps, withTranslate } from "../../components/with-translate"
 import { colors } from "../../styles/colors"
 
-interface GameControllerProps {
+interface GameControllerProps extends TranslateProps {
   actionCommand: Subject<string>
 }
 
-export class GameController extends Component<GameControllerProps> {
+class _GameController extends Component<GameControllerProps> {
   render() {
-    const { actionCommand } = this.props
+    const { actionCommand, translate } = this.props
 
     return (
       <Swipeable
@@ -21,18 +23,19 @@ export class GameController extends Component<GameControllerProps> {
         stopPropagation={true}
         delta={50}
       >
-        <main
-          className="wrap"
-          onClick={() => actionCommand.next(commands.TAP)}
-        />
+        <main className="wrap" onClick={() => actionCommand.next(commands.TAP)}>
+          <ControlInstructions
+            swipeInstruction={translate(
+              "controller.start-game.swipe-instruction",
+            )}
+            tapInstruction={translate("controller.start-game.tap-instruction")}
+          />
+        </main>
         <style jsx>{`
           .wrap {
             width: 100%;
             height: 100%;
             position: absolute;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             background-color: ${colors.BLACK};
             color: ${colors.WHITE};
             background-image: url("${clientConfig.staticPath}/grid.svg");
@@ -49,3 +52,5 @@ export class GameController extends Component<GameControllerProps> {
     )
   }
 }
+
+export const GameController = withTranslate(_GameController)
