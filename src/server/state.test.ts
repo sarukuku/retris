@@ -1,10 +1,12 @@
+import { commands } from "../commands"
 import { views } from "../views"
 import {
-  TestDisplays,
-  TestController,
   createTestState,
-  TestDisplay,
+  TestController,
   TestControllers,
+  TestDisplay,
+  TestDisplays,
+  TestGame,
 } from "./state.mocks"
 
 describe("onDisplayConnect", () => {
@@ -42,88 +44,6 @@ describe("onDisplayConnect", () => {
     state.onDisplayConnect(display)
 
     expect(display.state).toEqual(syncedState)
-  })
-})
-
-describe("onDisplayGameOver", () => {
-  test(`set active controller's view to ${
-    views.CONTROLLER_GAME_OVER
-  }`, async () => {
-    const state = createTestState()
-    const activeController = new TestController()
-    state.setActiveContoller(activeController)
-    const score = 500
-
-    await state.onDisplayGameOver(score)
-
-    expect(activeController.stateUpdates[0]).toEqual({
-      activeView: views.CONTROLLER_GAME_OVER,
-      score,
-    })
-  })
-
-  test(`set displays view to ${views.DISPLAY_GAME_OVER}`, async () => {
-    const displays = new TestDisplays()
-    const state = createTestState({ displays })
-    const score = 500
-
-    await state.onDisplayGameOver(score)
-
-    expect(displays.stateUpdates[0]).toEqual({
-      activeView: views.DISPLAY_GAME_OVER,
-    })
-  })
-
-  describe("if noone is in the queue", () => {
-    test(`set displays view to ${
-      views.DISPLAY_WAITING
-    } after some time`, async () => {
-      const displays = new TestDisplays()
-      const state = createTestState({ displays })
-      const score = 500
-
-      await state.onDisplayGameOver(score)
-
-      expect(displays.stateUpdates[1]).toEqual({
-        activeView: views.DISPLAY_WAITING,
-      })
-    })
-  })
-
-  describe("if someone is in the queue", () => {
-    test(`set next active controller's view to ${
-      views.CONTROLLER_START
-    } after some time`, async () => {
-      const displays = new TestDisplays()
-      const state = createTestState({ displays })
-      const activeController = new TestController()
-      const nextActiveController = new TestController()
-      state.setActiveContoller(activeController)
-      state.setControllerQueue([nextActiveController])
-      const score = 500
-
-      await state.onDisplayGameOver(score)
-
-      expect(nextActiveController.stateUpdates).toEqual([
-        { activeView: views.CONTROLLER_START },
-      ])
-    })
-
-    test(`set displays view to ${
-      views.DISPLAY_WAITING_TO_START
-    } after some time`, async () => {
-      const displays = new TestDisplays()
-      const nextActiveController = new TestController()
-      const state = createTestState({ displays })
-      state.setControllerQueue([nextActiveController])
-      const score = 500
-
-      await state.onDisplayGameOver(score)
-
-      expect(displays.stateUpdates[1]).toEqual({
-        activeView: views.DISPLAY_WAITING_TO_START,
-      })
-    })
   })
 })
 
@@ -210,7 +130,7 @@ describe("onControllerJoin", () => {
       state.onControllerJoin(controller)
 
       expect(controller.stateUpdates).toEqual([
-        { activeView: views.CONTROLLER_IN_QUEUE },
+        expect.objectContaining({ activeView: views.CONTROLLER_IN_QUEUE }),
       ])
     })
 
@@ -226,7 +146,7 @@ describe("onControllerJoin", () => {
       expect(displays.stateUpdates).toEqual([{ queueLength: 1 }])
     })
 
-    test("set controllers queueLength to 1", () => {
+    test("set controller to positionInQueue to 1", () => {
       const controllers = new TestControllers()
       const state = createTestState({ controllers })
       const controller = new TestController()
@@ -235,7 +155,9 @@ describe("onControllerJoin", () => {
 
       state.onControllerJoin(controller)
 
-      expect(controllers.stateUpdates).toEqual([{ queueLength: 1 }])
+      expect(controller.stateUpdates).toEqual([
+        expect.objectContaining({ positionInQueue: 1 }),
+      ])
     })
   })
 })
@@ -243,104 +165,223 @@ describe("onControllerJoin", () => {
 describe("onControllerStart", () => {
   test(`set active controller's view to ${
     views.CONTROLLER_GAME_CONTROLS
-  }`, () => {
+  }`, async () => {
     const state = createTestState()
     const controller = new TestController()
     state.setActiveContoller(controller)
 
-    state.onControllerStart(controller)
+    await state.onControllerStart(controller)
 
-    expect(controller.stateUpdates).toEqual([
-      { activeView: views.CONTROLLER_GAME_CONTROLS },
-    ])
+    expect(controller.stateUpdates[0]).toEqual({
+      activeView: views.CONTROLLER_GAME_CONTROLS,
+    })
   })
 
-  test(`set displays view to ${views.DISPLAY_GAME}`, () => {
+  test(`set active controller's view to ${
+    views.CONTROLLER_GAME_OVER
+  } after game over`, async () => {
+    const state = createTestState()
+    const controller = new TestController()
+    state.setActiveContoller(controller)
+
+    await state.onControllerStart(controller)
+
+    expect(controller.stateUpdates[1]).toEqual({
+      activeView: views.CONTROLLER_GAME_OVER,
+    })
+  })
+
+  test(`set displays view to ${views.DISPLAY_GAME}`, async () => {
     const displays = new TestDisplays()
     const state = createTestState({ displays })
     const controller = new TestController()
     state.setActiveContoller(controller)
 
-    state.onControllerStart(controller)
+    await state.onControllerStart(controller)
 
-    expect(displays.stateUpdates).toEqual([{ activeView: views.DISPLAY_GAME }])
+    expect(displays.stateUpdates[0]).toEqual(
+      expect.objectContaining({ activeView: views.DISPLAY_GAME }),
+    )
+  })
+
+  test("set displays score to 0", async () => {
+    const displays = new TestDisplays()
+    const state = createTestState({ displays })
+    const controller = new TestController()
+    state.setActiveContoller(controller)
+
+    await state.onControllerStart(controller)
+
+    expect(displays.stateUpdates[0]).toEqual(
+      expect.objectContaining({ score: 0 }),
+    )
+  })
+
+  test(`set displays view to ${
+    views.DISPLAY_GAME_OVER
+  } after game over`, async () => {
+    const displays = new TestDisplays()
+    const state = createTestState({ displays })
+    const controller = new TestController()
+    state.setActiveContoller(controller)
+
+    await state.onControllerStart(controller)
+
+    expect(displays.stateUpdates[1]).toEqual({
+      activeView: views.DISPLAY_GAME_OVER,
+    })
+  })
+
+  test(`set displays view to ${
+    views.DISPLAY_WAITING
+  } after a while after game over`, async () => {
+    const displays = new TestDisplays()
+    const state = createTestState({ displays })
+    const controller = new TestController()
+    state.setActiveContoller(controller)
+
+    await state.onControllerStart(controller)
+
+    expect(displays.stateUpdates[2]).toEqual({
+      activeView: views.DISPLAY_WAITING,
+    })
   })
 })
 
 describe("onControllerAction", () => {
-  test("invoke displays send action", () => {
-    const displays = new TestDisplays()
-    const state = createTestState({ displays })
-    const action = "foo"
+  test(`invoke ${commands.LEFT}`, () => {
+    const game = new TestGame()
+    const spy = jest.fn()
+    game.left = spy
+    const state = createTestState()
+    state.setGame(game)
 
-    state.onControllerAction(action)
+    state.onControllerAction(commands.LEFT)
 
-    expect(displays.sentActions).toEqual([action])
+    expect(spy).toHaveBeenCalled()
+  })
+
+  test(`invoke ${commands.RIGHT}`, () => {
+    const game = new TestGame()
+    const spy = jest.fn()
+    game.right = spy
+    const state = createTestState()
+    state.setGame(game)
+
+    state.onControllerAction(commands.RIGHT)
+
+    expect(spy).toHaveBeenCalled()
+  })
+
+  test(`invoke ${commands.DOWN}`, () => {
+    const game = new TestGame()
+    const spy = jest.fn()
+    game.down = spy
+    const state = createTestState()
+    state.setGame(game)
+
+    state.onControllerAction(commands.DOWN)
+
+    expect(spy).toHaveBeenCalled()
+  })
+
+  test(`invoke ${commands.TAP}`, () => {
+    const game = new TestGame()
+    const spy = jest.fn()
+    game.rotate = spy
+    const state = createTestState()
+    state.setGame(game)
+
+    state.onControllerAction(commands.TAP)
+
+    expect(spy).toHaveBeenCalled()
   })
 })
 
 describe("onControllerDisconnect", () => {
-  test("remove controller from controllers", () => {
+  test("remove controller from controllers", async () => {
     const controller = new TestController()
     const controllers = new TestControllers()
     controllers.controllers = [controller]
     const state = createTestState({ controllers })
 
-    state.onControllerDisconnect(controller)
+    await state.onControllerDisconnect(controller)
 
     expect(controllers.controllers).toEqual([])
   })
 
   describe("if not the active controller disconnects", () => {
-    test("don't replace with new one", () => {
+    test("don't replace with new one", async () => {
       const activeController = new TestController()
       const otherController = new TestController()
       const controllers = new TestControllers()
       const state = createTestState({ controllers })
       state.setActiveContoller(activeController)
 
-      state.onControllerDisconnect(otherController)
+      await state.onControllerDisconnect(otherController)
 
       expect(state.getActiveController()).toBe(activeController)
     })
   })
 
   describe("if controller is in queue", () => {
-    test("remove controller from queue", () => {
+    test("remove controller from queue", async () => {
       const controller = new TestController()
       const controllers = new TestControllers()
       const state = createTestState({ controllers })
       state.setControllerQueue([controller])
 
-      state.onControllerDisconnect(controller)
+      await state.onControllerDisconnect(controller)
 
       expect(controllers.controllers).toEqual([])
     })
 
-    test("set displays queueLenght to 0", () => {
+    test(`set displays activeView to ${views.DISPLAY_GAME_OVER}`, async () => {
       const activeController = new TestController()
       const controller = new TestController()
       const displays = new TestDisplays()
       const state = createTestState({ displays })
+      state.setGame(new TestGame())
       state.setActiveContoller(activeController)
       state.setControllerQueue([controller])
 
-      state.onControllerDisconnect(activeController)
+      await state.onControllerDisconnect(activeController)
 
-      expect(displays.stateUpdates).toContainEqual({ queueLength: 0 })
+      expect(displays.stateUpdates[0]).toEqual({
+        activeView: views.DISPLAY_GAME_OVER,
+      })
     })
 
-    test("set controllers queueLenght to 0", () => {
+    test(`set displays activeView to ${
+      views.DISPLAY_WAITING_TO_START
+    } after a while`, async () => {
       const activeController = new TestController()
       const controller = new TestController()
-      const controllers = new TestControllers()
-      const state = createTestState({ controllers })
+      const displays = new TestDisplays()
+      const state = createTestState({ displays })
+      state.setGame(new TestGame())
       state.setActiveContoller(activeController)
       state.setControllerQueue([controller])
 
-      state.onControllerDisconnect(activeController)
+      await state.onControllerDisconnect(activeController)
 
-      expect(controllers.stateUpdates).toContainEqual({ queueLength: 0 })
+      expect(displays.stateUpdates[1]).toEqual({
+        activeView: views.DISPLAY_WAITING_TO_START,
+      })
+    })
+
+    test("set displays queueLength to 0", async () => {
+      const activeController = new TestController()
+      const controller = new TestController()
+      const displays = new TestDisplays()
+      const state = createTestState({ displays })
+      state.setGame(new TestGame())
+      state.setActiveContoller(activeController)
+      state.setControllerQueue([controller])
+
+      await state.onControllerDisconnect(activeController)
+
+      expect(displays.stateUpdates[2]).toEqual({ queueLength: 0 })
     })
   })
 
@@ -351,6 +392,7 @@ describe("onControllerDisconnect", () => {
       const state = createTestState()
       const activeController = new TestController()
       const nextActiveController = new TestController()
+      state.setGame(new TestGame())
       state.setActiveContoller(activeController)
       state.setControllerQueue([nextActiveController])
 
@@ -366,6 +408,7 @@ describe("onControllerDisconnect", () => {
       const nextActiveController = new TestController()
       const activeController = new TestController()
       const state = createTestState({ displays })
+      state.setGame(new TestGame())
       state.setActiveContoller(activeController)
       state.setControllerQueue([nextActiveController])
 

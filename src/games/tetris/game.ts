@@ -13,6 +13,7 @@ export interface ScoreChange {
 
 export class Game {
   private isGameOver = false
+  private isForcedGameOver = false
   private board: Board
   private score = new Score()
   private currentLevel = 1
@@ -46,15 +47,18 @@ export class Game {
     })
   }
 
-  makeGameOver() {
+  forceGameOver() {
     this.isGameOver = true
+    this.isForcedGameOver = true
   }
 
-  async start() {
+  async start(): Promise<boolean> {
     while (!this.isGameOver) {
       this.board.step()
       await wait(this.mapLevelToTime())
     }
+
+    return this.isForcedGameOver
   }
 
   private mapLevelToTime(): number {

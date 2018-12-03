@@ -1,9 +1,21 @@
 import { isEmpty } from "ramda"
+import { ReplaySubject, Subject } from "rxjs"
 import { commands } from "../commands"
-import { Game } from "../games/tetris/game"
+import { ScoreChange } from "../games/tetris/game"
 import { TetrisMatrix } from "../games/tetris/shape"
 import { wait } from "../helpers"
 import { views } from "../views"
+
+export interface Game {
+  start(): Promise<boolean>
+  left(): void
+  right(): void
+  rotate(): void
+  down(): void
+  forceGameOver(): void
+  boardChange: ReplaySubject<TetrisMatrix>
+  scoreChange: Subject<ScoreChange>
+}
 
 export interface Display {
   updateState(state: DisplayState): void
@@ -43,11 +55,12 @@ export class State {
   protected activeController?: Controller
   protected controllerQueue: Controller[] = []
   protected gameOverTimeout: number
-  private game?: Game
+  protected game?: Game
 
   constructor(
     protected displays: Displays,
     protected controllers: Controllers,
+    private createGame: () => Game,
     { gameOverTimeout = FIVE_SECONDS } = {},
   ) {
     this.gameOverTimeout = gameOverTimeout
@@ -78,12 +91,13 @@ export class State {
       this.activeController.updateState({ activeView: views.CONTROLLER_START })
       this.displays.updateState({ activeView: views.DISPLAY_WAITING_TO_START })
     } else {
-      controller.updateState({ activeView: views.CONTROLLER_IN_QUEUE })
       this.controllerQueue.push(controller)
+      controller.updateState({
+        activeView: views.CONTROLLER_IN_QUEUE,
+        positionInQueue: this.controllerQueue.length,
+      })
       this.displays.updateState({ queueLength: this.controllerQueue.length })
     }
-
-    controller.updateState({ positionInQueue: this.controllerQueue.length })
   }
 
   async onControllerStart(controller: Controller) {
@@ -95,18 +109,24 @@ export class State {
       activeView: views.CONTROLLER_GAME_CONTROLS,
     })
 
-    this.game = new Game({ columnCount: 10, rowCount: 16 })
+    this.game = this.createGame()
     this.game.boardChange.subscribe(board =>
       this.displays.updateState({ board }),
     )
-    this.game.scoreChange.subscribe(score =>
-      this.displays.updateState({ score: score.current }),
-    )
+    this.game.scoreChange.subscribe(score => {
+      this.displays.updateState({ score: score.current })
+      if (this.activeController) {
+        this.activeController.updateState({ score: score.current })
+      }
+    })
 
-    this.displays.updateState({ activeView: views.DISPLAY_GAME })
+    this.displays.updateState({ activeView: views.DISPLAY_GAME, score: 0 })
 
-    await this.game.start()
-    await this.handleGameOver()
+    const isForcedGameOver = await this.game.start()
+    this.game = undefined
+    if (!isForcedGameOver) {
+      await this.handleGameOver()
+    }
   }
 
   private async handleGameOver() {
@@ -144,10 +164,14 @@ export class State {
     }
   }
 
-  onControllerDisconnect(controller: Controller) {
+  async onControllerDisconnect(controller: Controller) {
     if (controller === this.activeController) {
       if (this.game) {
-        this.game.makeGameOver()
+        this.game.forceGameOver()
+        this.game = undefined
+        await this.handleGameOver()
+      } else {
+        this.assignNewActiveController()
       }
     }
 

@@ -4,6 +4,7 @@ import { createServer } from "http"
 import pino from "pino"
 import socketio from "socket.io"
 import { config } from "./config"
+import { Game } from "./games/tetris/game"
 import { defaultTranslations } from "./i18n/default-translations"
 import { createLoadTranslationsFromSheets } from "./i18n/load-translations-from-sheets"
 import { createNextApp } from "./next"
@@ -42,6 +43,7 @@ async function main() {
   const state = new State(
     new SocketIODisplays(displayNamespace),
     new SocketIOControllers(controllerNamespace),
+    () => new Game({ columnCount: 10, rowCount: 16 }),
   )
   createSocketIOServer(state, {
     display: displayNamespace,

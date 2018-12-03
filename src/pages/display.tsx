@@ -67,21 +67,8 @@ export class _Display extends Component<DisplayProps, DisplayState> {
           }
         }
 
-        if (activeView === views.DISPLAY_GAME) {
-          if (
-            this.previousActiveView &&
-            this.previousActiveView !== activeView
-          ) {
-            this.resetGame()
-          }
-        }
-
         break
     }
-  }
-
-  private resetGame() {
-    this.setState({ score: 0 })
   }
 
   private onGameOver = () => {

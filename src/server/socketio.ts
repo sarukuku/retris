@@ -32,8 +32,8 @@ export function createSocketIOServer(
       state.onControllerAction(command)
     })
 
-    controllerSocket.on("disconnect", () => {
-      state.onControllerDisconnect(controller)
+    controllerSocket.on("disconnect", async () => {
+      await state.onControllerDisconnect(controller)
     })
   })
 }
