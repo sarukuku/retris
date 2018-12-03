@@ -63,21 +63,6 @@ export class State {
     this.displays.add(display)
   }
 
-  async onDisplayGameOver(score: number) {
-    if (this.activeController) {
-      this.activeController.updateState({
-        activeView: views.CONTROLLER_GAME_OVER,
-        score,
-      })
-    }
-
-    this.displays.updateState({ activeView: views.DISPLAY_GAME_OVER })
-
-    await wait(this.gameOverTimeout)
-
-    this.assignNewActiveController()
-  }
-
   onDisplayDisconnect(display: Display) {
     this.displays.remove(display)
   }

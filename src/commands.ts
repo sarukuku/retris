@@ -4,7 +4,6 @@ export const commands = {
   DOWN: "DOWN",
   TAP: "TAP",
   START: "START",
-  GAME_OVER: "GAME_OVER",
   JOIN: "JOIN",
   ACTION: "ACTION",
 }

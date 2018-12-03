@@ -1,5 +1,6 @@
 import React, { Component, Fragment } from "react"
 import { interval, Subject } from "rxjs"
+import { takeUntil } from "rxjs/operators"
 import { Tetris } from "../../../components/tetris"
 import {
   AutoUnsubscribeProps,
@@ -16,11 +17,11 @@ import { HUDItem } from "./hud-item"
 
 interface DisplayGameProps extends TranslateProps, AutoUnsubscribeProps {
   board: TetrisMatrix
-  actionCommand: Subject<string>
+  score: number
+  gameOver: Subject<void>
 }
 
 interface DisplayGameState {
-  score: number
   elapsedSeconds: number
 }
 
@@ -30,15 +31,14 @@ class _DisplayGame extends Component<DisplayGameProps> {
   private timeTicker = interval(ONE_SECOND)
 
   state: DisplayGameState = {
-    score: 0,
     elapsedSeconds: 0,
   }
 
   async componentDidMount() {
-    const { unsubscribeOnUnmount } = this.props
+    const { unsubscribeOnUnmount, gameOver } = this.props
 
     unsubscribeOnUnmount(
-      this.timeTicker.subscribe(() => {
+      this.timeTicker.pipe(takeUntil(gameOver)).subscribe(() => {
         const { elapsedSeconds } = this.state
         this.setState({ elapsedSeconds: elapsedSeconds + 1 })
       }),
@@ -46,8 +46,8 @@ class _DisplayGame extends Component<DisplayGameProps> {
   }
 
   render() {
-    const { translate, board } = this.props
-    const { score, elapsedSeconds } = this.state
+    const { translate, board, score } = this.props
+    const { elapsedSeconds } = this.state
 
     return (
       <Fragment>

@@ -2,7 +2,6 @@ import { NextContext } from "next"
 import React, { Component, Fragment } from "react"
 import { Subject } from "rxjs"
 import io from "socket.io-client"
-import { commands } from "../commands"
 import { AttractionLoop } from "../components/attraction-loop"
 import { BlurredOverlay } from "../components/blurred-overlay"
 import { AnalyticsProps, pageWithAnalytics } from "../components/with-analytics"
@@ -31,11 +30,9 @@ interface DisplayProps
 
 export class _Display extends Component<DisplayProps, DisplayState> {
   private previousActiveView?: string
+  private gameOver = new Subject<void>()
 
   state: DisplayState = {}
-
-  private actionCommand = new Subject<string>()
-  private gameOver = new Subject<number>()
 
   static async getInitialProps(ctx: NextContext) {
     if (ctx.req) {
@@ -56,24 +53,46 @@ export class _Display extends Component<DisplayProps, DisplayState> {
   private onSocket = ({ event, payload }: SocketPayload) => {
     switch (event) {
       case "state":
+        const { activeView } = payload
+        this.previousActiveView = this.state.activeView
+
         this.setState(payload)
+
+        if (activeView === views.DISPLAY_GAME_OVER) {
+          if (
+            this.previousActiveView &&
+            this.previousActiveView !== activeView
+          ) {
+            this.gameOver.next()
+          }
+        }
+
+        if (activeView === views.DISPLAY_GAME) {
+          if (
+            this.previousActiveView &&
+            this.previousActiveView !== activeView
+          ) {
+            this.resetGame()
+          }
+        }
+
         break
-      case commands.ACTION:
-        this.actionCommand.next(payload)
     }
   }
 
-  private onGameOver = (totalScore: number) => {
-    const { analytics, socket } = this.props
-    this.setState({ score: totalScore })
+  private resetGame() {
+    this.setState({ score: 0 })
+  }
+
+  private onGameOver = () => {
+    const { analytics } = this.props
+    const { score } = this.state
 
     analytics.sendCustomEvent({
       category: "GameOver",
       action: "TotalScore",
-      value: totalScore,
+      value: score,
     })
-
-    socket.next({ event: commands.GAME_OVER, payload: totalScore })
   }
 
   render() {
@@ -95,7 +114,6 @@ export class _Display extends Component<DisplayProps, DisplayState> {
     if (activeView === this.previousActiveView) {
       return
     }
-    this.previousActiveView = activeView
 
     const { analytics } = this.props
     if (activeView) {
@@ -128,7 +146,11 @@ export class _Display extends Component<DisplayProps, DisplayState> {
           <Fragment>
             <BlurredOverlay isActive={isGameOver}>
               {board && (
-                <DisplayGame actionCommand={this.actionCommand} board={board} />
+                <DisplayGame
+                  gameOver={this.gameOver}
+                  board={board}
+                  score={score}
+                />
               )}
             </BlurredOverlay>
             {isGameOver && <GameOver score={score} />}
