@@ -13,11 +13,10 @@ export interface ScoreChange {
 
 export class Game {
   private isGameOver = false
+  private isForcedGameOver = false
   private board: Board
   private score = new Score()
   private currentLevel = 1
-  private columnCount: number
-  private rowCount: number
 
   readonly boardChange: ReplaySubject<TetrisMatrix>
   readonly scoreChange = new Subject<ScoreChange>()
@@ -30,9 +29,6 @@ export class Game {
     columnCount: number
     rowCount: number
   }) {
-    this.rowCount = rowCount
-    this.columnCount = columnCount
-
     this.board = new Board(
       getNextShape,
       createEmptyMatrix(columnCount, rowCount),
@@ -51,19 +47,18 @@ export class Game {
     })
   }
 
-  getRowCount(): number {
-    return this.rowCount
+  forceGameOver() {
+    this.isGameOver = true
+    this.isForcedGameOver = true
   }
 
-  getColumnCount(): number {
-    return this.columnCount
-  }
-
-  async start() {
+  async start(): Promise<boolean> {
     while (!this.isGameOver) {
       this.board.step()
       await wait(this.mapLevelToTime())
     }
+
+    return this.isForcedGameOver
   }
 
   private mapLevelToTime(): number {

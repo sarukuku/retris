@@ -1,6 +1,21 @@
 import { isEmpty } from "ramda"
+import { ReplaySubject, Subject } from "rxjs"
+import { commands } from "../commands"
+import { ScoreChange } from "../games/tetris/game"
+import { TetrisMatrix } from "../games/tetris/shape"
 import { wait } from "../helpers"
 import { views } from "../views"
+
+export interface Game {
+  start(): Promise<boolean>
+  left(): void
+  right(): void
+  rotate(): void
+  down(): void
+  forceGameOver(): void
+  boardChange: ReplaySubject<TetrisMatrix>
+  scoreChange: Subject<ScoreChange>
+}
 
 export interface Display {
   updateState(state: DisplayState): void
@@ -10,13 +25,14 @@ export interface Displays {
   add(display: Display): void
   remove(display: Display): void
   updateState(state: DisplayState): void
-  sendAction(action: string): void
   getState(): DisplayState | undefined
 }
 
 export interface DisplayState {
   activeView?: string
   queueLength?: number
+  board?: TetrisMatrix
+  score?: number
 }
 
 export interface Controller {
@@ -25,7 +41,7 @@ export interface Controller {
 
 export interface ControllerState {
   activeView?: string
-  queueLength?: number
+  positionInQueue?: number
   score?: number
 }
 
@@ -39,10 +55,12 @@ export class State {
   protected activeController?: Controller
   protected controllerQueue: Controller[] = []
   protected gameOverTimeout: number
+  protected game?: Game
 
   constructor(
     protected displays: Displays,
     protected controllers: Controllers,
+    private createGame: () => Game,
     { gameOverTimeout = FIVE_SECONDS } = {},
   ) {
     this.gameOverTimeout = gameOverTimeout
@@ -56,21 +74,6 @@ export class State {
     const currentDisplayState = this.displays.getState() || initialDisplayState
     display.updateState(currentDisplayState)
     this.displays.add(display)
-  }
-
-  async onDisplayGameOver(score: number) {
-    if (this.activeController) {
-      this.activeController.updateState({
-        activeView: views.CONTROLLER_GAME_OVER,
-        score,
-      })
-    }
-
-    this.displays.updateState({ activeView: views.DISPLAY_GAME_OVER })
-
-    await wait(this.gameOverTimeout)
-
-    this.assignNewActiveController()
   }
 
   onDisplayDisconnect(display: Display) {
@@ -88,15 +91,16 @@ export class State {
       this.activeController.updateState({ activeView: views.CONTROLLER_START })
       this.displays.updateState({ activeView: views.DISPLAY_WAITING_TO_START })
     } else {
-      controller.updateState({ activeView: views.CONTROLLER_IN_QUEUE })
       this.controllerQueue.push(controller)
+      controller.updateState({
+        activeView: views.CONTROLLER_IN_QUEUE,
+        positionInQueue: this.controllerQueue.length,
+      })
       this.displays.updateState({ queueLength: this.controllerQueue.length })
     }
-
-    this.controllers.updateState({ queueLength: this.controllerQueue.length })
   }
 
-  onControllerStart(controller: Controller) {
+  async onControllerStart(controller: Controller) {
     if (this.activeController !== controller) {
       return
     }
@@ -104,16 +108,71 @@ export class State {
     this.activeController.updateState({
       activeView: views.CONTROLLER_GAME_CONTROLS,
     })
-    this.displays.updateState({ activeView: views.DISPLAY_GAME })
+
+    this.game = this.createGame()
+    this.game.boardChange.subscribe(board =>
+      this.displays.updateState({ board }),
+    )
+    this.game.scoreChange.subscribe(score => {
+      this.displays.updateState({ score: score.current })
+      if (this.activeController) {
+        this.activeController.updateState({ score: score.current })
+      }
+    })
+
+    this.displays.updateState({ activeView: views.DISPLAY_GAME, score: 0 })
+
+    const isForcedGameOver = await this.game.start()
+    this.game = undefined
+    if (!isForcedGameOver) {
+      await this.handleGameOver()
+    }
+  }
+
+  private async handleGameOver() {
+    if (this.activeController) {
+      this.activeController.updateState({
+        activeView: views.CONTROLLER_GAME_OVER,
+      })
+    }
+
+    this.displays.updateState({ activeView: views.DISPLAY_GAME_OVER })
+
+    await wait(this.gameOverTimeout)
+
+    this.assignNewActiveController()
   }
 
   onControllerAction(action: string) {
-    this.displays.sendAction(action)
+    if (!this.game) {
+      return
+    }
+
+    switch (action) {
+      case commands.LEFT:
+        this.game.left()
+        break
+      case commands.RIGHT:
+        this.game.right()
+        break
+      case commands.TAP:
+        this.game.rotate()
+        break
+      case commands.DOWN:
+        this.game.down()
+        break
+    }
   }
 
-  onControllerDisconnect(controller: Controller) {
+  async onControllerDisconnect(controller: Controller) {
     if (controller === this.activeController) {
-      this.assignNewActiveController()
+      if (this.game) {
+        this.game.forceGameOver()
+        this.game = undefined
+        await this.handleGameOver()
+      } else {
+        this.assignNewActiveController()
+      }
     }
 
     this.removeFromControllerQueue(controller)
@@ -123,7 +182,9 @@ export class State {
   private removeFromControllerQueue(controller: Controller): void {
     this.controllerQueue = this.controllerQueue.filter(c => c !== controller)
     this.displays.updateState({ queueLength: this.controllerQueue.length })
-    this.controllers.updateState({ queueLength: this.controllerQueue.length })
+    this.controllerQueue.forEach((c, index) =>
+      c.updateState({ positionInQueue: index + 1 }),
+    )
   }
 
   private assignNewActiveController() {

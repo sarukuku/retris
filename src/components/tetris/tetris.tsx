@@ -1,65 +1,45 @@
 import memoize from "fast-memoize"
 import React, { Component } from "react"
-import { ReplaySubject } from "rxjs"
 import { clientConfig } from "../../client-config"
+import { columnCount, rowCount } from "../../games/tetris/matrix"
 import { TetrisMatrix } from "../../games/tetris/shape"
 import { svgToImage } from "../../helpers"
 import { colors } from "../../styles/colors"
-import {
-  AutoUnsubscribeProps,
-  withAutoUnsubscribe,
-} from "../with-auto-unsubscribe"
 import { calculateCanvasSize } from "./calculate-canvas-size"
 
-interface Game {
-  boardChange: ReplaySubject<TetrisMatrix>
-  getColumnCount(): number
-  getRowCount(): number
-}
-
-interface TetrisProps extends AutoUnsubscribeProps {
-  game: Game
-}
-
-interface TetrisState {
-  score: number
+interface TetrisProps {
+  board: TetrisMatrix
 }
 
 type Ctx = CanvasRenderingContext2D
 type Canvas = HTMLCanvasElement
 
-class _Tetris extends Component<TetrisProps, TetrisState> {
-  private board?: TetrisMatrix
+export class Tetris extends Component<TetrisProps> {
   private previousBoard?: TetrisMatrix
   private blockSVG: SVGElement
   private readonly canvasRef = React.createRef<HTMLCanvasElement>()
 
   async componentDidMount() {
-    this.resizeCanvasToParentSize()
-    window.onresize = () => this.resizeCanvasToParentSize()
-
     await this.loadShapeBlock()
-
     const canvasRef = this.canvasRef
     const ctx = this.ctx
     window.requestAnimationFrame(() => this.renderFrame(canvasRef.current, ctx))
-
-    const { game, unsubscribeOnUnmount } = this.props
-    unsubscribeOnUnmount(
-      game.boardChange.subscribe(board => (this.board = board)),
-    )
+    window.onresize = () => this.resizeCanvasToParentSize()
+    this.resizeCanvasToParentSize()
   }
 
   private renderFrame = (canvas: Canvas | null, ctx?: Ctx): void => {
+    const { board } = this.props
     if (canvas && ctx && this.shouldRender()) {
-      this.previousBoard = this.board
+      this.previousBoard = board
       this.renderGame(canvas, ctx)
     }
     window.requestAnimationFrame(() => this.renderFrame(canvas, ctx))
   }
 
   private shouldRender() {
-    return this.previousBoard !== this.board
+    const { board } = this.props
+    return this.previousBoard !== board
   }
 
   private loadShapeBlock(): Promise<void> {
@@ -124,25 +104,23 @@ class _Tetris extends Component<TetrisProps, TetrisState> {
   }
 
   private drawBoard(canvas: Canvas, ctx: Ctx): void {
-    const board = this.board
+    const { board } = this.props
     if (!board) {
       return
     }
 
-    const { game } = this.props
-
     ctx.clearRect(0, 0, canvas.width, canvas.height)
 
     // Calculate board size so that borders end on exact pixels
-    const boardWidth = canvas.width - (canvas.width % game.getColumnCount())
-    const boardHeight = canvas.height - (canvas.height % game.getRowCount())
+    const boardWidth = canvas.width - (canvas.width % this.columnCount)
+    const boardHeight = canvas.height - (canvas.height % this.rowCount)
 
     // Draw the board background
     ctx.fillStyle = "black"
     ctx.fillRect(0, 0, boardWidth, boardHeight)
 
-    const cellWidth = boardWidth / game.getColumnCount()
-    const cellHeight = boardHeight / game.getRowCount()
+    const cellWidth = boardWidth / this.columnCount
+    const cellHeight = boardHeight / this.rowCount
     const innerWidth = Math.floor(cellWidth * 0.97)
     const innerHeight = Math.floor(cellHeight * 0.97)
     const paddingX = Math.floor((cellWidth - innerWidth) / 2)
@@ -192,8 +170,7 @@ class _Tetris extends Component<TetrisProps, TetrisState> {
       width: parentElement.clientWidth,
       height: parentElement.clientHeight,
     }
-    const { game } = this.props
-    const aspectRatio = game.getColumnCount() / game.getRowCount()
+    const aspectRatio = this.columnCount / this.rowCount
     const { width, height } = calculateCanvasSize({
       parent,
       aspectRatio,
@@ -209,6 +186,14 @@ class _Tetris extends Component<TetrisProps, TetrisState> {
 
     this.renderGame(canvas, ctx)
   }
-}
 
-export const Tetris = withAutoUnsubscribe(_Tetris)
+  private get columnCount(): number {
+    const { board } = this.props
+    return columnCount(board)
+  }
+
+  private get rowCount(): number {
+    const { board } = this.props
+    return rowCount(board)
+  }
+}

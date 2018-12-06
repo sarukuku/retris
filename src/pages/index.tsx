@@ -77,13 +77,13 @@ export class _Controller extends Component<ControllerProps, ControllerState> {
   }
 
   private renderView() {
-    const { activeView, queueLength = 0, score = 0 } = this.state
+    const { activeView, positionInQueue = 0, score = 0 } = this.state
 
     switch (activeView) {
       case views.CONTROLLER_GAME_OFFLINE:
         return <NotRunning />
       case views.CONTROLLER_IN_QUEUE:
-        return <InQueue queueLength={queueLength} />
+        return <InQueue positionInQueue={positionInQueue} />
       case views.CONTROLLER_START:
         return <StartGame onStartGame={this.onStartGame} />
       case views.CONTROLLER_GAME_CONTROLS:

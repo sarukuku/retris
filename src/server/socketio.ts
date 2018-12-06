@@ -8,17 +8,8 @@ export function createSocketIOServer(
   namespaces: { display: Namespace; controller: Namespace },
 ): void {
   namespaces.display.on("connect", displaySocket => {
-    if (Object.keys(namespaces.display.sockets).length > 1) {
-      displaySocket.disconnect(true)
-      return
-    }
-
     const display = new SocketIODisplay(displaySocket)
     state.onDisplayConnect(display)
-
-    displaySocket.on(commands.GAME_OVER, score => {
-      state.onDisplayGameOver(score)
-    })
 
     displaySocket.on("disconnect", () => {
       state.onDisplayDisconnect(display)
@@ -41,8 +32,8 @@ export function createSocketIOServer(
       state.onControllerAction(command)
     })
 
-    controllerSocket.on("disconnect", () => {
-      state.onControllerDisconnect(controller)
+    controllerSocket.on("disconnect", async () => {
+      await state.onControllerDisconnect(controller)
     })
   })
 }

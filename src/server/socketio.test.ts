@@ -37,24 +37,6 @@ describe("on display connect", () => {
   })
 })
 
-describe(`on display ${commands.GAME_OVER}`, () => {
-  test("invoke onDisplayGameOver", async () => {
-    const url = "/test"
-    const display = io.of(url)
-    const testEvent = "command received"
-    const state = createTestState()
-    state.onDisplayGameOver = async () => {
-      display.emit(testEvent)
-    }
-    createTestSocketIOServer({ state, display })
-    const socket = await connect(url)
-
-    socket.emit(commands.GAME_OVER)
-
-    await expect(waitForEmission(socket, testEvent)).resolves.toBeUndefined()
-  })
-})
-
 describe("on display disconnect", () => {
   test("invoke onDisplayDisconnect", async () => {
     const url = "/test"

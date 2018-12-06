@@ -2,7 +2,6 @@ import { NextContext } from "next"
 import React, { Component, Fragment } from "react"
 import { Subject } from "rxjs"
 import io from "socket.io-client"
-import { commands } from "../commands"
 import { AttractionLoop } from "../components/attraction-loop"
 import { BlurredOverlay } from "../components/blurred-overlay"
 import { AnalyticsProps, pageWithAnalytics } from "../components/with-analytics"
@@ -10,7 +9,12 @@ import {
   AutoUnsubscribeProps,
   pageWithAutoUnsubscribe,
 } from "../components/with-auto-unsubscribe"
-import { pageWithSocket, SocketProps } from "../components/with-socket"
+import {
+  pageWithSocket,
+  SocketPayload,
+  SocketProps,
+} from "../components/with-socket"
+import { DisplayState } from "../server/state"
 import { views } from "../views"
 import { DisplayGame } from "../views/display/display-game"
 import { GameOver } from "../views/display/game-over"
@@ -24,23 +28,11 @@ interface DisplayProps
   address: string
 }
 
-interface DisplayComponentState {
-  activeView: string
-  score: number
-  queueLength: number
-}
-
-export class _Display extends Component<DisplayProps, DisplayComponentState> {
+export class _Display extends Component<DisplayProps, DisplayState> {
   private previousActiveView?: string
+  private gameOver = new Subject<void>()
 
-  state: DisplayComponentState = {
-    activeView: views.DISPLAY_WAITING,
-    score: 0,
-    queueLength: 0,
-  }
-
-  private actionCommand = new Subject<string>()
-  private gameOver = new Subject<number>()
+  state: DisplayState = {}
 
   static async getInitialProps(ctx: NextContext) {
     if (ctx.req) {
@@ -53,30 +45,41 @@ export class _Display extends Component<DisplayProps, DisplayComponentState> {
     const { socket, unsubscribeOnUnmount } = this.props
 
     unsubscribeOnUnmount(
-      socket.subscribe(({ event, payload }) => {
-        switch (event) {
-          case "state":
-            this.setState(payload)
-            break
-          case commands.ACTION:
-            this.actionCommand.next(payload)
-        }
-      }),
+      socket.subscribe(this.onSocket),
       this.gameOver.subscribe(this.onGameOver),
     )
   }
 
-  private onGameOver = (totalScore: number) => {
-    const { analytics, socket } = this.props
-    this.setState({ score: totalScore })
+  private onSocket = ({ event, payload }: SocketPayload) => {
+    switch (event) {
+      case "state":
+        const { activeView } = payload
+        this.previousActiveView = this.state.activeView
+
+        this.setState(payload)
+
+        if (activeView === views.DISPLAY_GAME_OVER) {
+          if (
+            this.previousActiveView &&
+            this.previousActiveView !== activeView
+          ) {
+            this.gameOver.next()
+          }
+        }
+
+        break
+    }
+  }
+
+  private onGameOver = () => {
+    const { analytics } = this.props
+    const { score } = this.state
 
     analytics.sendCustomEvent({
       category: "GameOver",
       action: "TotalScore",
-      value: totalScore,
+      value: score,
     })
-
-    socket.next({ event: commands.GAME_OVER, payload: totalScore })
   }
 
   render() {
@@ -98,15 +101,16 @@ export class _Display extends Component<DisplayProps, DisplayComponentState> {
     if (activeView === this.previousActiveView) {
       return
     }
-    this.previousActiveView = activeView
 
     const { analytics } = this.props
-    analytics.sendPageView(activeView)
+    if (activeView) {
+      analytics.sendPageView(activeView)
+    }
   }
 
   private renderView() {
     const { address } = this.props
-    const { activeView, score } = this.state
+    const { activeView, score = 0, board } = this.state
 
     switch (activeView) {
       default:
@@ -128,10 +132,13 @@ export class _Display extends Component<DisplayProps, DisplayComponentState> {
         return (
           <Fragment>
             <BlurredOverlay isActive={isGameOver}>
-              <DisplayGame
-                actionCommand={this.actionCommand}
-                gameOver={this.gameOver}
-              />
+              {board && (
+                <DisplayGame
+                  gameOver={this.gameOver}
+                  board={board}
+                  score={score}
+                />
+              )}
             </BlurredOverlay>
             {isGameOver && <GameOver score={score} />}
           </Fragment>

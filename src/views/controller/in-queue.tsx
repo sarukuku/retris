@@ -3,12 +3,12 @@ import { withTranslate, TranslateProps } from "../../components/with-translate"
 import { colors } from "../../styles/colors"
 
 interface InQueueProps extends TranslateProps {
-  queueLength: number
+  positionInQueue: number
 }
 
 class _InQueue extends Component<InQueueProps> {
   render() {
-    const { queueLength, translate } = this.props
+    const { positionInQueue, translate } = this.props
 
     return (
       <main className="wrap">
@@ -17,7 +17,7 @@ class _InQueue extends Component<InQueueProps> {
           <span className="opaque">
             {translate("controller.in-queue.queue-intro-start")}
           </span>
-          <span>{queueLength}</span>
+          <span>{positionInQueue}</span>
           <span className="opaque">
             {translate("controller.in-queue.queue-intro-end")}
           </span>

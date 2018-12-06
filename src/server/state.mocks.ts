@@ -1,18 +1,36 @@
+import { ReplaySubject, Subject } from "rxjs"
+import { ScoreChange } from "../games/tetris/game"
+import { TetrisMatrix } from "../games/tetris/shape"
 import {
-  State,
   Controller,
-  Displays,
-  Display,
-  DisplayState,
   Controllers,
   ControllerState,
+  Display,
+  Displays,
+  DisplayState,
+  Game,
+  State,
 } from "./state"
 
 export function createTestState({
   displays = new TestDisplays(),
   controllers = new TestControllers(),
+  createGame = () => new TestGame(),
 } = {}) {
-  return new TestState(displays, controllers, { gameOverTimeout: 0 })
+  return new TestState(displays, controllers, createGame, {
+    gameOverTimeout: 0,
+  })
+}
+
+export class TestGame implements Game {
+  start = () => Promise.resolve(false)
+  left = () => undefined
+  right = () => undefined
+  rotate = () => undefined
+  down = () => undefined
+  forceGameOver = () => undefined
+  boardChange = new ReplaySubject<TetrisMatrix>()
+  scoreChange = new Subject<ScoreChange>()
 }
 
 export class TestState extends State {
@@ -30,6 +48,10 @@ export class TestState extends State {
 
   getControllerQueue() {
     return this.controllerQueue
+  }
+
+  setGame(game: Game) {
+    this.game = game
   }
 }
 
