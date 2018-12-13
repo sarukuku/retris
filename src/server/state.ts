@@ -1,5 +1,5 @@
 import { isEmpty } from "ramda"
-import { ReplaySubject, Subject } from "rxjs"
+import { ReplaySubject, Subject, Subscription } from "rxjs"
 import { commands } from "../commands"
 import { ScoreChange } from "../games/tetris/game"
 import { TetrisMatrix } from "../games/tetris/shape"
@@ -52,6 +52,7 @@ export interface Controllers {
 }
 
 export class State {
+  private subscriptions: Subscription[] = []
   protected activeController?: Controller
   protected controllerQueue: Controller[] = []
   protected gameOverTimeout: number
@@ -109,27 +110,34 @@ export class State {
       activeView: views.CONTROLLER_GAME_CONTROLS,
     })
 
+    if (this.game) {
+      console.info("Another game was launched") // tslint:disable-line
+    }
     this.game = this.createGame()
-    this.game.boardChange.subscribe(board =>
-      this.displays.updateState({ board }),
-    )
-    this.game.scoreChange.subscribe(score => {
-      this.displays.updateState({ score: score.current })
-      if (this.activeController) {
-        this.activeController.updateState({ score: score.current })
-      }
-    })
+    this.subscriptions = [
+      this.game.boardChange.subscribe(board =>
+        this.displays.updateState({ board }),
+      ),
+      this.game.scoreChange.subscribe(score => {
+        this.displays.updateState({ score: score.current })
+        if (this.activeController) {
+          this.activeController.updateState({ score: score.current })
+        }
+      }),
+    ]
 
     this.displays.updateState({ activeView: views.DISPLAY_GAME, score: 0 })
 
     const isForcedGameOver = await this.game.start()
-    this.game = undefined
     if (!isForcedGameOver) {
       await this.handleGameOver()
     }
   }
 
   private async handleGameOver() {
+    this.subscriptions.forEach(s => s.unsubscribe())
+    this.game = undefined
+
     if (this.activeController) {
       this.activeController.updateState({
         activeView: views.CONTROLLER_GAME_OVER,
@@ -168,7 +176,6 @@ export class State {
     if (controller === this.activeController) {
       if (this.game) {
         this.game.forceGameOver()
-        this.game = undefined
         await this.handleGameOver()
       } else {
         this.assignNewActiveController()
