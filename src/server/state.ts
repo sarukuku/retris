@@ -111,8 +111,10 @@ export class State {
     })
 
     if (this.game) {
-      console.info("Another game was launched") // tslint:disable-line
+      this.subscriptions.forEach(s => s.unsubscribe())
+      this.game = undefined
     }
+
     this.game = this.createGame()
     this.subscriptions = [
       this.game.boardChange.subscribe(board =>
