@@ -41,14 +41,18 @@ async function main() {
   const controllerNamespace = io.of("/controller")
 
   const state = new State(
-    new SocketIODisplays(displayNamespace),
-    new SocketIOControllers(controllerNamespace),
+    new SocketIODisplays(displayNamespace, logger),
+    new SocketIOControllers(controllerNamespace, logger),
     () => new Game({ columnCount: 10, rowCount: 16 }),
   )
-  createSocketIOServer(state, {
-    display: displayNamespace,
-    controller: controllerNamespace,
-  })
+  createSocketIOServer(
+    state,
+    {
+      display: displayNamespace,
+      controller: controllerNamespace,
+    },
+    logger,
+  )
 
   const errorRequestHandler: ErrorRequestHandler = (err, _req, res, _next) => {
     logger.error(`Request Error: ${err.stack || err}`)
