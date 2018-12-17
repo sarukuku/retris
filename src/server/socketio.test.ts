@@ -4,6 +4,7 @@ import socketio from "socket.io"
 import socketioClient from "socket.io-client"
 import { commands } from "../commands"
 import { wait } from "../helpers"
+import { Logger } from "../logger"
 import { createSocketIOServer } from "./socketio"
 import { createTestState } from "./state.mocks"
 
@@ -139,12 +140,17 @@ describe("on controller disconnect", () => {
   })
 })
 
+const logger: Logger = {
+  info: () => undefined,
+  error: () => undefined,
+}
+
 function createTestSocketIOServer({
   state = createTestState(),
   display = io.of("/display"),
   controller = io.of("/controller"),
 } = {}) {
-  return createSocketIOServer(state, { display, controller })
+  return createSocketIOServer(state, { display, controller }, logger)
 }
 
 function connect(url: string): Promise<SocketIOClient.Socket> {

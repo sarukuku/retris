@@ -102,6 +102,11 @@ export class State {
   }
 
   async onControllerStart(controller: Controller) {
+    if (this.game) {
+      console.info("Game already launched.") // tslint:disable-line
+      return
+    }
+
     if (this.activeController !== controller) {
       return
     }
@@ -109,11 +114,6 @@ export class State {
     this.activeController.updateState({
       activeView: views.CONTROLLER_GAME_CONTROLS,
     })
-
-    if (this.game) {
-      this.subscriptions.forEach(s => s.unsubscribe())
-      this.game = undefined
-    }
 
     this.game = this.createGame()
     this.subscriptions = [
