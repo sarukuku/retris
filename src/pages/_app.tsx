@@ -1,3 +1,5 @@
+import bugsnag from "@bugsnag/js"
+import bugsnagReact from "@bugsnag/plugin-react"
 import App, { AppComponentContext, Container } from "next/app"
 import Head from "next/head"
 import "normalize.css/normalize.css"
@@ -10,12 +12,10 @@ import { Translations } from "../i18n/default-translations"
 import { createTranslate } from "../i18n/translate"
 import { colors } from "../styles/colors"
 import { fonts, withFallback } from "../styles/fonts"
-import bugsnag from '@bugsnag/js'
-import bugsnagReact from '@bugsnag/plugin-react'
 
-const bugsnagClient = bugsnag('d6bc936b6e415dd8ccbf63d75dbd5641')
+const bugsnagClient = bugsnag("d6bc936b6e415dd8ccbf63d75dbd5641")
 bugsnagClient.use(bugsnagReact, React)
-const ErrorBoundary = bugsnagClient.getPlugin('react')
+const ErrorBoundary = bugsnagClient.getPlugin("react")
 
 interface RetrisProps {
   translations: Translations
