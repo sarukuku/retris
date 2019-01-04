@@ -1,3 +1,5 @@
+import bugsnag from "@bugsnag/js"
+import bugsnagReact from "@bugsnag/plugin-react"
 import App, { AppComponentContext, Container } from "next/app"
 import Head from "next/head"
 import "normalize.css/normalize.css"
@@ -10,6 +12,13 @@ import { Translations } from "../i18n/default-translations"
 import { createTranslate } from "../i18n/translate"
 import { colors } from "../styles/colors"
 import { fonts, withFallback } from "../styles/fonts"
+
+let BugsnagBoundary = React.Fragment
+if (clientConfig.bugsnagClientId) {
+  const bugsnagClient = bugsnag(clientConfig.bugsnagClientId)
+  bugsnagClient.use(bugsnagReact, React)
+  BugsnagBoundary = bugsnagClient.getPlugin("react")
+}
 
 interface RetrisProps {
   translations: Translations
@@ -33,41 +42,43 @@ class Retris extends App<RetrisProps> {
     const analytics = new GoogleAnalytics(clientConfig.googleAnalytics)
 
     return (
-      <AnalyticsContext.Provider value={analytics}>
-        <TranslationContext.Provider value={createTranslate(translations)}>
-          <Container>
-            <Head>
-              <meta
-                name="viewport"
-                content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, shrink-to-fit=no"
-              />
-            </Head>
-            <Component {...pageProps} />
-            <style global jsx>{`
-              html {
-                box-sizing: border-box;
-              }
+      <BugsnagBoundary>
+        <AnalyticsContext.Provider value={analytics}>
+          <TranslationContext.Provider value={createTranslate(translations)}>
+            <Container>
+              <Head>
+                <meta
+                  name="viewport"
+                  content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, shrink-to-fit=no"
+                />
+              </Head>
+              <Component {...pageProps} />
+              <style global jsx>{`
+                html {
+                  box-sizing: border-box;
+                }
 
-              *,
-              *:before,
-              *:after {
-                box-sizing: inherit;
-              }
+                *,
+                *:before,
+                *:after {
+                  box-sizing: inherit;
+                }
 
-              body {
-                overflow-y: hidden;
-                font-family: ${withFallback(fonts.JUNGKA)};
-                color: ${colors.WHITE};
-                background-color: ${colors.BLACK};
-                line-height: 1.35;
-                width: 100%;
-                height: 100%;
-                position: fixed;
-              }
-            `}</style>
-          </Container>
-        </TranslationContext.Provider>
-      </AnalyticsContext.Provider>
+                body {
+                  overflow-y: hidden;
+                  font-family: ${withFallback(fonts.JUNGKA)};
+                  color: ${colors.WHITE};
+                  background-color: ${colors.BLACK};
+                  line-height: 1.35;
+                  width: 100%;
+                  height: 100%;
+                  position: fixed;
+                }
+              `}</style>
+            </Container>
+          </TranslationContext.Provider>
+        </AnalyticsContext.Provider>
+      </BugsnagBoundary>
     )
   }
 }
