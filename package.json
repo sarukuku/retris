@@ -2,6 +2,8 @@
   "name": "retris",
   "version": "1.0.0",
   "dependencies": {
+    "@bugsnag/js": "5.1.0",
+    "@bugsnag/plugin-react": "5.1.0",
     "@storybook/addon-actions": "^4.0.0-rc.6",
     "@storybook/addon-links": "^4.0.0-rc.6",
     "@storybook/addons": "^4.0.0-rc.6",
