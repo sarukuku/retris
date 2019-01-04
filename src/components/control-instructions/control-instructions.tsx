@@ -55,12 +55,19 @@ export const ControlInstructions: React.SFC<ButtonProps> = ({
       }
 
       .instructions > div {
+        display: flex;
+        flex-direction: column;
         margin: 1rem;
       }
 
       .arrow,
       .hand {
         align-self: center;
+      }
+
+      .swipe-illustration,
+      .tap-illustration {
+        margin-top: auto;
       }
 
       .swipe-illustration__wrap {
