@@ -26,6 +26,10 @@ class _ReaktorTetris extends Component<
     this.game.start()
   }
 
+  componentWillUnmount() {
+    this.game.stop()
+  }
+
   render() {
     const { board } = this.state
     return board ? <Tetris board={board} /> : null

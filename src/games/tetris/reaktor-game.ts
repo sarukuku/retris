@@ -1,5 +1,5 @@
 import { last, prepend, remove } from "ramda"
-import { ReplaySubject } from "rxjs"
+import { ReplaySubject, Subscription } from "rxjs"
 import { wait } from "../../helpers"
 import { Board } from "./board"
 import { createEmptyMatrix, createEmptyRow } from "./matrix"
@@ -140,6 +140,7 @@ export class ReaktorGame {
   private latestBoard: TetrisMatrix
   private rowCount = 16
   private columnCount = 13
+  private subscriptions: Subscription[] = []
 
   readonly boardChange = new ReplaySubject<TetrisMatrix>()
 
@@ -148,11 +149,18 @@ export class ReaktorGame {
       this.getNextShape,
       createEmptyMatrix(this.columnCount, this.rowCount),
     )
-    this.board.gameOver.subscribe(() => (this.isGameOver = true))
-    this.board.boardChange.subscribe(board => {
-      this.latestBoard = board
-      this.boardChange.next(board)
-    })
+
+    this.subscriptions.push(
+      this.board.gameOver.subscribe(() => (this.isGameOver = true)),
+      this.board.boardChange.subscribe(board => {
+        this.latestBoard = board
+        this.boardChange.next(board)
+      }),
+    )
+  }
+
+  unsubscribe = () => {
+    this.subscriptions.forEach(s => s.unsubscribe())
   }
 
   private getNextShape = () => {

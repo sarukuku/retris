@@ -1,22 +1,28 @@
-import { ReplaySubject } from "rxjs"
+import { Subject } from "rxjs"
 import { ReaktorGame } from "./reaktor-game"
 import { TetrisMatrix } from "./shape"
 
 export class LoopedReaktorGame {
   private reaktorGame = new ReaktorGame()
-  boardChange = new ReplaySubject<TetrisMatrix>()
+  boardChange = new Subject<TetrisMatrix>()
+  private isRunning = true
 
   async start() {
-    let subscripiton = this.reaktorGame.boardChange.subscribe(board =>
+    let subscription = this.reaktorGame.boardChange.subscribe(board =>
       this.boardChange.next(board),
     )
-    while (true) {
+    while (this.isRunning) {
       await this.reaktorGame.start()
-      subscripiton.unsubscribe()
+      subscription.unsubscribe()
+      this.reaktorGame.unsubscribe()
       this.reaktorGame = new ReaktorGame()
-      subscripiton = this.reaktorGame.boardChange.subscribe(board =>
+      subscription = this.reaktorGame.boardChange.subscribe(board =>
         this.boardChange.next(board),
       )
     }
+  }
+
+  stop() {
+    this.isRunning = false
   }
 }
