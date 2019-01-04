@@ -13,9 +13,12 @@ import { createTranslate } from "../i18n/translate"
 import { colors } from "../styles/colors"
 import { fonts, withFallback } from "../styles/fonts"
 
-const bugsnagClient = bugsnag("d6bc936b6e415dd8ccbf63d75dbd5641")
-bugsnagClient.use(bugsnagReact, React)
-const ErrorBoundary = bugsnagClient.getPlugin("react")
+let BugsnagBoundary = React.Fragment
+if (clientConfig.bugsnagClientId) {
+  const bugsnagClient = bugsnag(clientConfig.bugsnagClientId)
+  bugsnagClient.use(bugsnagReact, React)
+  BugsnagBoundary = bugsnagClient.getPlugin("react")
+}
 
 interface RetrisProps {
   translations: Translations
@@ -39,7 +42,7 @@ class Retris extends App<RetrisProps> {
     const analytics = new GoogleAnalytics(clientConfig.googleAnalytics)
 
     return (
-      <ErrorBoundary>
+      <BugsnagBoundary>
         <AnalyticsContext.Provider value={analytics}>
           <TranslationContext.Provider value={createTranslate(translations)}>
             <Container>
@@ -75,7 +78,7 @@ class Retris extends App<RetrisProps> {
             </Container>
           </TranslationContext.Provider>
         </AnalyticsContext.Provider>
-      </ErrorBoundary>
+      </BugsnagBoundary>
     )
   }
 }
