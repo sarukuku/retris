@@ -10,7 +10,7 @@ export function createSocketIOServer(
   logger: Logger,
 ): void {
   namespaces.display.on("connect", displaySocket => {
-    const display = new SocketIODisplay(displaySocket, logger)
+    const display = new SocketIODisplay(displaySocket)
     log({ id: displaySocket.id, event: "connect", client: "display" })
     state.onDisplayConnect(display)
 
@@ -21,7 +21,7 @@ export function createSocketIOServer(
   })
 
   namespaces.controller.on("connect", controllerSocket => {
-    const controller = new SocketIOController(controllerSocket, logger)
+    const controller = new SocketIOController(controllerSocket)
     log({ id: controllerSocket.id, event: "connect", client: "controller" })
     state.onControllerConnect(controller)
 

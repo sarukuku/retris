@@ -41,8 +41,8 @@ async function main() {
   const controllerNamespace = io.of("/controller")
 
   const state = new State(
-    new SocketIODisplays(displayNamespace, logger),
-    new SocketIOControllers(controllerNamespace, logger),
+    new SocketIODisplays(displayNamespace),
+    new SocketIOControllers(controllerNamespace),
     () => new Game({ columnCount: 10, rowCount: 16 }),
   )
   createSocketIOServer(
