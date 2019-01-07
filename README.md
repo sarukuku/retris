@@ -14,9 +14,13 @@
 
 When a PR is merged to master it's automatically deployed to https://reaktor-tetris-staging.herokuapp.com/. Master is deployed manually via Heroku to https://reaktor-retris-production.herokuapp.com/. To access the apps you'll need access. Joonas (@aki7) can help you with this.
 
+## Bug tracking
+
+Clientside bugtracking uses a free version of Bugsnag. Currently Joonas and Ákos has access to the collected data. Ask them to get access.
+
 ## Good to know
 
-When you're running `yarn dev` and you save a file in your editor it's automatically formatted with `prettier`.
+When you're running `yarn pretty` and you save a file in your editor it's automatically formatted with `prettier` to match the lint rules. Imports aren't organised automatically by `yarn pretty`. That you'll need to do on your own.
 
 ## Add custom translations
 
