@@ -39,14 +39,22 @@ class _GameController extends Component<GameControllerProps> {
             position: absolute;
             background-color: ${colors.BLACK};
             color: ${colors.WHITE};
-            background-image: url("${clientConfig.staticPath}/grid.svg");
+            background-image: url("${
+              clientConfig.staticPath
+            }/r-symbol.png"), url("${clientConfig.staticPath}/grid.svg");
             background-repeat: no-repeat;
-            background-size: 90%;
-            background-position: 50% 75%;
+            background-size: 50%, 90%;
+            background-position: 50% 70%, 50% 75%;
           }
 
           p {
             color: ${colors.BELIZE_HOLE};
+          }
+
+          .logo {
+            height: 100%;
+            text-align: center;
+            opacity: 0.1;
           }
         `}</style>
       </Swipeable>

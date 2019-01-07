@@ -1,5 +1,6 @@
 import React, { Component } from "react"
-import { withTranslate, TranslateProps } from "../../components/with-translate"
+import { ReaktorLogo } from "../../components/reaktor-logo/reaktor-logo"
+import { TranslateProps, withTranslate } from "../../components/with-translate"
 import { colors } from "../../styles/colors"
 
 interface InQueueProps extends TranslateProps {
@@ -22,6 +23,9 @@ class _InQueue extends Component<InQueueProps> {
             {translate("controller.in-queue.queue-intro-end")}
           </span>
         </p>
+        <div className="logo">
+          <ReaktorLogo />
+        </div>
         <style jsx>{`
           .wrap {
             width: 100%;
@@ -41,6 +45,12 @@ class _InQueue extends Component<InQueueProps> {
           h1 {
             font-size: 1.6rem;
             font-weight: 500;
+          }
+
+          .logo {
+            height: 2rem;
+            position: absolute;
+            bottom: 2rem;
           }
 
           .opaque {

@@ -1,7 +1,8 @@
 import React, { Fragment, SFC } from "react"
+import { ReaktorLogo } from "../../../components/reaktor-logo/reaktor-logo"
 import {
-  withTranslate,
   TranslateProps,
+  withTranslate,
 } from "../../../components/with-translate"
 import { colors } from "../../../styles/colors"
 
@@ -13,6 +14,9 @@ const _WaitingToStart: SFC<TranslateProps> = ({ translate }) => (
         {translate("display.waiting-to-start.header.small.line1")}
         <span>{translate("display.waiting-to-start.header.small.line2")}</span>
       </p>
+      <div className="logo">
+        <ReaktorLogo />
+      </div>
     </div>
     <style jsx>{`
       .waiting-to-start {
@@ -23,6 +27,12 @@ const _WaitingToStart: SFC<TranslateProps> = ({ translate }) => (
         justify-content: center;
         color: ${colors.WHITE};
         text-align: center;
+      }
+
+      .logo {
+        height: 2rem;
+        position: absolute;
+        bottom: 2rem;
       }
 
       h1 {

@@ -1,4 +1,5 @@
 import React, { Fragment, SFC } from "react"
+import { ReaktorLogo } from "../../../components/reaktor-logo/reaktor-logo"
 import {
   TranslateProps,
   withTranslate,
@@ -17,6 +18,9 @@ const _GameOver: SFC<GameOverProps> = ({ score, translate }) => (
       <p className="score">{formatScore(score)}</p>
       <p>{translate("display.game-over.about-us")}</p>
       <p>{translate("display.game-over.website")}</p>
+      <div className="logo">
+        <ReaktorLogo />
+      </div>
     </div>
     <style jsx>{`
       .game-over {
@@ -37,6 +41,12 @@ const _GameOver: SFC<GameOverProps> = ({ score, translate }) => (
       p {
         font-size: 3.5vmax;
         margin-bottom: 0;
+      }
+
+      .logo {
+        height: 2rem;
+        position: absolute;
+        bottom: 2rem;
       }
 
       .score {
