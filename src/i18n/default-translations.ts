@@ -21,6 +21,8 @@ export const defaultTranslations = {
   "controller.in-queue.heading": "Hang tight! 🎮",
   "controller.in-queue.queue-intro-start": "There are",
   "controller.in-queue.queue-intro-end": "players in the line before you.",
+  "controller.game-controls.bottom-instruction":
+    "Protip: swipe down to nudge down, swipe up to smash down.",
   "controller.game-over.heading": "Game over 😒",
   "controller.game-over.score-label": "Score",
   "controller.game-over.copy":
