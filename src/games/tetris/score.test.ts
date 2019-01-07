@@ -2,7 +2,7 @@ import { Score } from "./score"
 
 test("invalid line clear", () => {
   const score = new Score()
-  const level = 1
+  const level = 0
   const numberOfLines = -1
 
   const gained = score.linesCleared(level, numberOfLines)
@@ -13,7 +13,7 @@ test("invalid line clear", () => {
 
 test("single line clear", () => {
   const score = new Score()
-  const level = 1
+  const level = 0
   const numberOfLines = 1
 
   const gained = score.linesCleared(level, numberOfLines)
@@ -24,7 +24,7 @@ test("single line clear", () => {
 
 test("consecutive single line clears", () => {
   const score = new Score()
-  const level = 1
+  const level = 0
   const numberOfLines = 1
 
   score.linesCleared(level, numberOfLines)
@@ -37,7 +37,7 @@ test("consecutive single line clears", () => {
 
 test("multi line clear", () => {
   const score = new Score()
-  const level = 1
+  const level = 0
   const numberOfLines = 4
 
   const gained = score.linesCleared(level, numberOfLines)
@@ -48,7 +48,7 @@ test("multi line clear", () => {
 
 test("higher level line clear", () => {
   const score = new Score()
-  const level = 10
+  const level = 9
   const numberOfLines = 1
 
   const gained = score.linesCleared(level, numberOfLines)

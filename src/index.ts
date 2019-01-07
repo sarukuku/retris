@@ -35,7 +35,7 @@ async function main() {
   await createNextApp(config.env, app)
 
   const server = createServer(app)
-  const io = socketio(server)
+  const io = socketio(server, { pingInterval: 10000, pingTimeout: 2000 })
 
   const displayNamespace = io.of("/display")
   const controllerNamespace = io.of("/controller")

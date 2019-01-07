@@ -1,4 +1,5 @@
 import React, { Fragment, SFC } from "react"
+import { ReaktorLogo } from "../../../components/reaktor-logo/reaktor-logo"
 import {
   TranslateProps,
   withTranslate,
@@ -16,6 +17,9 @@ const _Waiting: SFC<WaitingProps> = ({ translate, address }) => (
       <p>{translate("display.waiting.info")}</p>
       <h2>{translate("display.waiting.header.small")}</h2>
       <p>{address}</p>
+      <div className="logo">
+        <ReaktorLogo />
+      </div>
     </div>
     <style jsx>{`
       .waiting {
@@ -28,6 +32,12 @@ const _Waiting: SFC<WaitingProps> = ({ translate, address }) => (
         text-align: center;
       }
 
+      .logo {
+        height: 2rem;
+        position: absolute;
+        bottom: 2rem;
+      }
+
       h1 {
         font-size: 10vmax;
         text-transform: uppercase;
@@ -37,7 +47,7 @@ const _Waiting: SFC<WaitingProps> = ({ translate, address }) => (
       p {
         font-size: 3.5vmax;
         margin-top: 0;
-        margin: 0 2rem 6rem 2rem;
+        margin: 0 2rem 2rem 2rem;
       }
 
       h2 {

@@ -44,12 +44,6 @@ export function createSocketIOServer(
     })
 
     controllerSocket.on(commands.ACTION, command => {
-      log({
-        id: controllerSocket.id,
-        event: commands.ACTION,
-        action: command,
-        client: "controller",
-      })
       state.onControllerAction(command)
     })
 

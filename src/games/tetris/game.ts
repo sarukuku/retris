@@ -1,6 +1,7 @@
-import { Subject, ReplaySubject } from "rxjs"
+import { ReplaySubject, Subject } from "rxjs"
 import { wait } from "../../helpers"
 import { Board } from "./board"
+import { Difficulty } from "./difficulty"
 import { getNextShape } from "./get-next-shape"
 import { createEmptyMatrix } from "./matrix"
 import { Score } from "./score"
@@ -16,7 +17,7 @@ export class Game {
   private isForcedGameOver = false
   private board: Board
   private score = new Score()
-  private currentLevel = 1
+  private difficulty = new Difficulty()
 
   readonly boardChange: ReplaySubject<TetrisMatrix>
   readonly scoreChange = new Subject<ScoreChange>()
@@ -37,12 +38,10 @@ export class Game {
 
     this.board.gameOver.subscribe(() => (this.isGameOver = true))
     this.board.rowClear.subscribe((numberOfRowsCleared: number) => {
-      const gained = this.score.linesCleared(
-        this.currentLevel,
-        numberOfRowsCleared,
-      )
+      const currentLevel = this.difficulty.getCurrentLevel()
+      const gained = this.score.linesCleared(currentLevel, numberOfRowsCleared)
       const currentScore = this.score.current
-      this.currentLevel = Math.floor(currentScore / 500) + 1
+      this.difficulty.updateCurrentLevel(numberOfRowsCleared)
       this.scoreChange.next({ gained, current: currentScore })
     })
   }
@@ -55,15 +54,10 @@ export class Game {
   async start(): Promise<boolean> {
     while (!this.isGameOver) {
       this.board.step()
-      await wait(this.mapLevelToTime())
+      await wait(this.difficulty.getStepWaitTimeMS())
     }
 
     return this.isForcedGameOver
-  }
-
-  private mapLevelToTime(): number {
-    const level = this.currentLevel > 10 ? 10 : this.currentLevel
-    return -100 * level + 1100
   }
 
   rotate() {
@@ -87,6 +81,12 @@ export class Game {
   down() {
     if (!this.isGameOver) {
       this.board.down()
+    }
+  }
+
+  smash() {
+    if (!this.isGameOver) {
+      this.board.smash()
     }
   }
 }
