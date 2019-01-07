@@ -16,7 +16,7 @@ const _Waiting: SFC<WaitingProps> = ({ translate, address }) => (
       <h1>{translate("display.waiting.header.big")}</h1>
       <p>{translate("display.waiting.info")}</p>
       <h2>{translate("display.waiting.header.small")}</h2>
-      <p>{address}</p>
+      <p className="address">{address}</p>
       <div className="logo">
         <ReaktorLogo />
       </div>
@@ -39,15 +39,19 @@ const _Waiting: SFC<WaitingProps> = ({ translate, address }) => (
       }
 
       h1 {
-        font-size: 10vmax;
+        font-size: 12vmax;
         text-transform: uppercase;
         margin: 2rem 2rem 6rem 2rem;
       }
 
       p {
-        font-size: 3.5vmax;
+        font-size: 4.5vmax;
         margin-top: 0;
         margin: 0 2rem 2rem 2rem;
+      }
+
+      .address {
+        font-size: 5.5vmax;
       }
 
       h2 {
