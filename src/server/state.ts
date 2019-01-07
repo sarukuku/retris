@@ -12,6 +12,7 @@ export interface Game {
   right(): void
   rotate(): void
   down(): void
+  smash(): void
   forceGameOver(): void
   boardChange: ReplaySubject<TetrisMatrix>
   scoreChange: Subject<ScoreChange>
@@ -170,6 +171,9 @@ export class State {
         break
       case commands.DOWN:
         this.game.down()
+        break
+      case commands.SMASH:
+        this.game.smash()
         break
     }
   }

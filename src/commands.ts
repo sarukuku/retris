@@ -6,4 +6,5 @@ export const commands = {
   START: "START",
   JOIN: "JOIN",
   ACTION: "ACTION",
+  SMASH: "SMASH",
 }

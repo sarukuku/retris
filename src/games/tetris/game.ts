@@ -89,4 +89,10 @@ export class Game {
       this.board.down()
     }
   }
+
+  smash() {
+    if (!this.isGameOver) {
+      this.board.smash()
+    }
+  }
 }

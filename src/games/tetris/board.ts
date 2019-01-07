@@ -131,6 +131,12 @@ export class Board {
     return isBelowCellEmpty
   }
 
+  smash(): void {
+    while (this.canMoveDown()) {
+      this.down()
+    }
+  }
+
   step(): void {
     this.executeStep()
     this.invalidateBoard()

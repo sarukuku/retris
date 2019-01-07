@@ -20,6 +20,7 @@ class _GameController extends Component<GameControllerProps> {
         onSwipedRight={() => actionCommand.next(commands.RIGHT)}
         onSwipedDown={() => actionCommand.next(commands.DOWN)}
         onSwipedLeft={() => actionCommand.next(commands.LEFT)}
+        onSwipedUp={() => actionCommand.next(commands.SMASH)}
         stopPropagation={true}
         delta={50}
       >

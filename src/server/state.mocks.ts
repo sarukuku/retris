@@ -28,6 +28,7 @@ export class TestGame implements Game {
   right = () => undefined
   rotate = () => undefined
   down = () => undefined
+  smash = () => undefined
   forceGameOver = () => undefined
   boardChange = new ReplaySubject<TetrisMatrix>()
   scoreChange = new Subject<ScoreChange>()
