@@ -31,6 +31,9 @@ class _GameController extends Component<GameControllerProps> {
             )}
             tapInstruction={translate("controller.start-game.tap-instruction")}
           />
+          <p className="protip">
+            {translate("controller.game-controls.bottom-instruction")}
+          </p>
         </main>
         <style jsx>{`
           .wrap {
@@ -47,14 +50,18 @@ class _GameController extends Component<GameControllerProps> {
             background-position: 50% 70%, 50% 75%;
           }
 
-          p {
-            color: ${colors.BELIZE_HOLE};
-          }
-
           .logo {
             height: 100%;
             text-align: center;
             opacity: 0.1;
+          }
+
+          .protip {
+            opacity: .3;
+            margin: 1rem;
+            text-align: center;
+            position: absolute;
+            bottom: 0;
           }
         `}</style>
       </Swipeable>
