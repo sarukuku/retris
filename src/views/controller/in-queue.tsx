@@ -48,7 +48,7 @@ class _InQueue extends Component<InQueueProps> {
           }
 
           .logo {
-            height: 2rem;
+            width: 30%;
             position: absolute;
             bottom: 2rem;
           }

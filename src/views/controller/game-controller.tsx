@@ -57,8 +57,11 @@ class _GameController extends Component<GameControllerProps> {
           }
 
           .protip {
+            box-sizing: border-box;
+            width: 100%;
+            margin: 1rem 0;
+            padding: 0 1rem;
             opacity: .3;
-            margin: 1rem;
             text-align: center;
             position: absolute;
             bottom: 0;
