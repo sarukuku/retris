@@ -30,7 +30,7 @@ const _WaitingToStart: SFC<TranslateProps> = ({ translate }) => (
       }
 
       .logo {
-        height: 2rem;
+        width: 30%;
         position: absolute;
         bottom: 2rem;
       }

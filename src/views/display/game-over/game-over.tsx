@@ -44,7 +44,7 @@ const _GameOver: SFC<GameOverProps> = ({ score, translate }) => (
       }
 
       .logo {
-        height: 2rem;
+        width: 30%;
         position: absolute;
         bottom: 2rem;
       }

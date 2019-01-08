@@ -33,7 +33,7 @@ const _Waiting: SFC<WaitingProps> = ({ translate, address }) => (
       }
 
       .logo {
-        height: 2rem;
+        width: 30%;
         position: absolute;
         bottom: 2rem;
       }
@@ -41,7 +41,7 @@ const _Waiting: SFC<WaitingProps> = ({ translate, address }) => (
       h1 {
         font-size: 12vmax;
         text-transform: uppercase;
-        margin: 2rem 2rem 6rem 2rem;
+        margin: 2rem 2rem 5rem 2rem;
       }
 
       p {
