@@ -1,4 +1,4 @@
-const { parsed: localEnv } = require("dotenv").config()
+require("dotenv").config()
 
 const webpack = require("webpack")
 const path = require("path")
@@ -19,7 +19,13 @@ module.exports = withTypescript(
         )
       }
 
-      config.plugins.push(new webpack.EnvironmentPlugin(localEnv))
+      config.plugins.push(
+        new webpack.EnvironmentPlugin({
+          GA_TRACKING_CODE: process.env.GA_TRACKING_CODE,
+          GA_DEBUG_MODE: process.env.GA_DEBUG_MODE,
+          BUGSNAG_CLIENT_ID: process.env.BUGSNAG_CLIENT_ID,
+        }),
+      )
 
       return config
     },
