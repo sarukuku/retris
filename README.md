@@ -42,3 +42,9 @@ Currently Google Spreadsheet based custom translation is offered.
 7. If the environment variables are provided, the app will try to download and merge the Spreadsheet translations into the defaults on each page load.
 
 Check out the following sheet for an example structure: https://docs.google.com/spreadsheets/d/1KNi3vxCagcMp0x7dFKfo_CnIkWMaCwHadRPwuz23xm8/edit#gid=0
+
+## Frontend environment variables
+
+Some config env vars are used by the frontend, like Google Analytics tracking ID. This is separated into a `client-config.ts` file, as we want to avoid exposing sensitive configurations.
+
+If you'd like to add additional env config that is visible to the client, you'll also have to include the variable in the `next.config.js` file's `new webpack.EnvironmentPlugin` object, so that it is injected into the frontend code during build time.
