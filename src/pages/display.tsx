@@ -75,17 +75,21 @@ export class _Display extends Component<DisplayProps, DisplayState> {
     const { analytics } = this.props
     const { score, elapsedSeconds, isForcedGameOver } = this.state
 
+    const label = new Date().toJSON()
     analytics.sendCustomEvent({
+      label,
       category: "GameOver",
       action: "TotalScore",
       value: score,
     })
     analytics.sendCustomEvent({
+      label,
       category: "GameOver",
       action: "ElapsedSeconds",
       value: elapsedSeconds,
     })
     analytics.sendCustomEvent({
+      label,
       category: "GameOver",
       action: "IsForcedGameOver",
       value: isForcedGameOver ? 1 : 0,
