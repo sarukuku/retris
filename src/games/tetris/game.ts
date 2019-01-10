@@ -1,4 +1,4 @@
-import { ReplaySubject, Subject } from "rxjs"
+import { ReplaySubject, Subject, interval } from "rxjs"
 import { wait } from "../../helpers"
 import { Board } from "./board"
 import { Difficulty } from "./difficulty"
@@ -6,6 +6,9 @@ import { getNextShape } from "./get-next-shape"
 import { createEmptyMatrix } from "./matrix"
 import { Score } from "./score"
 import { TetrisMatrix } from "./shape"
+
+const ONE_SECOND_MS = 1000
+const secondsTicker = interval(ONE_SECOND_MS)
 
 export interface ScoreChange {
   gained: number
@@ -22,6 +25,7 @@ export class Game {
   readonly boardChange: ReplaySubject<TetrisMatrix>
   readonly scoreChange = new Subject<ScoreChange>()
   readonly levelChange = new Subject<number>()
+  readonly elapsedSecondsChange = new Subject<number>()
 
   constructor({
     columnCount,
@@ -52,10 +56,19 @@ export class Game {
   }
 
   async start(): Promise<boolean> {
+    let elapsedSeconds = 0
+    this.elapsedSecondsChange.next(elapsedSeconds)
+    const elapsedSubscription = secondsTicker.subscribe(() => {
+      this.elapsedSecondsChange.next(elapsedSeconds)
+      elapsedSeconds++
+    })
+
     while (!this.isGameOver) {
       this.board.step()
       await wait(this.difficulty.getStepWaitTimeMS())
     }
+
+    elapsedSubscription.unsubscribe()
 
     return this.isForcedGameOver
   }

@@ -73,12 +73,22 @@ export class _Display extends Component<DisplayProps, DisplayState> {
 
   private onGameOver = () => {
     const { analytics } = this.props
-    const { score } = this.state
+    const { score, elapsedSeconds, isForcedGameOver } = this.state
 
     analytics.sendCustomEvent({
       category: "GameOver",
       action: "TotalScore",
       value: score,
+    })
+    analytics.sendCustomEvent({
+      category: "GameOver",
+      action: "ElapsedSeconds",
+      value: elapsedSeconds,
+    })
+    analytics.sendCustomEvent({
+      category: "GameOver",
+      action: "IsForcedGameOver",
+      value: isForcedGameOver ? 1 : 0,
     })
   }
 
@@ -110,7 +120,7 @@ export class _Display extends Component<DisplayProps, DisplayState> {
 
   private renderView() {
     const { address } = this.props
-    const { activeView, score = 0, board } = this.state
+    const { activeView, score = 0, board, elapsedSeconds = 0 } = this.state
 
     switch (activeView) {
       default:
@@ -134,7 +144,7 @@ export class _Display extends Component<DisplayProps, DisplayState> {
             <BlurredOverlay isActive={isGameOver}>
               {board && (
                 <DisplayGame
-                  gameOver={this.gameOver}
+                  elapsedSeconds={elapsedSeconds}
                   board={board}
                   score={score}
                 />
