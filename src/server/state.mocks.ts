@@ -32,6 +32,7 @@ export class TestGame implements Game {
   forceGameOver = () => undefined
   boardChange = new ReplaySubject<TetrisMatrix>()
   scoreChange = new Subject<ScoreChange>()
+  elapsedSecondsChange = new Subject<number>()
 }
 
 export class TestState extends State {

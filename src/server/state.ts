@@ -16,6 +16,7 @@ export interface Game {
   forceGameOver(): void
   boardChange: ReplaySubject<TetrisMatrix>
   scoreChange: Subject<ScoreChange>
+  elapsedSecondsChange: Subject<number>
 }
 
 export interface Display {
@@ -34,6 +35,8 @@ export interface DisplayState {
   queueLength?: number
   board?: TetrisMatrix
   score?: number
+  elapsedSeconds?: number
+  isForcedGameOver?: boolean
 }
 
 export interface Controller {
@@ -121,6 +124,9 @@ export class State {
       this.game.boardChange.subscribe(board =>
         this.displays.updateState({ board }),
       ),
+      this.game.elapsedSecondsChange.subscribe(elapsedSeconds => {
+        this.displays.updateState({ elapsedSeconds })
+      }),
       this.game.scoreChange.subscribe(score => {
         this.displays.updateState({ score: score.current })
         if (this.activeController) {
@@ -133,11 +139,11 @@ export class State {
 
     const isForcedGameOver = await this.game.start()
     if (!isForcedGameOver) {
-      await this.handleGameOver()
+      await this.handleGameOver(isForcedGameOver)
     }
   }
 
-  private async handleGameOver() {
+  private async handleGameOver(isForcedGameOver: boolean) {
     this.subscriptions.forEach(s => s.unsubscribe())
     this.game = undefined
 
@@ -147,7 +153,10 @@ export class State {
       })
     }
 
-    this.displays.updateState({ activeView: views.DISPLAY_GAME_OVER })
+    this.displays.updateState({
+      activeView: views.DISPLAY_GAME_OVER,
+      isForcedGameOver,
+    })
 
     await wait(this.gameOverTimeout)
 
@@ -182,7 +191,8 @@ export class State {
     if (controller === this.activeController) {
       if (this.game) {
         this.game.forceGameOver()
-        await this.handleGameOver()
+        const isForcedGameOver = true
+        await this.handleGameOver(isForcedGameOver)
       } else {
         this.assignNewActiveController()
       }

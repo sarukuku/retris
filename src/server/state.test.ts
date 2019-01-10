@@ -227,9 +227,30 @@ describe("onControllerStart", () => {
 
     await state.onControllerStart(controller)
 
-    expect(displays.stateUpdates[1]).toEqual({
-      activeView: views.DISPLAY_GAME_OVER,
-    })
+    expect(displays.stateUpdates[1]).toEqual(
+      expect.objectContaining({
+        activeView: views.DISPLAY_GAME_OVER,
+      }),
+    )
+  })
+
+  test("set displays isForcedGameOver to false", async () => {
+    const displays = new TestDisplays()
+    const game = new TestGame()
+    const isForcedGameOver = false
+    game.start = async () => isForcedGameOver
+    const createGame = () => game
+    const state = createTestState({ displays, createGame })
+    const controller = new TestController()
+    state.setActiveContoller(controller)
+
+    await state.onControllerStart(controller)
+
+    expect(displays.stateUpdates[1]).toEqual(
+      expect.objectContaining({
+        isForcedGameOver,
+      }),
+    )
   })
 
   test(`set displays view to ${
@@ -347,9 +368,29 @@ describe("onControllerDisconnect", () => {
 
       await state.onControllerDisconnect(activeController)
 
-      expect(displays.stateUpdates[0]).toEqual({
-        activeView: views.DISPLAY_GAME_OVER,
-      })
+      expect(displays.stateUpdates[0]).toEqual(
+        expect.objectContaining({
+          activeView: views.DISPLAY_GAME_OVER,
+        }),
+      )
+    })
+
+    test("set displays isForcedGameOver to true", async () => {
+      const activeController = new TestController()
+      const controller = new TestController()
+      const displays = new TestDisplays()
+      const state = createTestState({ displays })
+      state.setGame(new TestGame())
+      state.setActiveContoller(activeController)
+      state.setControllerQueue([controller])
+
+      await state.onControllerDisconnect(activeController)
+
+      expect(displays.stateUpdates[0]).toEqual(
+        expect.objectContaining({
+          isForcedGameOver: true,
+        }),
+      )
     })
 
     test(`set displays activeView to ${
