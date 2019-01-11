@@ -96,6 +96,17 @@ describe("onControllerJoin", () => {
       ])
     })
 
+    test("refuse to re-enter the queue", () => {
+      const state = createTestState()
+      const controller = new TestController()
+
+      state.onControllerJoin(controller)
+      state.onControllerJoin(controller)
+
+      expect(state.getActiveController()).toBe(controller)
+      expect(state.getControllerQueue()).toEqual([])
+    })
+
     test(`set displays view to ${views.DISPLAY_WAITING_TO_START}`, () => {
       const displays = new TestDisplays()
       const state = createTestState({ displays })
@@ -132,6 +143,18 @@ describe("onControllerJoin", () => {
       expect(controller.stateUpdates).toEqual([
         expect.objectContaining({ activeView: views.CONTROLLER_IN_QUEUE }),
       ])
+    })
+
+    test("refuse to re-enter the queue", () => {
+      const state = createTestState()
+      const activeController = new TestController()
+      const controller = new TestController()
+      state.setActiveContoller(activeController)
+
+      state.onControllerJoin(controller)
+      state.onControllerJoin(controller)
+
+      expect(state.getControllerQueue()).toEqual([controller])
     })
 
     test("set displays queueLength to 1", () => {

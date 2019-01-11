@@ -96,6 +96,10 @@ export class State {
       this.activeController.updateState({ activeView: views.CONTROLLER_START })
       this.displays.updateState({ activeView: views.DISPLAY_WAITING_TO_START })
     } else {
+      if (this.hasControllerAlreadyJoined(controller)) {
+        return
+      }
+
       this.controllerQueue.push(controller)
       controller.updateState({
         activeView: views.CONTROLLER_IN_QUEUE,
@@ -105,9 +109,15 @@ export class State {
     }
   }
 
+  private hasControllerAlreadyJoined(controller: Controller) {
+    return (
+      this.activeController === controller ||
+      this.controllerQueue.includes(controller)
+    )
+  }
+
   async onControllerStart(controller: Controller) {
     if (this.game) {
-      console.info("Game already launched.") // tslint:disable-line
       return
     }
 
