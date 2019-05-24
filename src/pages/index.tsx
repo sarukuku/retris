@@ -1,5 +1,6 @@
 import React, { Component } from "react"
 import { Subject } from "rxjs"
+import { map, filter } from "rxjs/operators"
 import io from "socket.io-client"
 import { commands } from "../commands"
 import { AnalyticsProps, pageWithAnalytics } from "../components/with-analytics"
@@ -7,7 +8,11 @@ import {
   pageWithAutoUnsubscribe,
   AutoUnsubscribeProps,
 } from "../components/with-auto-unsubscribe"
-import { pageWithSocket, SocketProps } from "../components/with-socket"
+import {
+  pageWithSocket,
+  SocketProps,
+  SocketPayload,
+} from "../components/with-socket"
 import { ControllerState } from "../server/state"
 import { views } from "../views"
 import { GameController } from "../views/controller/game-controller"
@@ -43,16 +48,17 @@ export class _Controller extends Component<ControllerProps, ControllerState> {
 
   componentDidMount() {
     const { socket, unsubscribeOnUnmount } = this.props
+
+    const statePayloads = socket.pipe(
+      filter<SocketPayload>(({ event }) => event === "state"),
+      map<SocketPayload, ControllerState>(({ payload }) => payload),
+    )
+
     unsubscribeOnUnmount(
       this.actionCommand.subscribe((action: string) =>
         socket.next({ event: commands.ACTION, payload: action }),
       ),
-      socket.subscribe(({ event, payload }) => {
-        switch (event) {
-          case "state":
-            this.setState(payload)
-        }
-      }),
+      statePayloads.subscribe(state => this.setState(state)),
     )
   }
 
