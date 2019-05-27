@@ -4,19 +4,16 @@ import React, { Fragment } from "react"
 import { colors } from "../../styles/colors"
 
 interface FullscreenButtonProps {
-  isFullScreen: boolean
   onClick: () => void
 }
 
 const FullscreenButton: React.SFC<FullscreenButtonProps> = ({
-  isFullScreen,
+  children,
   onClick,
 }) => (
   <Fragment>
     <button onClick={onClick} className="fullscreen-button">
-      <span className="text">
-        {isFullScreen ? "Exit fullscreen" : "Go fullscreen"}
-      </span>
+      <span className="text">{children}</span>
     </button>
     <style jsx>{`
       .fullscreen-button {
@@ -68,6 +65,8 @@ export class FullscreenBar extends React.Component<{}, FullscreenBarState> {
   render() {
     const { isFullscreen } = this.state
 
+    const buttonText = isFullscreen ? "Exit fullscreen" : "Go fullscreen"
+
     return (
       <Fragment>
         <div
@@ -76,10 +75,9 @@ export class FullscreenBar extends React.Component<{}, FullscreenBarState> {
           })}
         >
           <div className="button-wrapper">
-            <FullscreenButton
-              onClick={this.handleClick}
-              isFullScreen={isFullscreen}
-            />
+            <FullscreenButton onClick={this.handleClick}>
+              {buttonText}
+            </FullscreenButton>
           </div>
         </div>
         <style jsx>{`
