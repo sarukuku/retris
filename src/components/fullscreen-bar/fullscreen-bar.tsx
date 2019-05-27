@@ -2,6 +2,7 @@ import classNames from "classnames"
 import fscreen from "fscreen"
 import React, { Fragment } from "react"
 import { colors } from "../../styles/colors"
+import { TranslateProps, withTranslate } from "../with-translate"
 
 interface FullscreenButtonProps {
   onClick: () => void
@@ -32,9 +33,14 @@ interface FullscreenBarState {
   isFullscreen: boolean
 }
 
+type FullscreenBarProps = TranslateProps
+
 const isInFullscreen = () => !!fscreen.fullscreenElement
 
-export class FullscreenBar extends React.Component<{}, FullscreenBarState> {
+class _FullscreenBar extends React.Component<
+  FullscreenBarProps,
+  FullscreenBarState
+> {
   state: FullscreenBarState = {
     isFullscreen: false,
   }
@@ -63,9 +69,12 @@ export class FullscreenBar extends React.Component<{}, FullscreenBarState> {
   }
 
   render() {
+    const { translate } = this.props
     const { isFullscreen } = this.state
 
-    const buttonText = isFullscreen ? "Exit fullscreen" : "Go fullscreen"
+    const buttonText = isFullscreen
+      ? translate("display.controls.exit-fullscreen")
+      : translate("display.controls.go-fullscreen")
 
     return (
       <Fragment>
@@ -107,3 +116,5 @@ export class FullscreenBar extends React.Component<{}, FullscreenBarState> {
     )
   }
 }
+
+export const FullscreenBar = withTranslate(_FullscreenBar)
