@@ -9,4 +9,5 @@ export const config = {
     spreadsheetID: process.env.TRANSLATION_SPREADSHEET_ID,
     sheetName: process.env.TRANSLATION_SHEET_NAME,
   },
+  forceHttps: process.env.FORCE_HTTPS === "true",
 }

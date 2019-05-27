@@ -9,6 +9,7 @@ import { defaultTranslations } from "./i18n/default-translations"
 import { createLoadTranslationsFromSheets } from "./i18n/load-translations-from-sheets"
 import { createNextApp } from "./next"
 import { asyncMiddleware } from "./server/express-async-middleware"
+import { httpsRedirectMiddleware } from "./server/https-redirect-middleware"
 import { createSocketIOServer } from "./server/socketio"
 import {
   SocketIOControllers,
@@ -25,6 +26,10 @@ async function main() {
   )
 
   const app = express()
+  if (config.forceHttps) {
+    app.use(httpsRedirectMiddleware)
+  }
+
   app.get(
     "/api/translations",
     asyncMiddleware(async (_req, res) => {
