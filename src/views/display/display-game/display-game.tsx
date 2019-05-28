@@ -1,4 +1,5 @@
 import React, { Fragment, SFC } from "react"
+import { ScoreEffects } from "../../../components/score-effects"
 import { Tetris } from "../../../components/tetris"
 import {
   TranslateProps,
@@ -7,6 +8,7 @@ import {
 import { TetrisMatrix } from "../../../games/tetris/shape"
 import { formatSeconds } from "../../../helpers"
 import { colors } from "../../../styles/colors"
+import { zIndices } from "../../../styles/z-indices"
 import { HUDItem } from "./hud-item"
 
 interface DisplayGameProps extends TranslateProps {
@@ -35,7 +37,9 @@ export const _DisplayGame: SFC<DisplayGameProps> = ({
           />
         </div>
         <div className="display-game__tetris">
-          <Tetris board={board} />
+          <ScoreEffects score={score}>
+            <Tetris board={board} />
+          </ScoreEffects>
         </div>
       </div>
       <style jsx>{`
@@ -52,6 +56,7 @@ export const _DisplayGame: SFC<DisplayGameProps> = ({
           flex-direction: row;
           align-items: center;
           color: ${colors.WHITE};
+          z-index: ${zIndices.HUD};
           background: linear-gradient(
             to bottom,
             rgba(0, 0, 0, 1) 0%,
@@ -60,6 +65,7 @@ export const _DisplayGame: SFC<DisplayGameProps> = ({
         }
 
         .display-game__tetris {
+          z-index: ${zIndices.GAME};
           text-align: center;
           height: 100%;
         }
