@@ -6,9 +6,10 @@
 2. Set the Environment variables based on `.env.example`
 3. Run `yarn`
 4. Run `yarn dev`
-5. ????
-6. Create a PR
-7. Profit
+5. Open the controller and display in your browser at `http://localhost:3000` and `http://localhost:3000/display`
+6. ????
+7. Create a PR
+8. Profit
 
 ## How to deploy?
 
