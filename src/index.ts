@@ -27,6 +27,7 @@ async function main() {
 
   const app = express()
   if (config.forceHttps) {
+    app.enable("trust proxy")
     app.use(httpsRedirectMiddleware)
   }
 
