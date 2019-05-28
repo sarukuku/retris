@@ -1,4 +1,6 @@
 export const zIndices = {
-  FULLSCREEN_BAR: 2,
+  HUD: 20,
+  FULLSCREEN_BAR: 10,
+  GAME: 1,
   BACKGROUND: -10,
 }
