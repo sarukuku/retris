@@ -1,3 +1,5 @@
+import dotenv from "dotenv"
+dotenv.config()
 import { clientConfig } from "./client-config"
 
 export const config = {

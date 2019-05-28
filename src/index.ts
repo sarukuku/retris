@@ -1,4 +1,3 @@
-import dotenv from "dotenv"
 import express, { ErrorRequestHandler } from "express"
 import { createServer } from "http"
 import pino from "pino"
@@ -16,7 +15,6 @@ import {
   SocketIODisplays,
 } from "./server/socketio-adapters"
 import { State } from "./server/state"
-dotenv.config()
 
 async function main() {
   const logger = pino()
