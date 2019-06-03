@@ -50,6 +50,12 @@ const _WaitingToStart: SFC<TranslateProps> = ({ translate }) => (
         display: block;
         opacity: 0.5;
       }
+
+      @media (min-aspect-ratio: 16/11) {
+        .logo {
+          width: 15%;
+        }
+      }
     `}</style>
   </Fragment>
 )

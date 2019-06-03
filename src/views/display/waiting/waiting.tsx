@@ -76,6 +76,10 @@ const _Waiting: SFC<WaitingProps> = ({ translate, address }) => (
         .address {
           margin-bottom: 2em;
         }
+
+        .logo {
+          width: 15%;
+        }
       }
     `}</style>
   </Fragment>

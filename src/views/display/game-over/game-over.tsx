@@ -65,6 +65,10 @@ const _GameOver: SFC<GameOverProps> = ({ score, translate }) => (
         h1 {
           margin-top: 0;
         }
+
+        .logo {
+          width: 15%;
+        }
       }
     `}</style>
   </Fragment>
