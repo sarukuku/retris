@@ -30,6 +30,7 @@ const _GameOver: SFC<GameOverProps> = ({ score, translate }) => (
         align-items: center;
         justify-content: center;
         color: ${colors.WHITE};
+        text-align: center;
       }
 
       h1 {
