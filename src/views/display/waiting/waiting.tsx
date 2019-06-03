@@ -59,6 +59,24 @@ const _Waiting: SFC<WaitingProps> = ({ translate, address }) => (
         text-transform: uppercase;
         margin-bottom: 0.5rem;
       }
+
+      @media (min-aspect-ratio: 16/11) {
+        .waiting {
+          justify-content: space-between;
+        }
+
+        h1,
+        p,
+        h2 {
+          line-height: 1;
+          margin-top: 0;
+          margin-bottom: 0;
+        }
+
+        .address {
+          margin-bottom: 2em;
+        }
+      }
     `}</style>
   </Fragment>
 )
