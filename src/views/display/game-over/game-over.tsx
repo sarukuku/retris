@@ -17,7 +17,7 @@ const _GameOver: SFC<GameOverProps> = ({ score, translate }) => (
       <h1>{translate("display.game-over.your-score")}</h1>
       <p className="score">{formatScore(score)}</p>
       <p>{translate("display.game-over.about-us")}</p>
-      <p>{translate("display.game-over.website")}</p>
+      <p className="website">{translate("display.game-over.website")}</p>
       <div className="logo">
         <ReaktorLogo />
       </div>
@@ -55,6 +55,16 @@ const _GameOver: SFC<GameOverProps> = ({ score, translate }) => (
         text-transform: uppercase;
         margin: 0 2rem 2rem 2rem;
         font-weight: 600;
+      }
+
+      .website {
+        margin-bottom: 3em;
+      }
+
+      @media (min-aspect-ratio: 16/11) {
+        h1 {
+          margin-top: 0;
+        }
       }
     `}</style>
   </Fragment>
