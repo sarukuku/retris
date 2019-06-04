@@ -4,6 +4,7 @@ import { Subject } from "rxjs"
 import io from "socket.io-client"
 import { AttractionLoop } from "../components/attraction-loop"
 import { BlurredOverlay } from "../components/blurred-overlay"
+import { FullscreenBar } from "../components/fullscreen-bar"
 import { AnalyticsProps, pageWithAnalytics } from "../components/with-analytics"
 import {
   AutoUnsubscribeProps,
@@ -15,6 +16,7 @@ import {
   SocketProps,
 } from "../components/with-socket"
 import { DisplayState } from "../server/state"
+import { zIndices } from "../styles/z-indices"
 import { views } from "../views"
 import { DisplayGame } from "../views/display/display-game"
 import { GameOver } from "../views/display/game-over"
@@ -100,10 +102,22 @@ export class _Display extends Component<DisplayProps, DisplayState> {
     this.sendPageView()
     return (
       <Fragment>
-        <div className="display">{this.renderView()}</div>
+        <div className="display">
+          <div className="fullscreen-bar">
+            <FullscreenBar />
+          </div>
+          {this.renderView()}
+        </div>
         <style jsx>{`
           .display {
             height: 100vh;
+            position: relative;
+          }
+
+          .fullscreen-bar {
+            z-index: ${zIndices.FULLSCREEN_BAR};
+            position: absolute;
+            width: 100%;
           }
         `}</style>
       </Fragment>

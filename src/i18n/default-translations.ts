@@ -14,6 +14,8 @@ export const defaultTranslations = {
   "display.game-over.your-score": "your score",
   "display.game-over.about-us": "We solve the most complex puzzles.",
   "display.game-over.website": "reaktor.com",
+  "display.controls.go-fullscreen": "Go fullscreen",
+  "display.controls.exit-fullscreen": "Exit fullscreen",
   "controller.start-game.heading": "You're up! 🙋‍♀️",
   "controller.start-game.swipe-instruction": "Swipe to move them",
   "controller.start-game.tap-instruction": "Tap to rotate them",
