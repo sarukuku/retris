@@ -1,4 +1,3 @@
-import dotenv from "dotenv"
 import express, { ErrorRequestHandler } from "express"
 import { createServer } from "http"
 import pino from "pino"
@@ -9,13 +8,13 @@ import { defaultTranslations } from "./i18n/default-translations"
 import { createLoadTranslationsFromSheets } from "./i18n/load-translations-from-sheets"
 import { createNextApp } from "./next"
 import { asyncMiddleware } from "./server/express-async-middleware"
+import { httpsRedirectMiddleware } from "./server/https-redirect-middleware"
 import { createSocketIOServer } from "./server/socketio"
 import {
   SocketIOControllers,
   SocketIODisplays,
 } from "./server/socketio-adapters"
 import { State } from "./server/state"
-dotenv.config()
 
 async function main() {
   const logger = pino()
@@ -25,6 +24,11 @@ async function main() {
   )
 
   const app = express()
+  if (config.forceHttps) {
+    app.enable("trust proxy")
+    app.use(httpsRedirectMiddleware)
+  }
+
   app.get(
     "/api/translations",
     asyncMiddleware(async (_req, res) => {
