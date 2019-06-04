@@ -64,7 +64,7 @@
     "start": "NODE_ENV=production node dist/index.js -p $PORT",
     "dev": "nodemon",
     "pretty": "npx onchange 'src/**/*.{ts,tsx}' -- prettier --write {{changed}}",
-    "test": "jest --verbose",
+    "test": "jest --maxWorkers=2",
     "storybook": "STATIC_PATH=\"\" start-storybook --quiet -p 3001 -s ./src/static",
     "sb": "yarn storybook",
     "build-storybook": "build-storybook"
