@@ -46,10 +46,17 @@ export function withSocket<Props>(
     componentDidMount() {
       this.socket = createSocket()
       this.socket.on("connect", () => {
-        this.setupCommFromServer()
-        this.setupCommToServer()
         this.setState({ didSocketConnect: true })
       })
+
+      // Register event handlers outside the `connect` handler so that
+      // they aren't re-registered on reconnection! For example, if the user
+      // is connected and they lock their screen, the OS's power management
+      // systems will probably start throttling/deferring network requests,
+      // causing reconnections *without* causing an unmount.
+      // https://socket.io/docs/client-api/#Event-%E2%80%98connect%E2%80%99
+      this.setupCommFromServer()
+      this.setupCommToServer()
     }
 
     private setupCommFromServer() {
