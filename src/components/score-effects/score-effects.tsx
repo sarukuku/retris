@@ -2,14 +2,8 @@ import React, { Fragment } from "react"
 import { colors } from "../../styles/colors"
 
 const screenShakeKeyframes = [
-  {
-    filter: "saturate(300%) blur(4px) contrast(80%) brightness(250%)",
-    transform: "scale(1.05)",
-  },
-  {
-    filter: "none",
-    transform: "none",
-  },
+  { transform: "scale(1.05)" },
+  { transform: "none" },
 ] as Keyframe[]
 
 const scoreGainKeyframes = [
