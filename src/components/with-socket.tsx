@@ -1,6 +1,5 @@
 import React, { ComponentType } from "react"
 import { ReplaySubject } from "rxjs"
-import { commands } from "../commands"
 import { retainGetInitialProps } from "./retain-get-initial-props"
 import {
   AutoUnsubscribeProps,
@@ -62,9 +61,6 @@ export function withSocket<Props>(
     private setupCommFromServer() {
       this.socket.on("state", payload => {
         this.socketSubject.next({ event: "state", payload })
-      })
-      this.socket.on(commands.ACTION, payload => {
-        this.socketSubject.next({ event: commands.ACTION, payload })
       })
     }
 

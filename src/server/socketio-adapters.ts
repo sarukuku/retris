@@ -1,5 +1,4 @@
 import { Namespace, Socket } from "socket.io"
-import { commands } from "../commands"
 import {
   Controller,
   Controllers,
@@ -26,10 +25,6 @@ export class SocketIODisplays implements Displays {
     const currentState = this.getState()
     this.state = { ...currentState, ...state }
     this.namespace.emit("state", state)
-  }
-
-  sendAction(action: string): void {
-    this.namespace.emit(commands.ACTION, action)
   }
 
   getState(): DisplayState | undefined {
