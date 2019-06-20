@@ -1,6 +1,7 @@
 import { NextContext } from "next"
 import React, { Component, Fragment } from "react"
 import { Subject } from "rxjs"
+import { filter, map } from "rxjs/operators"
 import io from "socket.io-client"
 import { AttractionLoop } from "../components/attraction-loop"
 import { BlurredOverlay } from "../components/blurred-overlay"
@@ -46,30 +47,27 @@ export class _Display extends Component<DisplayProps, DisplayState> {
   componentDidMount() {
     const { socket, unsubscribeOnUnmount } = this.props
 
+    const statePayloads = socket.pipe(
+      filter<SocketPayload>(({ event }) => event === "state"),
+      map<SocketPayload, DisplayState>(({ payload }) => payload),
+    )
+
     unsubscribeOnUnmount(
-      socket.subscribe(this.onSocket),
+      statePayloads.subscribe(this.onSocket),
       this.gameOver.subscribe(this.onGameOver),
     )
   }
 
-  private onSocket = ({ event, payload }: SocketPayload) => {
-    switch (event) {
-      case "state":
-        const { activeView } = payload
-        this.previousActiveView = this.state.activeView
+  private onSocket = (payload: any) => {
+    const { activeView } = payload
+    this.previousActiveView = this.state.activeView
 
-        this.setState(payload)
+    this.setState(payload)
 
-        if (activeView === views.DISPLAY_GAME_OVER) {
-          if (
-            this.previousActiveView &&
-            this.previousActiveView !== activeView
-          ) {
-            this.gameOver.next()
-          }
-        }
-
-        break
+    if (activeView === views.DISPLAY_GAME_OVER) {
+      if (this.previousActiveView && this.previousActiveView !== activeView) {
+        this.gameOver.next()
+      }
     }
   }
 
