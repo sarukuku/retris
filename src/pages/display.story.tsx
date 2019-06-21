@@ -1,7 +1,7 @@
 import { storiesOf } from "@storybook/react"
 import React from "react"
 import { ReplaySubject } from "rxjs"
-import { Analytics } from "../analytics"
+import { DummyAnalytics } from "../analytics/dummy-analytics"
 import { TranslationContext } from "../components/contexts"
 import { withAutoUnsubscribe } from "../components/with-auto-unsubscribe"
 import { SocketPayload } from "../components/with-socket"
@@ -10,10 +10,7 @@ import { createTranslate } from "../i18n/translate"
 import { views } from "../views"
 import { _Display } from "./display"
 
-const analyticsStub: Analytics = {
-  sendCustomEvent: () => undefined,
-  sendPageView: () => undefined,
-}
+const analyticsStub = new DummyAnalytics()
 
 const socket = new ReplaySubject<SocketPayload>()
 
