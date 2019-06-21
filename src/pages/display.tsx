@@ -1,7 +1,8 @@
 import { NextContext } from "next"
+import { complement, isNil } from "ramda"
 import React, { Component, Fragment } from "react"
 import { Subject } from "rxjs"
-import { filter, map } from "rxjs/operators"
+import { filter, map, distinctUntilChanged } from "rxjs/operators"
 import io from "socket.io-client"
 import { AttractionLoop } from "../components/attraction-loop"
 import { BlurredOverlay } from "../components/blurred-overlay"
@@ -23,6 +24,8 @@ import { DisplayGame } from "../views/display/display-game"
 import { GameOver } from "../views/display/game-over"
 import { Waiting } from "../views/display/waiting"
 import { WaitingToStart } from "../views/display/waiting-to-start"
+
+const isNotNil = complement(isNil)
 
 interface DisplayProps
   extends AnalyticsProps,
@@ -52,10 +55,21 @@ export class _Display extends Component<DisplayProps, DisplayState> {
       map<SocketPayload, DisplayState>(({ payload }) => payload),
     )
 
+    const activeViewChanges = statePayloads.pipe(
+      map<DisplayState, string | undefined>(payload => payload.activeView),
+      filter<string>(isNotNil),
+      distinctUntilChanged(),
+    )
+
     unsubscribeOnUnmount(
       statePayloads.subscribe(this.onSocket),
+      activeViewChanges.subscribe(this.onSendActiveViewAnalytics),
       this.gameOver.subscribe(this.onGameOver),
     )
+  }
+
+  private onSendActiveViewAnalytics = (activeView: string) => {
+    this.props.analytics.sendPageView(activeView)
   }
 
   private onSocket = (payload: any) => {
@@ -97,7 +111,6 @@ export class _Display extends Component<DisplayProps, DisplayState> {
   }
 
   render() {
-    this.sendPageView()
     return (
       <Fragment>
         <div className="display">
@@ -120,18 +133,6 @@ export class _Display extends Component<DisplayProps, DisplayState> {
         `}</style>
       </Fragment>
     )
-  }
-
-  private sendPageView() {
-    const { activeView } = this.state
-    if (activeView === this.previousActiveView) {
-      return
-    }
-
-    const { analytics } = this.props
-    if (activeView) {
-      analytics.sendPageView(activeView)
-    }
   }
 
   private renderView() {

@@ -1,6 +1,12 @@
+import { complement, isNil } from "ramda"
 import React, { Component } from "react"
 import { Subject } from "rxjs"
-import { map, filter, distinctUntilKeyChanged } from "rxjs/operators"
+import {
+  map,
+  filter,
+  distinctUntilChanged,
+  distinctUntilKeyChanged,
+} from "rxjs/operators"
 import io from "socket.io-client"
 import { commands } from "../commands"
 import { AnalyticsProps, pageWithAnalytics } from "../components/with-analytics"
@@ -36,13 +42,14 @@ function vibrateTurnStart() {
   return vibrate([150, 1, 500])
 }
 
+const isNotNil = complement(isNil)
+
 interface ControllerProps
   extends AnalyticsProps,
     SocketProps,
     AutoUnsubscribeProps {}
 
 export class _Controller extends Component<ControllerProps, ControllerState> {
-  private previousActiveView?: string
   private actionCommand = new Subject<string>()
 
   state: ControllerState = {}
@@ -68,6 +75,12 @@ export class _Controller extends Component<ControllerProps, ControllerState> {
       map<SocketPayload, ControllerState>(({ payload }) => payload),
     )
 
+    const activeViewChanges = statePayloads.pipe(
+      map<ControllerState, string | undefined>(payload => payload.activeView),
+      filter<string>(isNotNil),
+      distinctUntilChanged(),
+    )
+
     const vibrateTriggers = statePayloads.pipe(
       // vibrate when active view changes to the start screen
       distinctUntilKeyChanged("activeView"),
@@ -80,27 +93,16 @@ export class _Controller extends Component<ControllerProps, ControllerState> {
       ),
       statePayloads.subscribe(state => this.setState(state)),
       vibrateTriggers.subscribe(() => vibrateTurnStart()),
+      activeViewChanges.subscribe(this.onSendActiveViewAnalytics),
     )
   }
 
   render() {
-    this.sendPageView()
     return this.renderView()
   }
 
-  private sendPageView() {
-    const { activeView } = this.state
-    if (!activeView) {
-      return
-    }
-
-    if (activeView === this.previousActiveView) {
-      return
-    }
-    this.previousActiveView = activeView
-
-    const { analytics } = this.props
-    analytics.sendPageView(activeView)
+  private onSendActiveViewAnalytics = (activeView: string) => {
+    this.props.analytics.sendPageView(activeView)
   }
 
   private renderView() {
