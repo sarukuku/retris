@@ -1,7 +1,6 @@
 import { NextContext } from "next"
 import { complement, isNil } from "ramda"
 import React, { Component, Fragment } from "react"
-import { Subject } from "rxjs"
 import { filter, map, distinctUntilChanged } from "rxjs/operators"
 import io from "socket.io-client"
 import { AttractionLoop } from "../components/attraction-loop"
@@ -35,9 +34,6 @@ interface DisplayProps
 }
 
 export class _Display extends Component<DisplayProps, DisplayState> {
-  private previousActiveView?: string
-  private gameOver = new Subject<void>()
-
   state: DisplayState = {}
 
   static async getInitialProps(ctx: NextContext) {
@@ -61,10 +57,14 @@ export class _Display extends Component<DisplayProps, DisplayState> {
       distinctUntilChanged(),
     )
 
+    const gameOverAnalyticsTriggers = activeViewChanges.pipe(
+      filter(view => view === views.DISPLAY_GAME_OVER),
+    )
+
     unsubscribeOnUnmount(
       statePayloads.subscribe(this.onSocket),
       activeViewChanges.subscribe(this.onSendActiveViewAnalytics),
-      this.gameOver.subscribe(this.onGameOver),
+      gameOverAnalyticsTriggers.subscribe(this.onGameOver),
     )
   }
 
@@ -73,16 +73,7 @@ export class _Display extends Component<DisplayProps, DisplayState> {
   }
 
   private onSocket = (payload: any) => {
-    const { activeView } = payload
-    this.previousActiveView = this.state.activeView
-
     this.setState(payload)
-
-    if (activeView === views.DISPLAY_GAME_OVER) {
-      if (this.previousActiveView && this.previousActiveView !== activeView) {
-        this.gameOver.next()
-      }
-    }
   }
 
   private onGameOver = () => {
