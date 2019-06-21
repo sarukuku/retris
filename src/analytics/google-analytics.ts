@@ -1,31 +1,26 @@
 import ReactGA from "react-ga"
-import { isBrowser } from "../helpers"
-import { Analytics, EventArgs } from "./analytics"
+import { Analytics, EventArgs } from "./types"
 
-interface Args {
+export interface AnalyticsArgs {
   trackingCode: string
   debugMode: boolean
 }
 
 export class GoogleAnalytics implements Analytics {
-  constructor({ trackingCode, debugMode }: Args) {
+  constructor({ trackingCode, debugMode }: AnalyticsArgs) {
     ReactGA.initialize(trackingCode, { debug: debugMode })
   }
 
   sendPageView(pageURL: string): void {
-    if (isBrowser()) {
-      ReactGA.pageview(pageURL)
-    }
+    ReactGA.pageview(pageURL)
   }
 
   sendCustomEvent({ action, category, label, value }: EventArgs): void {
-    if (isBrowser()) {
-      ReactGA.event({
-        action,
-        category,
-        label,
-        value,
-      })
-    }
+    ReactGA.event({
+      action,
+      category,
+      label,
+      value,
+    })
   }
 }
