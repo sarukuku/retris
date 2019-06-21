@@ -8,42 +8,24 @@ interface Args {
 }
 
 export class GoogleAnalytics implements Analytics {
-  private isInited = false
-  private trackingCode: string
-  private debugMode: boolean
-
   constructor({ trackingCode, debugMode }: Args) {
-    this.trackingCode = trackingCode
-    this.debugMode = debugMode
+    ReactGA.initialize(trackingCode, { debug: debugMode })
   }
 
   sendPageView(pageURL: string): void {
-    this.withInitializedTracker(() => {
+    if (isBrowser()) {
       ReactGA.pageview(pageURL)
-    })
+    }
   }
 
   sendCustomEvent({ action, category, label, value }: EventArgs): void {
-    this.withInitializedTracker(() => {
+    if (isBrowser()) {
       ReactGA.event({
         action,
         category,
         label,
         value,
       })
-    })
-  }
-
-  private withInitializedTracker(fn: () => void) {
-    if (this.isInited) {
-      return fn()
     }
-
-    if (!isBrowser()) {
-      return
-    }
-
-    ReactGA.initialize(this.trackingCode, { debug: this.debugMode })
-    this.isInited = true
   }
 }
