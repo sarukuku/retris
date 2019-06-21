@@ -1,12 +1,7 @@
 import { complement, isNil } from "ramda"
 import React, { Component } from "react"
 import { Subject } from "rxjs"
-import {
-  map,
-  filter,
-  distinctUntilChanged,
-  distinctUntilKeyChanged,
-} from "rxjs/operators"
+import { map, filter, distinctUntilChanged } from "rxjs/operators"
 import io from "socket.io-client"
 import { commands } from "../commands"
 import { AnalyticsProps, pageWithAnalytics } from "../components/with-analytics"
@@ -81,10 +76,9 @@ export class _Controller extends Component<ControllerProps, ControllerState> {
       distinctUntilChanged(),
     )
 
-    const vibrateTriggers = statePayloads.pipe(
+    const vibrateTriggers = activeViewChanges.pipe(
       // vibrate when active view changes to the start screen
-      distinctUntilKeyChanged("activeView"),
-      filter(state => state.activeView === views.CONTROLLER_START),
+      filter(activeView => activeView === views.CONTROLLER_START),
     )
 
     unsubscribeOnUnmount(
