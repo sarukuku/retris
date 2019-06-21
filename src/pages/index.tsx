@@ -97,15 +97,11 @@ export class _Controller extends Component<ControllerProps, ControllerState> {
     )
   }
 
-  render() {
-    return this.renderView()
-  }
-
   private onSendActiveViewAnalytics = (activeView: string) => {
     this.props.analytics.sendPageView(activeView)
   }
 
-  private renderView() {
+  render() {
     const { activeView, positionInQueue = 0, score = 0 } = this.state
 
     switch (activeView) {
