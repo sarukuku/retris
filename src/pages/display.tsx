@@ -1,6 +1,7 @@
 import { NextContext } from "next"
+import { complement, isNil } from "ramda"
 import React, { Component, Fragment } from "react"
-import { Subject } from "rxjs"
+import { filter, map, distinctUntilChanged } from "rxjs/operators"
 import io from "socket.io-client"
 import { AttractionLoop } from "../components/attraction-loop"
 import { BlurredOverlay } from "../components/blurred-overlay"
@@ -23,6 +24,8 @@ import { GameOver } from "../views/display/game-over"
 import { Waiting } from "../views/display/waiting"
 import { WaitingToStart } from "../views/display/waiting-to-start"
 
+const isNotNil = complement(isNil)
+
 interface DisplayProps
   extends AnalyticsProps,
     SocketProps,
@@ -31,9 +34,6 @@ interface DisplayProps
 }
 
 export class _Display extends Component<DisplayProps, DisplayState> {
-  private previousActiveView?: string
-  private gameOver = new Subject<void>()
-
   state: DisplayState = {}
 
   static async getInitialProps(ctx: NextContext) {
@@ -46,31 +46,34 @@ export class _Display extends Component<DisplayProps, DisplayState> {
   componentDidMount() {
     const { socket, unsubscribeOnUnmount } = this.props
 
+    const statePayloads = socket.pipe(
+      filter<SocketPayload>(({ event }) => event === "state"),
+      map<SocketPayload, DisplayState>(({ payload }) => payload),
+    )
+
+    const activeViewChanges = statePayloads.pipe(
+      map<DisplayState, string | undefined>(payload => payload.activeView),
+      filter<string>(isNotNil),
+      distinctUntilChanged(),
+    )
+
+    const gameOverAnalyticsTriggers = activeViewChanges.pipe(
+      filter(view => view === views.DISPLAY_GAME_OVER),
+    )
+
     unsubscribeOnUnmount(
-      socket.subscribe(this.onSocket),
-      this.gameOver.subscribe(this.onGameOver),
+      statePayloads.subscribe(this.onSocket),
+      activeViewChanges.subscribe(this.onSendActiveViewAnalytics),
+      gameOverAnalyticsTriggers.subscribe(this.onGameOver),
     )
   }
 
-  private onSocket = ({ event, payload }: SocketPayload) => {
-    switch (event) {
-      case "state":
-        const { activeView } = payload
-        this.previousActiveView = this.state.activeView
+  private onSendActiveViewAnalytics = (activeView: string) => {
+    this.props.analytics.sendPageView(activeView)
+  }
 
-        this.setState(payload)
-
-        if (activeView === views.DISPLAY_GAME_OVER) {
-          if (
-            this.previousActiveView &&
-            this.previousActiveView !== activeView
-          ) {
-            this.gameOver.next()
-          }
-        }
-
-        break
-    }
+  private onSocket = (payload: any) => {
+    this.setState(payload)
   }
 
   private onGameOver = () => {
@@ -99,7 +102,6 @@ export class _Display extends Component<DisplayProps, DisplayState> {
   }
 
   render() {
-    this.sendPageView()
     return (
       <Fragment>
         <div className="display">
@@ -122,18 +124,6 @@ export class _Display extends Component<DisplayProps, DisplayState> {
         `}</style>
       </Fragment>
     )
-  }
-
-  private sendPageView() {
-    const { activeView } = this.state
-    if (activeView === this.previousActiveView) {
-      return
-    }
-
-    const { analytics } = this.props
-    if (activeView) {
-      analytics.sendPageView(activeView)
-    }
   }
 
   private renderView() {

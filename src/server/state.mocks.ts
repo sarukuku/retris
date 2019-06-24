@@ -61,7 +61,6 @@ export class TestDisplays implements Displays {
   displays: Display[] = []
   state: DisplayState | undefined
   stateUpdates: DisplayState[] = []
-  sentActions: string[] = []
 
   add(display: Display): void {
     this.displays.push(display)
@@ -75,10 +74,6 @@ export class TestDisplays implements Displays {
     this.stateUpdates.push(state)
     const currentState = this.state || {}
     this.state = { ...currentState, ...state }
-  }
-
-  sendAction(action: string): void {
-    this.sentActions.push(action)
   }
 
   getState(): DisplayState | undefined {

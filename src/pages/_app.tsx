@@ -4,7 +4,7 @@ import App, { AppComponentContext, Container } from "next/app"
 import Head from "next/head"
 import "normalize.css/normalize.css"
 import React from "react"
-import { GoogleAnalytics } from "../analytics/google-analytics"
+import { createAnalytics } from "../analytics"
 import { ClientAPI } from "../client-api"
 import { clientConfig } from "../client-config"
 import { AnalyticsContext, TranslationContext } from "../components/contexts"
@@ -39,7 +39,7 @@ class Retris extends App<RetrisProps> {
 
   render() {
     const { Component, pageProps, translations } = this.props
-    const analytics = new GoogleAnalytics(clientConfig.googleAnalytics)
+    const analytics = createAnalytics(clientConfig.googleAnalytics)
 
     return (
       <BugsnagBoundary>
