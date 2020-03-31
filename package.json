@@ -38,7 +38,7 @@
     "fscreen": "1.0.2",
     "isomorphic-unfetch": "3.0.0",
     "jest": "23.6.0",
-    "next": "7.0.2",
+    "next": "9.3.2",
     "nock": "10.0.2",
     "nodemon": "1.18.7",
     "normalize.css": "8.0.0",
